@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation
+import CreateGame
 import Effect exposing (Effect)
 import Effect.History
 import Effect.LocalStorage
@@ -21,6 +22,7 @@ import Url exposing (Url)
 type Screen
     = BlankScreen
     | GameHistoryScreen GameHistory.Model
+    | CreateGameScreen CreateGame.Model
     | PlayGameScreen (ID { game : () }) PlayGame.Model
 
 
@@ -49,8 +51,8 @@ initScreen direction screen =
             )
 
         Router.Direct Router.ToCreateGame ->
-            ( screen
-            , Router.replace Router.ToGameHistory
+            ( CreateGameScreen CreateGame.initial
+            , Effect.none
             )
 
         Router.Direct (Router.ToPlayGame gameID) ->
@@ -86,6 +88,7 @@ type Msg
     | UrlChanged Url
     | LocalStorageMsg Effect.LocalStorage.Msg
     | GameHistoryMsg GameHistory.Msg
+    | CreateGameMsg CreateGame.Msg
     | PlayGameMsg PlayGame.Msg
 
 
@@ -122,10 +125,10 @@ update msg model =
                 Just ( nextLocalStorage, subMsg ) ->
                     update subMsg { model | localStorage = nextLocalStorage }
 
-        ( GameHistoryMsg gameListMsg, GameHistoryScreen gameHistory ) ->
+        ( GameHistoryMsg gameHistoryMsg, GameHistoryScreen gameHistory ) ->
             let
                 ( nextGameHistory, gameHistoryEffect ) =
-                    GameHistory.update gameListMsg gameHistory
+                    GameHistory.update gameHistoryMsg gameHistory
             in
             ( { model | screen = GameHistoryScreen nextGameHistory }
             , Effect.map GameHistoryMsg gameHistoryEffect
@@ -134,10 +137,22 @@ update msg model =
         ( GameHistoryMsg _, _ ) ->
             ( model, Effect.none )
 
-        ( PlayGameMsg gameMsg, PlayGameScreen gameID playGame ) ->
+        ( CreateGameMsg createGameMsg, CreateGameScreen createGame ) ->
+            let
+                ( nextCreateGame, createGameEffect ) =
+                    CreateGame.update createGameMsg createGame
+            in
+            ( { model | screen = CreateGameScreen nextCreateGame }
+            , Effect.map CreateGameMsg createGameEffect
+            )
+
+        ( CreateGameMsg _, _ ) ->
+            ( model, Effect.none )
+
+        ( PlayGameMsg playGameMsg, PlayGameScreen gameID playGame ) ->
             let
                 ( nextPlayGame, playGameEffect ) =
-                    PlayGame.update gameMsg playGame
+                    PlayGame.update playGameMsg playGame
             in
             ( { model | screen = PlayGameScreen gameID nextPlayGame }
             , Effect.map PlayGameMsg playGameEffect
@@ -160,6 +175,9 @@ subscriptions model =
                 Sub.none
 
             GameHistoryScreen _ ->
+                Sub.none
+
+            CreateGameScreen _ ->
                 Sub.none
 
             PlayGameScreen _ playGame ->
@@ -207,6 +225,9 @@ view model =
 
         GameHistoryScreen gameHistory ->
             Element.map GameHistoryMsg (GameHistory.view gameHistory)
+
+        CreateGameScreen createGame ->
+            Element.map CreateGameMsg (CreateGame.view createGame)
 
         PlayGameScreen _ playGame ->
             Element.map PlayGameMsg (PlayGame.view playGame)
