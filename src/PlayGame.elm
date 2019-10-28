@@ -1,6 +1,6 @@
 module PlayGame exposing (Model, Msg, init, subscriptions, update, view)
 
-import Cons exposing (Cons)
+import Cons
 import Dice
 import Effect exposing (Effect)
 import Element exposing (Element, column, el, none, row, text)
@@ -8,6 +8,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
+import Game exposing (Game)
 import ID exposing (ID)
 import Player exposing (Player)
 import Task
@@ -16,48 +17,6 @@ import Time
 
 
 -- M O D E L
-
-
-type alias Move =
-    { player : Player.Color
-    , dice : ( Dice.Number, Dice.Number, Dice.Event )
-    , endAt : Time.Posix
-    }
-
-
-type alias Game =
-    { players : Cons Player
-    , startAt : Time.Posix
-    , moves : List Move
-    }
-
-
-getCurrentHelp : Player.Color -> List Player -> Maybe Player
-getCurrentHelp latest players =
-    case players of
-        first :: second :: rest ->
-            if latest == first.color then
-                Just second
-
-            else
-                getCurrentHelp latest (second :: rest)
-
-        _ ->
-            Nothing
-
-
-getCurrent : Game -> Player.Color
-getCurrent game =
-    case List.head game.moves of
-        Nothing ->
-            Cons.head game.players
-                |> .color
-
-        Just latest ->
-            Cons.tail game.players
-                |> getCurrentHelp latest.player
-                |> Maybe.withDefault (Cons.head game.players)
-                |> .color
 
 
 type alias State =
@@ -195,7 +154,7 @@ viewPlayers : Game -> State -> Element Msg
 viewPlayers game state =
     let
         current =
-            getCurrent game
+            Game.getCurrentPlayer game
     in
     row
         [ Element.width Element.fill

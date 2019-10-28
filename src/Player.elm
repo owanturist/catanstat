@@ -1,4 +1,12 @@
-module Player exposing (Color(..), Player, decoder, encoder, paint)
+module Player exposing
+    ( Color(..)
+    , Player
+    , colorDecoder
+    , colorEncoder
+    , decoder
+    , encoder
+    , paint
+    )
 
 import Element
 import Json.Decode as Decode exposing (Decoder)
