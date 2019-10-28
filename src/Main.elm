@@ -2,8 +2,11 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation
+import Effect exposing (Effect)
+import Effect.History
 import Element exposing (row, text)
 import Element.Input exposing (button)
+import Middleware
 import Url exposing (Url)
 
 
@@ -12,14 +15,15 @@ import Url exposing (Url)
 
 
 type alias Model =
-    { count : Int
+    { navigation : Browser.Navigation.Key
+    , count : Int
     }
 
 
-init : () -> Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
-init _ _ _ =
-    ( Model 0
-    , Cmd.none
+init : () -> Url -> Browser.Navigation.Key -> ( Model, Effect Msg )
+init _ _ navigation =
+    ( Model navigation 0
+    , Effect.none
     )
 
 
@@ -34,7 +38,7 @@ type Msg
     | Inc
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     ( case msg of
         Dec ->
@@ -45,7 +49,7 @@ update msg model =
 
         _ ->
             model
-    , Cmd.none
+    , Effect.none
     )
 
 
@@ -56,6 +60,25 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
+
+
+
+-- M I D D L E W A R E S
+
+
+middlewares : Model -> Effect.Custom msg -> ( Model, Cmd msg )
+middlewares model effect =
+    case effect of
+        Effect.Cmd cmd ->
+            ( model, cmd )
+
+        Effect.History action ->
+            ( model
+            , Effect.History.middleware model.navigation action
+            )
+
+        Effect.Toast toast ->
+            ( model, Cmd.none )
 
 
 
@@ -86,11 +109,12 @@ view model =
 
 main : Program () Model Msg
 main =
-    Browser.application
+    Middleware.application
         { onUrlRequest = UrlRequested
         , onUrlChange = UrlChanged
         , init = init
         , update = update
         , subscriptions = subscriptions
+        , middlewares = middlewares
         , view = view
         }
