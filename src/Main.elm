@@ -5,11 +5,8 @@ import Browser.Navigation
 import Effect exposing (Effect)
 import Effect.History
 import Effect.LocalStorage
-import Element exposing (row, text)
-import Element.Input exposing (button)
-import Json.Decode
-import Json.Encode
-import LocalStorage
+import Element
+import Game
 import Middleware
 import Url exposing (Url)
 
@@ -19,17 +16,23 @@ import Url exposing (Url)
 
 
 type alias Model =
-    { navigation : Browser.Navigation.Key
-    , localStorage : Effect.LocalStorage.State Msg
-    , count : Int
-    , hoi : String
+    { localStorage : Effect.LocalStorage.State Msg
+    , navigation : Browser.Navigation.Key
+    , game : Game.Model
     }
 
 
 init : () -> Url -> Browser.Navigation.Key -> ( Model, Effect Msg )
 init _ _ navigation =
-    ( Model navigation Effect.LocalStorage.initial 0 "hey"
-    , LocalStorage.setItem "hoi" (Json.Encode.string "hi")
+    let
+        ( initialGame, gameEffect ) =
+            Game.init
+    in
+    ( { localStorage = Effect.LocalStorage.initial
+      , navigation = navigation
+      , game = initialGame
+      }
+    , Effect.map GameMsg gameEffect
     )
 
 
@@ -41,14 +44,18 @@ type Msg
     = UrlRequested Browser.UrlRequest
     | UrlChanged Url
     | LocalStorageMsg Effect.LocalStorage.Msg
-    | ReadHoi (Result LocalStorage.Error String)
-    | Dec
-    | Inc
+    | GameMsg Game.Msg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case msg of
+        UrlRequested _ ->
+            Debug.todo "Main.UrlRequested"
+
+        UrlChanged _ ->
+            Debug.todo "UrlChanged"
+
         LocalStorageMsg localStorageMsg ->
             case Effect.LocalStorage.update localStorageMsg model.localStorage of
                 Nothing ->
@@ -57,28 +64,14 @@ update msg model =
                 Just ( nextLocalStorage, subMsg ) ->
                     update subMsg { model | localStorage = nextLocalStorage }
 
-        Dec ->
-            ( { model | count = model.count - 1 }
-            , LocalStorage.getItem "hoi" Json.Decode.string ReadHoi
+        GameMsg gameMsg ->
+            let
+                ( nextGame, gameEffect ) =
+                    Game.update gameMsg model.game
+            in
+            ( { model | game = nextGame }
+            , Effect.map GameMsg gameEffect
             )
-
-        Inc ->
-            ( { model | count = model.count + 1 }
-            , Effect.none
-            )
-
-        ReadHoi (Err _) ->
-            ( { model | hoi = "error" }
-            , Effect.none
-            )
-
-        ReadHoi (Ok hoi) ->
-            ( { model | hoi = hoi }
-            , Effect.none
-            )
-
-        _ ->
-            ( model, Effect.none )
 
 
 
@@ -114,8 +107,8 @@ middlewares model effect =
             , Effect.History.middleware model.navigation action
             )
 
-        Effect.Toast toast ->
-            ( model, Cmd.none )
+        Effect.Toast _ ->
+            Debug.todo "Main.Toast"
 
 
 
@@ -124,18 +117,8 @@ middlewares model effect =
 
 view : Model -> Browser.Document Msg
 view model =
-    row []
-        [ button []
-            { onPress = Just Dec
-            , label = text "-"
-            }
-        , text (String.fromInt model.count)
-        , button []
-            { onPress = Just Inc
-            , label = text "+"
-            }
-        , text model.hoi
-        ]
+    Game.view model.game
+        |> Element.map GameMsg
         |> Element.layout []
         |> List.singleton
         |> Browser.Document "Catan"
