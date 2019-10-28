@@ -178,7 +178,7 @@ viewPlayers model =
 
 
 viewDiceSide : Bool -> Dice -> Element Msg
-viewDiceSide selected dice =
+viewDiceSide vivid dice =
     let
         ( bgColor, fColor, label ) =
             case dice of
@@ -204,17 +204,14 @@ viewDiceSide selected dice =
         [ Element.width Element.fill
         , Element.height (Element.px 60)
         , Border.rounded 5
-        , if selected then
-            Background.color (Element.rgb255 155 89 182)
-
-          else
-            Background.color bgColor
-        , if selected then
-            Font.color (Element.rgb255 236 240 241)
-
-          else
-            Font.color fColor
+        , Background.color bgColor
+        , Font.color fColor
         , Font.center
+        , if vivid then
+            Element.alpha 1
+
+          else
+            Element.alpha 0.33
         ]
         { onPress = Just (Choose dice)
         , label = label
@@ -229,7 +226,11 @@ viewDice toDice selected elements =
         , Element.spacing 10
         ]
         (List.map
-            (\element -> viewDiceSide (Just element == selected) (toDice element))
+            (\element ->
+                viewDiceSide
+                    (selected == Nothing || selected == Just element)
+                    (toDice element)
+            )
             elements
         )
 
@@ -243,15 +244,16 @@ viewResult ( whiteDice, redDice, eventDice ) =
         , Border.rounded 80
         , eventDice
             |> Maybe.map Dice.paint
-            |> Maybe.withDefault (Element.rgb255 236 240 241)
+            |> Maybe.withDefault (Element.rgb255 189 195 199)
             |> Background.color
-        , if eventDice == Nothing then
-            Font.color (Element.rgb255 52 73 94)
+        , Font.color (Element.rgb255 236 240 241)
+        , Font.center
+        , Font.size 84
+        , if whiteDice == Nothing || redDice == Nothing || eventDice == Nothing then
+            Element.alpha 0.33
 
           else
-            Font.color (Element.rgb255 236 240 241)
-        , Font.center
-        , Font.size 96
+            Element.alpha 1
         ]
         { onPress = Nothing
         , label =
