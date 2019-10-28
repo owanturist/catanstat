@@ -2,14 +2,15 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation
-import Cons
 import Effect exposing (Effect)
 import Effect.History
 import Effect.LocalStorage
-import Element
+import Element exposing (Element, none)
 import Game
+import GameList
+import ID exposing (ID)
 import Middleware
-import Player exposing (Player)
+import Router
 import Url exposing (Url)
 
 
@@ -17,29 +18,57 @@ import Url exposing (Url)
 -- M O D E L
 
 
+type Screen
+    = BlankScreen
+    | GameListScreen GameList.Model
+    | GameScreen (ID { game : () }) Game.Model
+
+
 type alias Model =
     { localStorage : Effect.LocalStorage.State Msg
     , navigation : Browser.Navigation.Key
-    , game : Game.Model
+    , screen : Screen
     }
 
 
+initScreen : Router.Direction -> Screen -> ( Screen, Effect Msg )
+initScreen direction screen =
+    case direction of
+        Router.Redirect route ->
+            ( screen
+            , Router.replace route
+            )
+
+        Router.Direct Router.ToGameList ->
+            let
+                ( initialGameList, gameListEffect ) =
+                    GameList.init
+            in
+            ( GameListScreen initialGameList
+            , Effect.map GameListMsg gameListEffect
+            )
+
+        Router.Direct (Router.ToGame gameID) ->
+            let
+                ( initialGame, gameEffect ) =
+                    Game.init gameID
+            in
+            ( GameScreen gameID initialGame
+            , Effect.map GameMsg gameEffect
+            )
+
+
 init : () -> Url -> Browser.Navigation.Key -> ( Model, Effect Msg )
-init _ _ navigation =
+init _ url navigation =
     let
-        ( initialGame, gameEffect ) =
-            Cons.cons (Player Player.Red "Red")
-                [ Player Player.Blue "Blue"
-                , Player Player.White "White"
-                , Player Player.Yellow "Yellow"
-                ]
-                |> Game.init
+        ( initialScreen, screenEffect ) =
+            initScreen (Router.parse url) BlankScreen
     in
     ( { localStorage = Effect.LocalStorage.initial
       , navigation = navigation
-      , game = initialGame
+      , screen = initialScreen
       }
-    , Effect.map GameMsg gameEffect
+    , screenEffect
     )
 
 
@@ -51,19 +80,36 @@ type Msg
     = UrlRequested Browser.UrlRequest
     | UrlChanged Url
     | LocalStorageMsg Effect.LocalStorage.Msg
+    | GameListMsg GameList.Msg
     | GameMsg Game.Msg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
-    case msg of
-        UrlRequested _ ->
-            Debug.todo "Main.UrlRequested"
+    case ( msg, model.screen ) of
+        ( UrlRequested (Browser.Internal url), _ ) ->
+            ( model
+            , Url.toString url
+                |> Browser.Navigation.pushUrl model.navigation
+                |> Effect.fromCmd
+            )
 
-        UrlChanged _ ->
-            Debug.todo "UrlChanged"
+        ( UrlRequested (Browser.External url), _ ) ->
+            ( model
+            , Browser.Navigation.load url
+                |> Effect.fromCmd
+            )
 
-        LocalStorageMsg localStorageMsg ->
+        ( UrlChanged url, _ ) ->
+            let
+                ( nextScreen, screenEffect ) =
+                    initScreen (Router.parse url) model.screen
+            in
+            ( { model | screen = nextScreen }
+            , screenEffect
+            )
+
+        ( LocalStorageMsg localStorageMsg, _ ) ->
             case Effect.LocalStorage.update localStorageMsg model.localStorage of
                 Nothing ->
                     ( model, Effect.none )
@@ -71,14 +117,29 @@ update msg model =
                 Just ( nextLocalStorage, subMsg ) ->
                     update subMsg { model | localStorage = nextLocalStorage }
 
-        GameMsg gameMsg ->
+        ( GameListMsg gameListMsg, GameListScreen gameList ) ->
+            let
+                ( nextGameList, gameListEffect ) =
+                    GameList.update gameListMsg gameList
+            in
+            ( { model | screen = GameListScreen nextGameList }
+            , Effect.map GameListMsg gameListEffect
+            )
+
+        ( GameListMsg _, _ ) ->
+            ( model, Effect.none )
+
+        ( GameMsg gameMsg, GameScreen gameID game ) ->
             let
                 ( nextGame, gameEffect ) =
-                    Game.update gameMsg model.game
+                    Game.update gameMsg game
             in
-            ( { model | game = nextGame }
+            ( { model | screen = GameScreen gameID nextGame }
             , Effect.map GameMsg gameEffect
             )
+
+        ( GameMsg _, _ ) ->
+            ( model, Effect.none )
 
 
 
@@ -89,7 +150,15 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Sub.map LocalStorageMsg Effect.LocalStorage.subscriptions
-        , Sub.map GameMsg (Game.subscriptions model.game)
+        , case model.screen of
+            BlankScreen ->
+                Sub.none
+
+            GameListScreen _ ->
+                Sub.none
+
+            GameScreen _ game ->
+                Sub.map GameMsg (Game.subscriptions game)
         ]
 
 
@@ -125,13 +194,24 @@ middlewares model effect =
 -- V I E W
 
 
-view : Model -> Browser.Document Msg
+view : Model -> Element Msg
 view model =
-    Game.view model.game
-        |> Element.map GameMsg
-        |> Element.layout []
-        |> List.singleton
-        |> Browser.Document "Catan"
+    case model.screen of
+        BlankScreen ->
+            none
+
+        GameListScreen gameList ->
+            Element.map GameListMsg (GameList.view gameList)
+
+        GameScreen _ game ->
+            Element.map GameMsg (Game.view game)
+
+
+document : Model -> Browser.Document Msg
+document model =
+    Browser.Document "Catan"
+        [ Element.layout [] (view model)
+        ]
 
 
 
@@ -147,5 +227,5 @@ main =
         , update = update
         , subscriptions = subscriptions
         , middlewares = middlewares
-        , view = view
+        , view = document
         }

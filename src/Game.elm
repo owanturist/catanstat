@@ -8,6 +8,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
+import ID exposing (ID)
 import Player exposing (Player)
 import Task
 import Time
@@ -34,8 +35,16 @@ type alias Model =
     }
 
 
-init : Cons Player -> ( Model, Effect Msg )
-init players =
+init : ID { game : () } -> ( Model, Effect Msg )
+init gameID =
+    let
+        players =
+            Cons.cons (Player Player.Red "Red")
+                [ Player Player.Blue "Blue"
+                , Player Player.White "White"
+                , Player Player.Yellow "Yellow"
+                ]
+    in
     ( { current = (Cons.head players).color
       , dice = ( Nothing, Nothing, Nothing )
       , players = players
