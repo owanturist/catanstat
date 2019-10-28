@@ -17,6 +17,7 @@ import Url.Parser exposing ((</>), Parser, s, top)
 
 type Route
     = ToGameList
+    | ToGameCreate
     | ToGame (ID { game : () })
 
 
@@ -24,6 +25,7 @@ parser : Parser (Route -> a) a
 parser =
     Url.Parser.oneOf
         [ Url.Parser.map ToGameList top
+        , Url.Parser.map ToGameCreate (s "create")
         , Url.Parser.map ToGame (s "game" </> ID.parser)
         ]
 
@@ -48,6 +50,9 @@ toPath route =
     case route of
         ToGameList ->
             absolute [] []
+
+        ToGameCreate ->
+            absolute [ "create" ] []
 
         ToGame gameID ->
             absolute [ "game", ID.toString gameID ] []

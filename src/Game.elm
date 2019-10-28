@@ -25,13 +25,49 @@ type alias Move =
     }
 
 
-type alias Model =
-    { current : Player.Color
-    , dice : ( Maybe Dice.Number, Maybe Dice.Number, Maybe Dice.Event )
-    , players : Cons Player
+type alias Game =
+    { players : Cons Player
     , startAt : Time.Posix
+    , moves : List Move
+    }
+
+
+getCurrentHelp : Player.Color -> List Player -> Maybe Player
+getCurrentHelp latest players =
+    case players of
+        first :: second :: rest ->
+            if latest == first.color then
+                Just second
+
+            else
+                getCurrentHelp latest (second :: rest)
+
+        _ ->
+            Nothing
+
+
+getCurrent : Game -> Player.Color
+getCurrent game =
+    case List.head game.moves of
+        Nothing ->
+            Cons.head game.players
+                |> .color
+
+        Just latest ->
+            Cons.tail game.players
+                |> getCurrentHelp latest.player
+                |> Maybe.withDefault (Cons.head game.players)
+                |> .color
+
+
+type alias State =
+    { dice : ( Maybe Dice.Number, Maybe Dice.Number, Maybe Dice.Event )
     , now : Time.Posix
     }
+
+
+type Model
+    = Model Game State
 
 
 init : ID { game : () } -> ( Model, Effect Msg )
@@ -44,12 +80,14 @@ init gameID =
                 , Player Player.Yellow "Yellow"
                 ]
     in
-    ( { current = (Cons.head players).color
-      , dice = ( Nothing, Nothing, Nothing )
-      , players = players
-      , startAt = Time.millisToPosix 0
-      , now = Time.millisToPosix 0
-      }
+    ( Model
+        { players = players
+        , startAt = Time.millisToPosix 0
+        , moves = []
+        }
+        { dice = ( Nothing, Nothing, Nothing )
+        , now = Time.millisToPosix 0
+        }
     , Time.now
         |> Task.perform SetStartTime
         |> Effect.fromCmd
@@ -69,35 +107,33 @@ type Dice
 type Msg
     = SetStartTime Time.Posix
     | Tick Time.Posix
+      -- | LoadGame
     | Choose Dice
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
-update msg model =
+update msg (Model game state) =
     case msg of
         SetStartTime startAt ->
-            ( { model
-                | startAt = startAt
-                , now = startAt
-              }
+            ( Model { game | startAt = startAt } { state | now = startAt }
             , Effect.none
             )
 
         Tick now ->
-            ( { model | now = now }
+            ( Model game { state | now = now }
             , Effect.none
             )
 
         Choose dice ->
-            ( case ( dice, model.dice ) of
+            ( case ( dice, state.dice ) of
                 ( White white, ( _, red, event ) ) ->
-                    { model | dice = ( Just white, red, event ) }
+                    Model game { state | dice = ( Just white, red, event ) }
 
                 ( Red red, ( white, _, event ) ) ->
-                    { model | dice = ( white, Just red, event ) }
+                    Model game { state | dice = ( white, Just red, event ) }
 
                 ( Event event, ( white, red, _ ) ) ->
-                    { model | dice = ( white, red, Just event ) }
+                    Model game { state | dice = ( white, red, Just event ) }
             , Effect.none
             )
 
@@ -155,16 +191,20 @@ viewPlayer duration player =
         )
 
 
-viewPlayers : Model -> Element Msg
-viewPlayers model =
+viewPlayers : Game -> State -> Element Msg
+viewPlayers game state =
+    let
+        current =
+            getCurrent game
+    in
     row
         [ Element.width Element.fill
         ]
         (Cons.foldr
             (\player acc ->
                 viewPlayer
-                    (if model.current == player.color then
-                        Just (Time.posixToMillis model.now - Time.posixToMillis model.startAt)
+                    (if current == player.color then
+                        Just (Time.posixToMillis state.now - Time.posixToMillis game.startAt)
 
                      else
                         Nothing
@@ -173,7 +213,7 @@ viewPlayers model =
                     :: acc
             )
             []
-            model.players
+            game.players
         )
 
 
@@ -265,19 +305,19 @@ viewResult ( whiteDice, redDice, eventDice ) =
 
 
 view : Model -> Element Msg
-view model =
+view (Model game state) =
     let
         ( white, red, event ) =
-            model.dice
+            state.dice
     in
     column
         [ Element.width Element.fill
         , Element.height Element.fill
         , Element.spacing 10
         ]
-        [ viewPlayers model
+        [ viewPlayers game state
         , viewDice White white Dice.numbers
         , viewDice Red red Dice.numbers
         , viewDice Event event Dice.events
-        , viewResult model.dice
+        , viewResult state.dice
         ]

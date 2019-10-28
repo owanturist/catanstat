@@ -48,6 +48,11 @@ initScreen direction screen =
             , Effect.map GameListMsg gameListEffect
             )
 
+        Router.Direct Router.ToGameCreate ->
+            ( screen
+            , Router.replace Router.ToGameList
+            )
+
         Router.Direct (Router.ToGame gameID) ->
             let
                 ( initialGame, gameEffect ) =
