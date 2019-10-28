@@ -29,7 +29,6 @@ type alias Model =
     { current : Player.Color
     , dice : ( Maybe Dice.Number, Maybe Dice.Number, Maybe Dice.Event )
     , players : Cons Player
-    , moves : List Move
     , startAt : Time.Posix
     , now : Time.Posix
     }
@@ -48,7 +47,6 @@ init gameID =
     ( { current = (Cons.head players).color
       , dice = ( Nothing, Nothing, Nothing )
       , players = players
-      , moves = []
       , startAt = Time.millisToPosix 0
       , now = Time.millisToPosix 0
       }
@@ -90,30 +88,16 @@ update msg model =
             , Effect.none
             )
 
-        Choose (White white) ->
-            let
-                ( _, red, event ) =
-                    model.dice
-            in
-            ( { model | dice = ( Just white, red, event ) }
-            , Effect.none
-            )
+        Choose dice ->
+            ( case ( dice, model.dice ) of
+                ( White white, ( _, red, event ) ) ->
+                    { model | dice = ( Just white, red, event ) }
 
-        Choose (Red red) ->
-            let
-                ( white, _, event ) =
-                    model.dice
-            in
-            ( { model | dice = ( white, Just red, event ) }
-            , Effect.none
-            )
+                ( Red red, ( white, _, event ) ) ->
+                    { model | dice = ( white, Just red, event ) }
 
-        Choose (Event event) ->
-            let
-                ( white, red, _ ) =
-                    model.dice
-            in
-            ( { model | dice = ( white, red, Just event ) }
+                ( Event event, ( white, red, _ ) ) ->
+                    { model | dice = ( white, red, Just event ) }
             , Effect.none
             )
 
