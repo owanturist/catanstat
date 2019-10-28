@@ -1,5 +1,6 @@
 module PlayGame exposing (Model, Msg, init, subscriptions, update, view)
 
+import Api
 import Cons
 import Dice
 import Effect exposing (Effect)
@@ -10,6 +11,7 @@ import Element.Font as Font
 import Element.Input exposing (button)
 import Game exposing (Game)
 import ID exposing (ID)
+import LocalStorage
 import Player exposing (Player)
 import Task
 import Time
@@ -26,30 +28,23 @@ type alias State =
 
 
 type Model
-    = Model Game State
+    = Model (Maybe Game) State
 
 
 init : ID { game : () } -> ( Model, Effect Msg )
 init gameID =
-    let
-        players =
-            Cons.cons (Player Player.Red "Red")
-                [ Player Player.Blue "Blue"
-                , Player Player.White "White"
-                , Player Player.Yellow "Yellow"
-                ]
-    in
     ( Model
-        { players = players
-        , startAt = Time.millisToPosix 0
-        , moves = []
-        }
+        Nothing
         { dice = ( Nothing, Nothing, Nothing )
         , now = Time.millisToPosix 0
         }
-    , Time.now
-        |> Task.perform SetStartTime
-        |> Effect.fromCmd
+    , Effect.batch
+        [ Api.loadGame gameID
+            |> Effect.map LoadGame
+        , Time.now
+            |> Task.perform Tick
+            |> Effect.fromCmd
+        ]
     )
 
 
@@ -64,17 +59,21 @@ type Dice
 
 
 type Msg
-    = SetStartTime Time.Posix
+    = LoadGame (Result LocalStorage.Error Game)
     | Tick Time.Posix
-      -- | LoadGame
     | Choose Dice
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg (Model game state) =
     case msg of
-        SetStartTime startAt ->
-            ( Model { game | startAt = startAt } { state | now = startAt }
+        LoadGame (Err err) ->
+            ( Model game state
+            , Effect.none
+            )
+
+        LoadGame (Ok loadedGame) ->
+            ( Model (Just loadedGame) state
             , Effect.none
             )
 
@@ -274,7 +273,12 @@ view (Model game state) =
         , Element.height Element.fill
         , Element.spacing 10
         ]
-        [ viewPlayers game state
+        [ case game of
+            Nothing ->
+                none
+
+            Just g ->
+                viewPlayers g state
         , viewDice White white Dice.numbers
         , viewDice Red red Dice.numbers
         , viewDice Event event Dice.events

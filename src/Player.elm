@@ -3,9 +3,12 @@ module Player exposing
     , Player
     , colorDecoder
     , colorEncoder
+    , colorToInt
     , decoder
     , encoder
     , paint
+    , x4
+    , x6
     )
 
 import Element
@@ -127,3 +130,17 @@ decoder =
     Decode.map2 Player
         (Decode.index 0 colorDecoder)
         (Decode.index 1 Decode.string)
+
+
+x4 : List Player
+x4 =
+    [ Player Red "Red"
+    , Player Blue "Blue"
+    , Player White "White"
+    , Player Yellow "Yellow"
+    ]
+
+
+x6 : List Player
+x6 =
+    x4 ++ [ Player Green "Green", Player Brown "Brown" ]

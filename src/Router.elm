@@ -9,7 +9,8 @@ module Router exposing
 
 import Effect exposing (Effect)
 import Effect.History
-import ID exposing (ID)
+import Game
+import ID
 import Url exposing (Url)
 import Url.Builder exposing (absolute)
 import Url.Parser exposing ((</>), Parser, s, top)
@@ -18,7 +19,7 @@ import Url.Parser exposing ((</>), Parser, s, top)
 type Route
     = ToGameHistory
     | ToCreateGame
-    | ToPlayGame (ID { game : () })
+    | ToPlayGame Game.ID
 
 
 parser : Parser (Route -> a) a

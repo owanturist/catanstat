@@ -7,8 +7,8 @@ import Effect exposing (Effect)
 import Effect.History
 import Effect.LocalStorage
 import Element exposing (Element, none)
+import Game
 import GameHistory
-import ID exposing (ID)
 import Middleware
 import PlayGame
 import Router
@@ -23,7 +23,7 @@ type Screen
     = BlankScreen
     | GameHistoryScreen GameHistory.Model
     | CreateGameScreen CreateGame.Model
-    | PlayGameScreen (ID { game : () }) PlayGame.Model
+    | PlayGameScreen Game.ID PlayGame.Model
 
 
 type alias Model =

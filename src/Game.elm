@@ -1,11 +1,25 @@
-module Game exposing (Dice, Game, Move, decoder, encoder, getCurrentPlayer)
+module Game exposing (Dice, Game, ID, Move, create, decoder, encoder, generateID, getCurrentPlayer)
 
 import Cons exposing (Cons)
 import Dice
+import ID
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
+import Murmur3
 import Player exposing (Player)
 import Time
+
+
+type alias ID =
+    ID.ID { game : () }
+
+
+generateID : Time.Posix -> ID
+generateID posix =
+    Time.posixToMillis posix
+        |> String.fromInt
+        |> Murmur3.hashString 0
+        |> ID.fromInt
 
 
 posixEncoder : Time.Posix -> Value
@@ -67,7 +81,8 @@ moveDecoder =
 
 
 type alias Game =
-    { startAt : Time.Posix
+    { id : ID
+    , startAt : Time.Posix
     , players : Cons Player
     , moves : List Move
     }
@@ -76,7 +91,8 @@ type alias Game =
 encoder : Game -> Value
 encoder game =
     Encode.list identity
-        [ posixEncoder game.startAt
+        [ ID.encoder game.id
+        , posixEncoder game.startAt
         , Encode.list Player.encoder (Cons.toList game.players)
         , Encode.list moveEncoder game.moves
         ]
@@ -84,10 +100,11 @@ encoder game =
 
 decoder : Decoder Game
 decoder =
-    Decode.map3 Game
-        (Decode.index 0 posixDecoder)
-        (Decode.index 1 (Decode.oneOrMore Cons.cons Player.decoder))
-        (Decode.index 2 (Decode.list moveDecoder))
+    Decode.map4 Game
+        (Decode.index 0 ID.decoder)
+        (Decode.index 1 posixDecoder)
+        (Decode.index 2 (Decode.oneOrMore Cons.cons Player.decoder))
+        (Decode.index 3 (Decode.list moveDecoder))
 
 
 getCurrentPlayerHelp : Player.Color -> List Player -> Maybe Player
@@ -116,3 +133,8 @@ getCurrentPlayer game =
                 |> getCurrentPlayerHelp latest.player
                 |> Maybe.withDefault (Cons.head game.players)
                 |> .color
+
+
+create : Cons Player -> Time.Posix -> Game
+create players posix =
+    Game (generateID posix) posix players []
