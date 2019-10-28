@@ -1,4 +1,4 @@
-module Game exposing (Model, Msg, init, subscriptions, update, view)
+module PlayGame exposing (Model, Msg, init, subscriptions, update, view)
 
 import Cons exposing (Cons)
 import Dice

@@ -16,17 +16,17 @@ import Url.Parser exposing ((</>), Parser, s, top)
 
 
 type Route
-    = ToGameList
-    | ToGameCreate
-    | ToGame (ID { game : () })
+    = ToGameHistory
+    | ToCreateGame
+    | ToPlayGame (ID { game : () })
 
 
 parser : Parser (Route -> a) a
 parser =
     Url.Parser.oneOf
-        [ Url.Parser.map ToGameList top
-        , Url.Parser.map ToGameCreate (s "create")
-        , Url.Parser.map ToGame (s "game" </> ID.parser)
+        [ Url.Parser.map ToGameHistory top
+        , Url.Parser.map ToCreateGame (s "create")
+        , Url.Parser.map ToPlayGame (s "game" </> ID.parser)
         ]
 
 
@@ -39,7 +39,7 @@ parse : Url -> Direction
 parse url =
     case Url.Parser.parse parser url of
         Nothing ->
-            Redirect ToGameList
+            Redirect ToGameHistory
 
         Just route ->
             Direct route
@@ -48,13 +48,13 @@ parse url =
 toPath : Route -> String
 toPath route =
     case route of
-        ToGameList ->
+        ToGameHistory ->
             absolute [] []
 
-        ToGameCreate ->
+        ToCreateGame ->
             absolute [ "create" ] []
 
-        ToGame gameID ->
+        ToPlayGame gameID ->
             absolute [ "game", ID.toString gameID ] []
 
 

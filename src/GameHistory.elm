@@ -1,4 +1,4 @@
-module GameList exposing (Model, Msg, init, update, view)
+module GameHistory exposing (Model, Msg, init, update, view)
 
 import Effect exposing (Effect)
 import Element exposing (Element, text)
