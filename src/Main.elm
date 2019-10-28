@@ -2,12 +2,14 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation
+import Cons
 import Effect exposing (Effect)
 import Effect.History
 import Effect.LocalStorage
 import Element
 import Game
 import Middleware
+import Player exposing (Player)
 import Url exposing (Url)
 
 
@@ -26,7 +28,12 @@ init : () -> Url -> Browser.Navigation.Key -> ( Model, Effect Msg )
 init _ _ navigation =
     let
         ( initialGame, gameEffect ) =
-            Game.init
+            Cons.cons (Player Player.Red "Red")
+                [ Player Player.Blue "Blue"
+                , Player Player.White "White"
+                , Player Player.Yellow "Yellow"
+                ]
+                |> Game.init
     in
     ( { localStorage = Effect.LocalStorage.initial
       , navigation = navigation
@@ -79,8 +86,11 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.map LocalStorageMsg Effect.LocalStorage.subscriptions
+subscriptions model =
+    Sub.batch
+        [ Sub.map LocalStorageMsg Effect.LocalStorage.subscriptions
+        , Sub.map GameMsg (Game.subscriptions model.game)
+        ]
 
 
 
