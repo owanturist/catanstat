@@ -10,8 +10,9 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Extra exposing (formatMilliseconds)
+import FontAwesome.Attributes
 import FontAwesome.Icon exposing (Icon, viewIcon)
-import FontAwesome.Solid exposing (chartPie, dice, square)
+import FontAwesome.Solid exposing (chartPie, dice, home, square)
 import Game exposing (Game)
 import Json.Decode as Decode
 import LocalStorage
@@ -211,24 +212,21 @@ viewPlayers players =
         (List.map viewPlayer players)
 
 
-viewLink : Router.Route -> Icon -> String -> Element msg
-viewLink route icon label =
+viewLink : Router.Route -> Icon -> Element msg
+viewLink route icon =
     link
-        [ Element.paddingXY 15 5
+        [ Element.padding 10
         , Border.rounded 6
         , Background.color Palette.amethyst
         , Font.color Palette.clouds
         ]
         { url = Router.toPath route
         , label =
-            row
-                [ Element.spacing 10
-                ]
-                [ viewIcon icon
-                    |> Element.html
-                    |> el []
-                , text label
-                ]
+            icon
+                |> FontAwesome.Icon.viewStyled
+                    [ FontAwesome.Attributes.fw
+                    ]
+                |> Element.html
         }
 
 
@@ -258,8 +256,9 @@ view gameID model =
                     , Element.paddingXY 10 0
                     , Element.spacing 10
                     ]
-                    [ viewLink (Router.ToPlayGame gameID) dice "play"
-                    , viewLink (Router.ToGameStat gameID) chartPie "stat"
+                    [ viewLink Router.ToGameHistory home
+                    , viewLink (Router.ToPlayGame gameID) dice
+                    , viewLink (Router.ToGameStat gameID) chartPie
                     , case game.status of
                         Game.InGame ->
                             none
@@ -274,15 +273,34 @@ view gameID model =
                                     , Font.color Palette.wetAsphalt
                                     ]
                     ]
-                , state.turns
-                    |> List.filterMap
-                        (\turn ->
-                            Maybe.map
-                                (viewTurn turn)
-                                (Dict.Any.get turn.player state.players)
-                        )
-                    |> column
-                        [ Element.width Element.fill
-                        , Element.height Element.shrink
-                        ]
+                , if List.isEmpty state.turns then
+                    text "You don't have any turns!"
+                        |> el
+                            [ Element.centerX
+                            , Element.centerY
+                            ]
+                        |> el
+                            [ Element.width Element.fill
+                            , Element.height (Element.px 200)
+                            , Background.color Palette.clouds
+                            , Font.color Palette.concrete
+                            , Font.size 24
+                            ]
+                        |> el
+                            [ Element.width Element.fill
+                            , Element.padding 10
+                            ]
+
+                  else
+                    state.turns
+                        |> List.filterMap
+                            (\turn ->
+                                Maybe.map
+                                    (viewTurn turn)
+                                    (Dict.Any.get turn.player state.players)
+                            )
+                        |> column
+                            [ Element.width Element.fill
+                            , Element.height Element.shrink
+                            ]
                 ]

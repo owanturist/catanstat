@@ -11,8 +11,9 @@ import Element.Events as Events
 import Element.Font as Font
 import Element.Input exposing (button)
 import Extra exposing (formatMilliseconds, ifelse)
+import FontAwesome.Attributes
 import FontAwesome.Icon exposing (Icon, viewIcon)
-import FontAwesome.Solid exposing (chartPie, check, flag, listUl, square, times, trophy)
+import FontAwesome.Solid exposing (alignJustify, chartPie, check, flag, home, square, times, trophy)
 import Game exposing (Game)
 import ID exposing (ID)
 import Json.Decode as Decode
@@ -369,46 +370,40 @@ viewResult current state =
         }
 
 
-viewLink : Router.Route -> Icon -> String -> Element msg
-viewLink route icon label =
+viewLink : Router.Route -> Icon -> Element msg
+viewLink route icon =
     link
-        [ Element.paddingXY 15 5
+        [ Element.padding 10
         , Border.rounded 6
         , Background.color Palette.amethyst
         , Font.color Palette.clouds
         ]
         { url = Router.toPath route
         , label =
-            row
-                [ Element.spacing 10
-                ]
-                [ viewIcon icon
-                    |> Element.html
-                    |> el []
-                , text label
-                ]
+            icon
+                |> FontAwesome.Icon.viewStyled
+                    [ FontAwesome.Attributes.fw
+                    ]
+                |> Element.html
         }
 
 
 viewFinishTrigger : Player.Color -> Element Msg
 viewFinishTrigger current =
     button
-        [ Element.paddingXY 15 5
+        [ Element.alignRight
+        , Element.padding 10
         , Border.rounded 6
         , Background.color Palette.amethyst
         , Font.color Palette.clouds
-        , Element.alignRight
         ]
         { onPress = Just (ShowFinishDialog current)
         , label =
-            row
-                [ Element.spacing 10
-                ]
-                [ viewIcon flag
-                    |> Element.html
-                    |> el []
-                , text "finish"
-                ]
+            flag
+                |> FontAwesome.Icon.viewStyled
+                    [ FontAwesome.Attributes.fw
+                    ]
+                |> Element.html
         }
 
 
@@ -533,8 +528,9 @@ viewSucceed game state =
                 , Element.spacing 10
                 , Element.width Element.fill
                 ]
-                [ viewLink (Router.ToGameLog game.id) listUl "logs"
-                , viewLink (Router.ToGameStat game.id) chartPie "stat"
+                [ viewLink Router.ToGameHistory home
+                , viewLink (Router.ToGameLog game.id) alignJustify
+                , viewLink (Router.ToGameStat game.id) chartPie
                 , case game.status of
                     Game.InGame ->
                         viewFinishTrigger current

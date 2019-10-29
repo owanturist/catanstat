@@ -9,9 +9,8 @@ import Element exposing (Element, column, el, link, none, row, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Element.Input exposing (button)
-import FontAwesome.Icon exposing (Icon, viewIcon)
-import FontAwesome.Solid exposing (chartPie, check, flag, listUl, plus, square, times, trophy)
+import FontAwesome.Icon exposing (viewIcon)
+import FontAwesome.Solid exposing (plus, trophy)
 import Game exposing (Game)
 import ID
 import Json.Decode as Decode
@@ -142,8 +141,8 @@ formatDate =
 viewPlayer : Bool -> Player -> Element msg
 viewPlayer winner player =
     el
-        [ Element.width (Element.px 32)
-        , Element.height (Element.px 32)
+        [ Element.width (Element.px 30)
+        , Element.height (Element.px 30)
         , Background.color (Player.toColor player.color)
         , Font.color Palette.clouds
         , Border.rounded 3
@@ -154,6 +153,7 @@ viewPlayer winner player =
                 |> el
                     [ Element.centerX
                     , Element.centerY
+                    , Font.size 15
                     ]
 
          else
@@ -211,7 +211,7 @@ viewSucceed state =
         ]
         [ link
             [ Element.width Element.fill
-            , Element.paddingXY 20 10
+            , Element.padding 15
             , Border.rounded 6
             , Background.color Palette.peterRiver
             , Font.color Palette.clouds

@@ -10,8 +10,9 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Extra exposing (formatMilliseconds, ifelse)
+import FontAwesome.Attributes
 import FontAwesome.Icon exposing (Icon, viewIcon)
-import FontAwesome.Solid exposing (dice, listUl, square)
+import FontAwesome.Solid exposing (alignJustify, dice, home, square)
 import Game exposing (Game)
 import Json.Decode as Decode
 import LocalStorage
@@ -55,7 +56,11 @@ increment =
 
 percent : Int -> Int -> String
 percent total x =
-    Round.round 2 (100 * toFloat x / toFloat total) ++ "%"
+    if total == 0 then
+        "0%"
+
+    else
+        Round.round 2 (100 * toFloat x / toFloat total) ++ "%"
 
 
 calcCombinationsNumbers : List Game.Move -> Dict Int Int
@@ -171,24 +176,21 @@ viewDiceSide color icon =
         (Element.html (viewIcon icon))
 
 
-viewLink : Router.Route -> Icon -> String -> Element msg
-viewLink route icon label =
+viewLink : Router.Route -> Icon -> Element msg
+viewLink route icon =
     link
-        [ Element.paddingXY 15 5
+        [ Element.padding 10
         , Border.rounded 6
         , Background.color Palette.amethyst
         , Font.color Palette.clouds
         ]
         { url = Router.toPath route
         , label =
-            row
-                [ Element.spacing 10
-                ]
-                [ viewIcon icon
-                    |> Element.html
-                    |> el []
-                , text label
-                ]
+            icon
+                |> FontAwesome.Icon.viewStyled
+                    [ FontAwesome.Attributes.fw
+                    ]
+                |> Element.html
         }
 
 
@@ -385,8 +387,9 @@ view gameID model =
                     [ Element.spacing 10
                     , Element.width Element.fill
                     ]
-                    [ viewLink (Router.ToPlayGame gameID) dice "play"
-                    , viewLink (Router.ToGameLog gameID) listUl "logs"
+                    [ viewLink (Router.ToPlayGame gameID) home
+                    , viewLink (Router.ToPlayGame gameID) dice
+                    , viewLink (Router.ToGameLog gameID) alignJustify
                     , case game.status of
                         Game.InGame ->
                             none

@@ -92,7 +92,7 @@ toColor color =
             Palette.concrete
 
         Red ->
-            Palette.alizarin
+            Palette.pomegranate
 
         Blue ->
             Palette.peterRiver
