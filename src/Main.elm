@@ -11,6 +11,7 @@ import FontAwesome.Styles
 import Game
 import GameHistory
 import GameLog
+import GameStat
 import Middleware
 import PlayGame
 import Router
@@ -27,7 +28,7 @@ type Screen
     | CreateGameScreen CreateGame.Model
     | PlayGameScreen Game.ID PlayGame.Model
     | GameLogScreen Game.ID GameLog.Model
-    | GameStatScreen Game.ID
+    | GameStatScreen Game.ID GameStat.Model
 
 
 type alias Model =
@@ -46,13 +47,10 @@ initScreen direction screen =
             )
 
         Router.Direct Router.ToGameHistory ->
-            let
-                ( initialGameHistory, gameHistoryEffect ) =
-                    GameHistory.init
-            in
-            ( GameHistoryScreen initialGameHistory
-            , Effect.map GameHistoryMsg gameHistoryEffect
-            )
+            Tuple.mapBoth
+                GameHistoryScreen
+                (Effect.map GameHistoryMsg)
+                GameHistory.init
 
         Router.Direct Router.ToCreateGame ->
             ( CreateGameScreen CreateGame.initial
@@ -60,27 +58,22 @@ initScreen direction screen =
             )
 
         Router.Direct (Router.ToPlayGame gameID) ->
-            let
-                ( initialPlayGame, playGameEffect ) =
-                    PlayGame.init gameID
-            in
-            ( PlayGameScreen gameID initialPlayGame
-            , Effect.map PlayGameMsg playGameEffect
-            )
+            Tuple.mapBoth
+                (PlayGameScreen gameID)
+                (Effect.map PlayGameMsg)
+                (PlayGame.init gameID)
 
         Router.Direct (Router.ToGameLog gameID) ->
-            let
-                ( initialGameLog, gameLogEffect ) =
-                    GameLog.init gameID
-            in
-            ( GameLogScreen gameID initialGameLog
-            , Effect.map GameLogMsg gameLogEffect
-            )
+            Tuple.mapBoth
+                (GameLogScreen gameID)
+                (Effect.map GameLogMsg)
+                (GameLog.init gameID)
 
         Router.Direct (Router.ToGameStat gameID) ->
-            ( screen
-            , Effect.none
-            )
+            Tuple.mapBoth
+                (GameStatScreen gameID)
+                (Effect.map GameStatMsg)
+                (GameStat.init gameID)
 
 
 init : () -> Url -> Browser.Navigation.Key -> ( Model, Effect Msg )
@@ -109,6 +102,7 @@ type Msg
     | CreateGameMsg CreateGame.Msg
     | PlayGameMsg PlayGame.Msg
     | GameLogMsg GameLog.Msg
+    | GameStatMsg GameStat.Msg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
@@ -192,6 +186,18 @@ update msg model =
         ( GameLogMsg _, _ ) ->
             ( model, Effect.none )
 
+        ( GameStatMsg gameStatMsg, GameStatScreen gameID gameStat ) ->
+            let
+                ( nextGameStat, gameStatEffect ) =
+                    GameStat.update gameStatMsg gameStat
+            in
+            ( { model | screen = GameStatScreen gameID nextGameStat }
+            , Effect.map GameStatMsg gameStatEffect
+            )
+
+        ( GameStatMsg _, _ ) ->
+            ( model, Effect.none )
+
 
 
 -- S U B S C R I P T I O N
@@ -217,7 +223,7 @@ subscriptions model =
             GameLogScreen _ _ ->
                 Sub.none
 
-            GameStatScreen _ ->
+            GameStatScreen _ _ ->
                 Sub.none
         ]
 
@@ -272,8 +278,8 @@ view model =
         GameLogScreen gameID gameLog ->
             Element.map GameLogMsg (GameLog.view gameID gameLog)
 
-        GameStatScreen _ ->
-            none
+        GameStatScreen _ gameStat ->
+            Element.map GameStatMsg (GameStat.view gameStat)
 
 
 document : Model -> Browser.Document Msg

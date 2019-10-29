@@ -11,7 +11,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Extra exposing (formatMilliseconds)
 import FontAwesome.Icon exposing (Icon, viewIcon)
-import FontAwesome.Solid exposing (dice, square)
+import FontAwesome.Solid exposing (chartPie, dice, square)
 import Game exposing (Game)
 import Json.Decode as Decode
 import LocalStorage
@@ -211,6 +211,27 @@ viewPlayers players =
         (List.map viewPlayer players)
 
 
+viewLink : Router.Route -> Icon -> String -> Element msg
+viewLink route icon label =
+    link
+        [ Element.paddingXY 15 5
+        , Border.rounded 6
+        , Background.color Palette.amethyst
+        , Font.color Palette.clouds
+        ]
+        { url = Router.toPath route
+        , label =
+            row
+                [ Element.spacing 10
+                ]
+                [ viewIcon icon
+                    |> Element.html
+                    |> el []
+                , text label
+                ]
+        }
+
+
 view : Game.ID -> Model -> Element Msg
 view gameID model =
     case model of
@@ -227,27 +248,14 @@ view gameID model =
                 , Element.spacing 10
                 ]
                 [ viewPlayers (countPlayers state)
-                , link
-                    [ Element.paddingXY 10 5
-                    , Border.rounded 6
-                    , Background.color Palette.amethyst
-                    , Font.color Palette.clouds
+                , row
+                    [ Element.width Element.fill
+                    , Element.paddingXY 10 0
+                    , Element.spacing 10
                     ]
-                    { url = Router.toPath (Router.ToPlayGame gameID)
-                    , label =
-                        row
-                            [ Element.spacing 5
-                            ]
-                            [ viewIcon dice
-                                |> Element.html
-                                |> el []
-                            , text "play"
-                            ]
-                    }
-                    |> el
-                        [ Element.width Element.fill
-                        , Element.paddingXY 10 0
-                        ]
+                    [ viewLink (Router.ToPlayGame gameID) dice "play"
+                    , viewLink (Router.ToGameStat gameID) chartPie "stat"
+                    ]
                 , state.turns
                     |> List.filterMap
                         (\turn ->

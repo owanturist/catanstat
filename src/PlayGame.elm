@@ -10,8 +10,8 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
 import Extra exposing (formatMilliseconds)
-import FontAwesome.Icon exposing (viewIcon)
-import FontAwesome.Solid exposing (listUl, square)
+import FontAwesome.Icon exposing (Icon, viewIcon)
+import FontAwesome.Solid exposing (chartPie, listUl, square)
 import Game exposing (Game)
 import ID exposing (ID)
 import LocalStorage
@@ -250,6 +250,27 @@ viewResult ( whiteDice, redDice, eventDice ) current =
         }
 
 
+viewLink : Router.Route -> Icon -> String -> Element msg
+viewLink route icon label =
+    link
+        [ Element.paddingXY 15 5
+        , Border.rounded 6
+        , Background.color Palette.amethyst
+        , Font.color Palette.clouds
+        ]
+        { url = Router.toPath route
+        , label =
+            row
+                [ Element.spacing 10
+                ]
+                [ viewIcon icon
+                    |> Element.html
+                    |> el []
+                , text label
+                ]
+        }
+
+
 view : Game.ID -> Model -> Element Msg
 view gameID model =
     let
@@ -292,25 +313,11 @@ view gameID model =
                     , bottom = 0
                     , right = 0
                     }
+                , Element.spacing 10
                 , Element.width Element.fill
                 ]
-                [ link
-                    [ Element.paddingXY 10 5
-                    , Border.rounded 6
-                    , Background.color Palette.amethyst
-                    , Font.color Palette.clouds
-                    ]
-                    { url = Router.toPath (Router.ToGameLog gameID)
-                    , label =
-                        row
-                            [ Element.spacing 5
-                            ]
-                            [ viewIcon listUl
-                                |> Element.html
-                                |> el []
-                            , text "logs"
-                            ]
-                    }
+                [ viewLink (Router.ToGameLog gameID) listUl "logs"
+                , viewLink (Router.ToGameStat gameID) chartPie "stat"
                 ]
             , viewDice White white Dice.numbers
             , viewDice Red red Dice.numbers
