@@ -11,9 +11,9 @@ module Player exposing
     , x6
     )
 
-import Element
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
+import Palette
 
 
 
@@ -85,26 +85,26 @@ colorDecoder =
         Decode.int
 
 
-paint : Color -> Element.Color
+paint : Color -> Palette.Color
 paint color =
     case color of
         White ->
-            Element.rgb255 236 240 241
+            Palette.clouds
 
         Red ->
-            Element.rgb255 231 76 60
+            Palette.alizarin
 
         Blue ->
-            Element.rgb255 52 152 219
+            Palette.peterRiver
 
         Yellow ->
-            Element.rgb255 243 156 18
+            Palette.orange
 
         Green ->
-            Element.rgb255 46 204 113
+            Palette.emerald
 
         Brown ->
-            Element.rgb255 211 84 0
+            Palette.pumpkin
 
 
 

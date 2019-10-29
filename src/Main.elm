@@ -10,6 +10,7 @@ import Element exposing (Element, none)
 import FontAwesome.Styles
 import Game
 import GameHistory
+import GameLog
 import Middleware
 import PlayGame
 import Router
@@ -25,6 +26,8 @@ type Screen
     | GameHistoryScreen GameHistory.Model
     | CreateGameScreen CreateGame.Model
     | PlayGameScreen Game.ID PlayGame.Model
+    | GameLogScreen Game.ID GameLog.Model
+    | GameStatScreen Game.ID
 
 
 type alias Model =
@@ -65,6 +68,20 @@ initScreen direction screen =
             , Effect.map PlayGameMsg playGameEffect
             )
 
+        Router.Direct (Router.ToGameLog gameID) ->
+            let
+                ( initialGameLog, gameLogEffect ) =
+                    GameLog.init gameID
+            in
+            ( GameLogScreen gameID initialGameLog
+            , Effect.map GameLogMsg gameLogEffect
+            )
+
+        Router.Direct (Router.ToGameStat gameID) ->
+            ( screen
+            , Effect.none
+            )
+
 
 init : () -> Url -> Browser.Navigation.Key -> ( Model, Effect Msg )
 init _ url navigation =
@@ -91,6 +108,7 @@ type Msg
     | GameHistoryMsg GameHistory.Msg
     | CreateGameMsg CreateGame.Msg
     | PlayGameMsg PlayGame.Msg
+    | GameLogMsg GameLog.Msg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
@@ -162,6 +180,18 @@ update msg model =
         ( PlayGameMsg _, _ ) ->
             ( model, Effect.none )
 
+        ( GameLogMsg gameLogMsg, GameLogScreen gameID gameLog ) ->
+            let
+                ( nextGameLog, gameLogEffect ) =
+                    GameLog.update gameLogMsg gameLog
+            in
+            ( { model | screen = GameLogScreen gameID nextGameLog }
+            , Effect.map GameLogMsg gameLogEffect
+            )
+
+        ( GameLogMsg _, _ ) ->
+            ( model, Effect.none )
+
 
 
 -- S U B S C R I P T I O N
@@ -183,6 +213,12 @@ subscriptions model =
 
             PlayGameScreen _ playGame ->
                 Sub.map PlayGameMsg (PlayGame.subscriptions playGame)
+
+            GameLogScreen _ _ ->
+                Sub.none
+
+            GameStatScreen _ ->
+                Sub.none
         ]
 
 
@@ -230,8 +266,14 @@ view model =
         CreateGameScreen createGame ->
             Element.map CreateGameMsg (CreateGame.view createGame)
 
-        PlayGameScreen _ playGame ->
-            Element.map PlayGameMsg (PlayGame.view playGame)
+        PlayGameScreen gameID playGame ->
+            Element.map PlayGameMsg (PlayGame.view gameID playGame)
+
+        GameLogScreen _ gameLog ->
+            Element.map GameLogMsg (GameLog.view gameLog)
+
+        GameStatScreen _ ->
+            none
 
 
 document : Model -> Browser.Document Msg

@@ -11,9 +11,9 @@ module Dice exposing
     , toInt
     )
 
-import Element
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
+import Palette
 
 
 
@@ -146,17 +146,17 @@ events =
     [ Yellow, Blue, Green, Black, Black, Black ]
 
 
-paint : Event -> Element.Color
+paint : Event -> Palette.Color
 paint event =
     case event of
         Yellow ->
-            Element.rgb255 241 196 15
+            Palette.sunFlower
 
         Blue ->
-            Element.rgb255 41 128 185
+            Palette.belizeHole
 
         Green ->
-            Element.rgb255 39 174 96
+            Palette.nephritis
 
         Black ->
-            Element.rgb255 44 62 80
+            Palette.midnightBlue

@@ -4,17 +4,19 @@ import Api
 import Cons
 import Dice
 import Effect exposing (Effect)
-import Element exposing (Element, column, el, none, row, text)
+import Element exposing (Element, column, el, link, none, row, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
 import FontAwesome.Icon exposing (viewIcon)
-import FontAwesome.Solid exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo, square)
+import FontAwesome.Solid exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo, listUl, square)
 import Game exposing (Game)
 import ID exposing (ID)
 import LocalStorage
+import Palette
 import Player exposing (Player)
+import Router
 import Task
 import Time
 
@@ -153,7 +155,7 @@ viewPlayer duration player =
         [ Element.width Element.fill
         , Element.height (Element.px 60)
         , Background.color (Player.paint player.color)
-        , Font.color (Element.rgb255 236 240 241)
+        , Font.color Palette.clouds
         ]
         (case duration of
             Nothing ->
@@ -216,12 +218,12 @@ viewDiceSide vivid dice =
         ( fColor, label ) =
             case dice of
                 White white ->
-                    ( Element.rgb255 149 165 166
+                    ( Palette.concrete
                     , viewNumberDice white
                     )
 
                 Red red ->
-                    ( Element.rgb255 231 76 60
+                    ( Palette.alizarin
                     , viewNumberDice red
                     )
 
@@ -231,8 +233,7 @@ viewDiceSide vivid dice =
                     )
     in
     button
-        [ Element.width Element.fill
-        , Border.rounded 5
+        [ Border.rounded 5
         , Font.color fColor
         , Font.size 60
         , Font.center
@@ -250,8 +251,8 @@ viewDiceSide vivid dice =
 viewDice : (a -> Dice) -> Maybe a -> List a -> Element Msg
 viewDice toDice selected elements =
     row
-        [ Element.width Element.fill
-        , Element.paddingXY 10 0
+        [ Element.spaceEvenly
+        , Element.width Element.fill
         ]
         (List.map
             (\element ->
@@ -272,9 +273,9 @@ viewResult ( whiteDice, redDice, eventDice ) current =
         , Border.rounded 80
         , eventDice
             |> Maybe.map Dice.paint
-            |> Maybe.withDefault (Element.rgb255 189 195 199)
+            |> Maybe.withDefault Palette.silver
             |> Background.color
-        , Font.color (Element.rgb255 236 240 241)
+        , Font.color Palette.clouds
         , Font.center
         , Font.size 84
         , if whiteDice == Nothing || redDice == Nothing || eventDice == Nothing then
@@ -292,8 +293,8 @@ viewResult ( whiteDice, redDice, eventDice ) current =
         }
 
 
-view : Model -> Element Msg
-view model =
+view : Game.ID -> Model -> Element Msg
+view gameID model =
     let
         ( white, red, event ) =
             model.dice
@@ -316,15 +317,48 @@ view model =
     column
         [ Element.width Element.fill
         , Element.height Element.fill
-        , Element.spacing 5
         ]
         [ model.game
             |> Maybe.map (Cons.toList << .players)
             |> Maybe.map2 (viewPlayers duration) current
             |> Maybe.withDefault none
-        , viewDice White white Dice.numbers
-        , viewDice Red red Dice.numbers
-        , viewDice Event event Dice.events
-        , Maybe.map (viewResult model.dice) current
-            |> Maybe.withDefault none
+        , column
+            [ Element.paddingXY 10 0
+            , Element.spacing 5
+            , Element.width Element.fill
+            , Element.height Element.fill
+            ]
+            [ row
+                [ Element.paddingEach
+                    { top = 10
+                    , left = 0
+                    , bottom = 0
+                    , right = 0
+                    }
+                , Element.width Element.fill
+                ]
+                [ link
+                    [ Element.paddingXY 10 5
+                    , Border.rounded 6
+                    , Background.color Palette.amethyst
+                    , Font.color Palette.clouds
+                    ]
+                    { url = Router.toPath (Router.ToGameLog gameID)
+                    , label =
+                        row
+                            [ Element.spacing 5
+                            ]
+                            [ viewIcon listUl
+                                |> Element.html
+                                |> el []
+                            , text "logs"
+                            ]
+                    }
+                ]
+            , viewDice White white Dice.numbers
+            , viewDice Red red Dice.numbers
+            , viewDice Event event Dice.events
+            , Maybe.map (viewResult model.dice) current
+                |> Maybe.withDefault none
+            ]
         ]

@@ -11,6 +11,7 @@ import Element.Events as Events
 import Element.Font as Font
 import Element.Input as Input exposing (button)
 import Game exposing (Game)
+import Palette
 import Player exposing (Player)
 import Router
 import Task
@@ -188,8 +189,8 @@ view model =
         , button
             [ Element.padding 10
             , Element.width Element.fill
-            , Background.color (Element.rgb255 52 73 94)
-            , Font.color (Element.rgb255 236 240 241)
+            , Background.color Palette.wetAsphalt
+            , Font.color Palette.clouds
             , Font.center
             ]
             { onPress =

@@ -20,6 +20,8 @@ type Route
     = ToGameHistory
     | ToCreateGame
     | ToPlayGame Game.ID
+    | ToGameLog Game.ID
+    | ToGameStat Game.ID
 
 
 parser : Parser (Route -> a) a
@@ -28,6 +30,8 @@ parser =
         [ Url.Parser.map ToGameHistory top
         , Url.Parser.map ToCreateGame (s "create")
         , Url.Parser.map ToPlayGame (s "game" </> ID.parser)
+        , Url.Parser.map ToGameLog (s "game" </> ID.parser </> s "log")
+        , Url.Parser.map ToGameStat (s "game" </> ID.parser </> s "stat")
         ]
 
 
@@ -57,6 +61,12 @@ toPath route =
 
         ToPlayGame gameID ->
             absolute [ "game", ID.toString gameID ] []
+
+        ToGameLog gameID ->
+            absolute [ "game", ID.toString gameID, "log" ] []
+
+        ToGameStat gameID ->
+            absolute [ "game", ID.toString gameID, "stat" ] []
 
 
 push : Route -> Effect msg
