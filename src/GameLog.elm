@@ -94,7 +94,7 @@ type alias State =
 type Model
     = Loading
     | Failure Decode.Error
-    | Succeed State
+    | Succeed Game State
 
 
 init : Game.ID -> ( Model, Effect Msg )
@@ -127,7 +127,7 @@ update msg model =
             )
 
         ( LoadGame (Ok loadedGame), _ ) ->
-            ( Succeed
+            ( Succeed loadedGame
                 { turns = gameToTurns loadedGame
                 , players = playersToDict loadedGame.players
                 , sequence = Cons.map .color loadedGame.players
@@ -239,9 +239,14 @@ view gameID model =
             none
 
         Failure error ->
-            text (Decode.errorToString error)
+            el
+                [ Element.width Element.fill
+                , Font.family [ Font.monospace ]
+                , Font.size 10
+                ]
+                (text (Decode.errorToString error))
 
-        Succeed state ->
+        Succeed game state ->
             column
                 [ Element.width Element.fill
                 , Element.height Element.fill
@@ -255,6 +260,19 @@ view gameID model =
                     ]
                     [ viewLink (Router.ToPlayGame gameID) dice "play"
                     , viewLink (Router.ToGameStat gameID) chartPie "stat"
+                    , case game.status of
+                        Game.InGame ->
+                            none
+
+                        Game.Finished endAt _ ->
+                            Time.posixToMillis endAt
+                                - Time.posixToMillis game.startAt
+                                |> formatMilliseconds
+                                |> text
+                                |> el
+                                    [ Element.alignRight
+                                    , Font.color Palette.wetAsphalt
+                                    ]
                     ]
                 , state.turns
                     |> List.filterMap

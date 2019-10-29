@@ -1,4 +1,4 @@
-module Game exposing (Dice, Game, ID, Move, create, decoder, encoder, generateID, getCurrentPlayer)
+module Game exposing (Dice, Game, ID, Move, Status(..), create, decoder, encoder, generateID, getCurrentPlayer)
 
 import Cons exposing (Cons)
 import Dice
@@ -80,31 +80,62 @@ moveDecoder =
         (Decode.index 2 diceDecoder)
 
 
+type Status
+    = InGame
+    | Finished Time.Posix Player.Color
+
+
+statusEncoder : Status -> Value
+statusEncoder status =
+    case status of
+        InGame ->
+            Encode.null
+
+        Finished endAt winner ->
+            Encode.list identity
+                [ posixEncoder endAt
+                , Player.colorEncoder winner
+                ]
+
+
+statusDecoder : Decoder Status
+statusDecoder =
+    Decode.oneOf
+        [ Decode.null InGame
+        , Decode.map2 Finished
+            (Decode.index 0 posixDecoder)
+            (Decode.index 1 Player.colorDecoder)
+        ]
+
+
 type alias Game =
     { id : ID
     , startAt : Time.Posix
+    , status : Status
     , players : Cons Player
     , moves : List Move
     }
 
 
 encoder : Game -> Value
-encoder game =
+encoder { id, startAt, status, players, moves } =
     Encode.list identity
-        [ ID.encoder game.id
-        , posixEncoder game.startAt
-        , Encode.list Player.encoder (Cons.toList game.players)
-        , Encode.list moveEncoder game.moves
+        [ ID.encoder id
+        , posixEncoder startAt
+        , statusEncoder status
+        , Encode.list Player.encoder (Cons.toList players)
+        , Encode.list moveEncoder moves
         ]
 
 
 decoder : Decoder Game
 decoder =
-    Decode.map4 Game
+    Decode.map5 Game
         (Decode.index 0 ID.decoder)
         (Decode.index 1 posixDecoder)
-        (Decode.index 2 (Decode.oneOrMore Cons.cons Player.decoder))
-        (Decode.index 3 (Decode.list moveDecoder))
+        (Decode.index 2 statusDecoder)
+        (Decode.index 3 (Decode.oneOrMore Cons.cons Player.decoder))
+        (Decode.index 4 (Decode.list moveDecoder))
 
 
 getCurrentPlayerHelp : Player.Color -> List Player -> Maybe Player
@@ -137,4 +168,4 @@ getCurrentPlayer game =
 
 create : Cons Player -> Time.Posix -> Game
 create players posix =
-    Game (generateID posix) posix players []
+    Game (generateID posix) posix InGame players []

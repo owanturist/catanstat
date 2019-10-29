@@ -9,7 +9,7 @@ import Element exposing (Element, column, el, link, none, row, table, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Extra exposing (ifelse)
+import Extra exposing (formatMilliseconds, ifelse)
 import FontAwesome.Icon exposing (Icon, viewIcon)
 import FontAwesome.Solid exposing (dice, listUl, square)
 import Game exposing (Game)
@@ -18,6 +18,7 @@ import LocalStorage
 import Palette
 import Round
 import Router
+import Time
 
 
 
@@ -112,7 +113,7 @@ calcCombinationsEvents moves =
 type Model
     = Loading
     | Failure Decode.Error
-    | Succeed State
+    | Succeed Game State
 
 
 init : Game.ID -> ( Model, Effect Msg )
@@ -145,7 +146,7 @@ update msg model =
             )
 
         ( LoadGame (Ok loadedGame), _ ) ->
-            ( Succeed
+            ( Succeed loadedGame
                 { total = List.length loadedGame.moves
                 , combinationsNumbers = calcCombinationsNumbers loadedGame.moves
                 , overallWhite = calcOverallNumbers .white loadedGame.moves
@@ -367,9 +368,14 @@ view gameID model =
             none
 
         Failure error ->
-            text (Decode.errorToString error)
+            el
+                [ Element.width Element.fill
+                , Font.family [ Font.monospace ]
+                , Font.size 10
+                ]
+                (text (Decode.errorToString error))
 
-        Succeed state ->
+        Succeed game state ->
             column
                 [ Element.padding 10
                 , Element.spacing 20
@@ -377,9 +383,23 @@ view gameID model =
                 ]
                 [ row
                     [ Element.spacing 10
+                    , Element.width Element.fill
                     ]
                     [ viewLink (Router.ToPlayGame gameID) dice "play"
                     , viewLink (Router.ToGameLog gameID) listUl "logs"
+                    , case game.status of
+                        Game.InGame ->
+                            none
+
+                        Game.Finished endAt _ ->
+                            Time.posixToMillis endAt
+                                - Time.posixToMillis game.startAt
+                                |> formatMilliseconds
+                                |> text
+                                |> el
+                                    [ Element.alignRight
+                                    , Font.color Palette.wetAsphalt
+                                    ]
                     ]
                 , viewCombinationsNumbersTable state.total state.combinationsNumbers
                 , viewOverallNumbersTable Palette.concrete state.total state.overallWhite
