@@ -5,12 +5,13 @@ import Cons exposing (Cons)
 import Dice
 import Dict.Any exposing (AnyDict)
 import Effect exposing (Effect)
-import Element exposing (Element, column, el, none, row, text)
+import Element exposing (Element, column, el, link, none, row, text)
+import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Extra exposing (formatMilliseconds)
 import FontAwesome.Icon exposing (Icon, viewIcon)
-import FontAwesome.Solid exposing (square)
+import FontAwesome.Solid exposing (dice, square)
 import Game exposing (Game)
 import Json.Decode as Decode
 import LocalStorage
@@ -55,17 +56,39 @@ gameToTurns game =
         |> .turns
 
 
-type alias State =
-    { turns : List Turn
-    , players : AnyDict Int Player.Color Player
-    }
-
-
 playersToDict : Cons Player -> AnyDict Int Player.Color Player
 playersToDict players =
     players
         |> Cons.foldr (\player acc -> ( player.color, player ) :: acc) []
         |> Dict.Any.fromList Player.colorToInt
+
+
+countPlayers : State -> List ( Int, Player )
+countPlayers state =
+    let
+        durations =
+            List.foldr
+                (\turn ->
+                    Dict.Any.update turn.player
+                        (Just << (+) turn.duration << Maybe.withDefault 0)
+                )
+                (Dict.Any.empty Player.colorToInt)
+                state.turns
+    in
+    Cons.filterMap
+        (\playerColor ->
+            Maybe.map2 Tuple.pair
+                (Dict.Any.get playerColor durations)
+                (Dict.Any.get playerColor state.players)
+        )
+        state.sequence
+
+
+type alias State =
+    { turns : List Turn
+    , players : AnyDict Int Player.Color Player
+    , sequence : Cons Player.Color
+    }
 
 
 type Model
@@ -107,6 +130,7 @@ update msg model =
             ( Succeed
                 { turns = gameToTurns loadedGame
                 , players = playersToDict loadedGame.players
+                , sequence = Cons.map .color loadedGame.players
                 }
             , Effect.none
             )
@@ -163,8 +187,32 @@ viewTurn turn player =
             ]
 
 
-view : Model -> Element Msg
-view model =
+viewPlayer : ( Int, Player ) -> Element Msg
+viewPlayer ( duration, player ) =
+    formatMilliseconds duration
+        |> text
+        |> el
+            [ Element.centerX
+            , Element.centerY
+            ]
+        |> el
+            [ Element.width Element.fill
+            , Element.height (Element.px 60)
+            , Background.color (Player.toColor player.color)
+            , Font.color Palette.clouds
+            ]
+
+
+viewPlayers : List ( Int, Player ) -> Element Msg
+viewPlayers players =
+    row
+        [ Element.width Element.fill
+        ]
+        (List.map viewPlayer players)
+
+
+view : Game.ID -> Model -> Element Msg
+view gameID model =
     case model of
         Loading ->
             none
@@ -173,14 +221,42 @@ view model =
             text (Decode.errorToString error)
 
         Succeed state ->
-            state.turns
-                |> List.filterMap
-                    (\turn ->
-                        Maybe.map
-                            (viewTurn turn)
-                            (Dict.Any.get turn.player state.players)
-                    )
-                |> column
-                    [ Element.width Element.fill
-                    , Element.height Element.fill
+            column
+                [ Element.width Element.fill
+                , Element.height Element.fill
+                , Element.spacing 10
+                ]
+                [ viewPlayers (countPlayers state)
+                , link
+                    [ Element.paddingXY 10 5
+                    , Border.rounded 6
+                    , Background.color Palette.amethyst
+                    , Font.color Palette.clouds
                     ]
+                    { url = Router.toPath (Router.ToPlayGame gameID)
+                    , label =
+                        row
+                            [ Element.spacing 5
+                            ]
+                            [ viewIcon dice
+                                |> Element.html
+                                |> el []
+                            , text "play"
+                            ]
+                    }
+                    |> el
+                        [ Element.width Element.fill
+                        , Element.paddingXY 10 0
+                        ]
+                , state.turns
+                    |> List.filterMap
+                        (\turn ->
+                            Maybe.map
+                                (viewTurn turn)
+                                (Dict.Any.get turn.player state.players)
+                        )
+                    |> column
+                        [ Element.width Element.fill
+                        , Element.height Element.shrink
+                        ]
+                ]

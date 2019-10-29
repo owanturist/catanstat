@@ -269,8 +269,8 @@ view model =
         PlayGameScreen gameID playGame ->
             Element.map PlayGameMsg (PlayGame.view gameID playGame)
 
-        GameLogScreen _ gameLog ->
-            Element.map GameLogMsg (GameLog.view gameLog)
+        GameLogScreen gameID gameLog ->
+            Element.map GameLogMsg (GameLog.view gameID gameLog)
 
         GameStatScreen _ ->
             none
