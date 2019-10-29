@@ -272,8 +272,8 @@ view model =
         CreateGameScreen createGame ->
             Element.map CreateGameMsg (CreateGame.view createGame)
 
-        PlayGameScreen gameID playGame ->
-            Element.map PlayGameMsg (PlayGame.view gameID playGame)
+        PlayGameScreen _ playGame ->
+            Element.map PlayGameMsg (PlayGame.view playGame)
 
         GameLogScreen gameID gameLog ->
             Element.map GameLogMsg (GameLog.view gameID gameLog)
