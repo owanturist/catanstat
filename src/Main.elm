@@ -7,6 +7,7 @@ import Effect exposing (Effect)
 import Effect.History
 import Effect.LocalStorage
 import Element exposing (Element, none)
+import FontAwesome.Styles
 import Game
 import GameHistory
 import Middleware
@@ -236,7 +237,8 @@ view model =
 document : Model -> Browser.Document Msg
 document model =
     Browser.Document "Catan"
-        [ Element.layout [] (view model)
+        [ FontAwesome.Styles.css
+        , Element.layout [] (view model)
         ]
 
 

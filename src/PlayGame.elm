@@ -9,6 +9,8 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
+import FontAwesome.Icon exposing (viewIcon)
+import FontAwesome.Solid exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo, square)
 import Game exposing (Game)
 import ID exposing (ID)
 import LocalStorage
@@ -21,23 +23,19 @@ import Time
 -- M O D E L
 
 
-type alias State =
+type alias Model =
     { dice : ( Maybe Dice.Number, Maybe Dice.Number, Maybe Dice.Event )
     , now : Time.Posix
+    , game : Maybe Game
     }
-
-
-type Model
-    = Model (Maybe Game) State
 
 
 init : ID { game : () } -> ( Model, Effect Msg )
 init gameID =
     ( Model
+        ( Nothing, Nothing, Nothing )
+        (Time.millisToPosix 0)
         Nothing
-        { dice = ( Nothing, Nothing, Nothing )
-        , now = Time.millisToPosix 0
-        }
     , Effect.batch
         [ Api.loadGame gameID
             |> Effect.map LoadGame
@@ -66,47 +64,50 @@ type Msg
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
-update msg (Model game state) =
+update msg model =
     case msg of
         LoadGame (Err err) ->
-            ( Model game state
+            ( model
             , Effect.none
             )
 
         LoadGame (Ok loadedGame) ->
-            ( Model (Just loadedGame) state
+            ( { model | game = Just loadedGame }
             , Effect.none
             )
 
         Tick now ->
-            ( Model game { state | now = now }
+            ( { model | now = now }
             , Effect.none
             )
 
         Choose dice ->
-            ( case ( dice, state.dice ) of
+            ( case ( dice, model.dice ) of
                 ( White white, ( _, red, event ) ) ->
-                    Model game { state | dice = ( Just white, red, event ) }
+                    { model | dice = ( Just white, red, event ) }
 
                 ( Red red, ( white, _, event ) ) ->
-                    Model game { state | dice = ( white, Just red, event ) }
+                    { model | dice = ( white, Just red, event ) }
 
                 ( Event event, ( white, red, _ ) ) ->
-                    Model game { state | dice = ( white, red, Just event ) }
+                    { model | dice = ( white, red, Just event ) }
             , Effect.none
             )
 
         Turn current finalDice ->
-            case game of
+            case model.game of
                 Nothing ->
-                    ( Model game state, Effect.none )
+                    ( model, Effect.none )
 
-                Just g ->
+                Just game ->
                     let
                         nextGame =
-                            { g | moves = Game.Move state.now current finalDice :: g.moves }
+                            { game | moves = Game.Move model.now current finalDice :: game.moves }
                     in
-                    ( Model (Just nextGame) { state | dice = ( Nothing, Nothing, Nothing ) }
+                    ( { model
+                        | dice = ( Nothing, Nothing, Nothing )
+                        , game = Just nextGame
+                      }
                     , Api.saveGame nextGame
                     )
 
@@ -187,35 +188,53 @@ viewPlayers duration current players =
         )
 
 
+viewNumberDice : Dice.Number -> Element msg
+viewNumberDice dice =
+    case dice of
+        Dice.One ->
+            Element.html (viewIcon diceOne)
+
+        Dice.Two ->
+            Element.html (viewIcon diceTwo)
+
+        Dice.Three ->
+            Element.html (viewIcon diceThree)
+
+        Dice.Four ->
+            Element.html (viewIcon diceFour)
+
+        Dice.Five ->
+            Element.html (viewIcon diceFive)
+
+        Dice.Six ->
+            Element.html (viewIcon diceSix)
+
+
 viewDiceSide : Bool -> Dice -> Element Msg
 viewDiceSide vivid dice =
     let
-        ( bgColor, fColor, label ) =
+        ( fColor, label ) =
             case dice of
                 White white ->
-                    ( Element.rgb255 236 240 241
-                    , Element.rgb255 52 73 94
-                    , text (String.fromInt (Dice.toInt white))
+                    ( Element.rgb255 149 165 166
+                    , viewNumberDice white
                     )
 
                 Red red ->
                     ( Element.rgb255 231 76 60
-                    , Element.rgb255 236 240 241
-                    , text (String.fromInt (Dice.toInt red))
+                    , viewNumberDice red
                     )
 
                 Event event ->
                     ( Dice.paint event
-                    , Dice.paint event
-                    , none
+                    , Element.html (viewIcon square)
                     )
     in
     button
         [ Element.width Element.fill
-        , Element.height (Element.px 60)
         , Border.rounded 5
-        , Background.color bgColor
         , Font.color fColor
+        , Font.size 60
         , Font.center
         , if vivid then
             Element.alpha 1
@@ -233,7 +252,6 @@ viewDice toDice selected elements =
     row
         [ Element.width Element.fill
         , Element.paddingXY 10 0
-        , Element.spacing 10
         ]
         (List.map
             (\element ->
@@ -275,38 +293,38 @@ viewResult ( whiteDice, redDice, eventDice ) current =
 
 
 view : Model -> Element Msg
-view (Model game state) =
+view model =
     let
         ( white, red, event ) =
-            state.dice
+            model.dice
 
         current =
-            Maybe.map Game.getCurrentPlayer game
+            Maybe.map Game.getCurrentPlayer model.game
 
         duration =
-            case game of
+            case model.game of
                 Nothing ->
                     0
 
-                Just { startAt, moves } ->
-                    List.head moves
+                Just game ->
+                    List.head game.moves
                         |> Maybe.map .endAt
-                        |> Maybe.withDefault startAt
+                        |> Maybe.withDefault game.startAt
                         |> Time.posixToMillis
-                        |> (-) (Time.posixToMillis state.now)
+                        |> (-) (Time.posixToMillis model.now)
     in
     column
         [ Element.width Element.fill
         , Element.height Element.fill
-        , Element.spacing 10
+        , Element.spacing 5
         ]
-        [ game
+        [ model.game
             |> Maybe.map (Cons.toList << .players)
             |> Maybe.map2 (viewPlayers duration) current
             |> Maybe.withDefault none
         , viewDice White white Dice.numbers
         , viewDice Red red Dice.numbers
         , viewDice Event event Dice.events
-        , Maybe.map (viewResult state.dice) current
+        , Maybe.map (viewResult model.dice) current
             |> Maybe.withDefault none
         ]
