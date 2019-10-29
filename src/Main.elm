@@ -53,9 +53,10 @@ initScreen direction screen =
                 GameHistory.init
 
         Router.Direct Router.ToCreateGame ->
-            ( CreateGameScreen CreateGame.initial
-            , Effect.none
-            )
+            Tuple.mapBoth
+                CreateGameScreen
+                (Effect.map CreateGameMsg)
+                CreateGame.initial
 
         Router.Direct (Router.ToPlayGame gameID) ->
             Tuple.mapBoth
@@ -253,7 +254,7 @@ middlewares model effect =
             )
 
         Effect.Toast _ ->
-            Debug.todo "Main.Toast"
+            ( model, Cmd.none )
 
 
 

@@ -549,10 +549,20 @@ viewSucceed game state =
                                 , Font.color Palette.wetAsphalt
                                 ]
                 ]
-            , viewDice White state.white Dice.numbers
-            , viewDice Red state.red Dice.numbers
-            , viewDice Event state.event Dice.events
-            , viewResult current state
+            , if game.status == Game.InGame then
+                column
+                    [ Element.width Element.fill
+                    , Element.height Element.fill
+                    , Element.spacing 5
+                    ]
+                    [ viewDice White state.white Dice.numbers
+                    , viewDice Red state.red Dice.numbers
+                    , viewDice Event state.event Dice.events
+                    , viewResult current state
+                    ]
+
+              else
+                none
             ]
         ]
 
