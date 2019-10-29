@@ -143,7 +143,7 @@ viewDraft ( position, { inGame, player } ) =
         [ Element.paddingXY 20 5
         , Element.spacing 5
         , Element.width Element.fill
-        , Background.color (Player.paint player.color)
+        , Background.color (Player.toColor player.color)
         , if inGame then
             Element.alpha 1
 

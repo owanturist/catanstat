@@ -6,7 +6,7 @@ module Player exposing
     , colorToInt
     , decoder
     , encoder
-    , paint
+    , toColor
     , x4
     , x6
     )
@@ -85,11 +85,11 @@ colorDecoder =
         Decode.int
 
 
-paint : Color -> Palette.Color
-paint color =
+toColor : Color -> Palette.Color
+toColor color =
     case color of
         White ->
-            Palette.clouds
+            Palette.concrete
 
         Red ->
             Palette.alizarin

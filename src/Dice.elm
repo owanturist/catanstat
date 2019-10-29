@@ -7,10 +7,13 @@ module Dice exposing
     , numberDecoder
     , numberEncoder
     , numbers
-    , paint
+    , toColor
+    , toIcon
     , toInt
     )
 
+import FontAwesome.Icon exposing (Icon)
+import FontAwesome.Solid exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 import Palette
@@ -146,17 +149,39 @@ events =
     [ Yellow, Blue, Green, Black, Black, Black ]
 
 
-paint : Event -> Palette.Color
-paint event =
+toColor : Event -> Palette.Color
+toColor event =
     case event of
         Yellow ->
             Palette.sunFlower
 
         Blue ->
-            Palette.belizeHole
+            Palette.peterRiver
 
         Green ->
             Palette.nephritis
 
         Black ->
             Palette.midnightBlue
+
+
+toIcon : Number -> Icon
+toIcon number =
+    case number of
+        One ->
+            diceOne
+
+        Two ->
+            diceTwo
+
+        Three ->
+            diceThree
+
+        Four ->
+            diceFour
+
+        Five ->
+            diceFive
+
+        Six ->
+            diceSix

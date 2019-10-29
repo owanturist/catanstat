@@ -1,24 +1,82 @@
 module GameLog exposing (Model, Msg, init, update, view)
 
 import Api
+import Cons exposing (Cons)
+import Dice
+import Dict.Any exposing (AnyDict)
 import Effect exposing (Effect)
-import Element exposing (Element, text)
+import Element exposing (Element, column, el, none, row, text)
+import Element.Border as Border
+import Element.Font as Font
+import Extra exposing (formatMilliseconds)
+import FontAwesome.Icon exposing (Icon, viewIcon)
+import FontAwesome.Solid exposing (square)
 import Game exposing (Game)
+import Json.Decode as Decode
 import LocalStorage
+import Palette
+import Player exposing (Player)
+import Router
+import Time
 
 
 
 -- M O D E L
 
 
-type alias Model =
-    { game : Maybe Game
+type alias Turn =
+    { index : Int
+    , player : Player.Color
+    , dice : Game.Dice
+    , duration : Int
     }
+
+
+gameToTurns : Game -> List Turn
+gameToTurns game =
+    List.foldr
+        (\move { index, startAt, turns } ->
+            { index = index + 1
+            , startAt = move.endAt
+            , turns =
+                { index = index
+                , player = move.player
+                , dice = move.dice
+                , duration = Time.posixToMillis move.endAt - Time.posixToMillis startAt
+                }
+                    :: turns
+            }
+        )
+        { index = 1
+        , startAt = game.startAt
+        , turns = []
+        }
+        game.moves
+        |> .turns
+
+
+type alias State =
+    { turns : List Turn
+    , players : AnyDict Int Player.Color Player
+    }
+
+
+playersToDict : Cons Player -> AnyDict Int Player.Color Player
+playersToDict players =
+    players
+        |> Cons.foldr (\player acc -> ( player.color, player ) :: acc) []
+        |> Dict.Any.fromList Player.colorToInt
+
+
+type Model
+    = Loading
+    | Failure Decode.Error
+    | Succeed State
 
 
 init : Game.ID -> ( Model, Effect Msg )
 init gameID =
-    ( Model Nothing
+    ( Loading
     , Api.loadGame gameID
         |> Effect.map LoadGame
     )
@@ -34,12 +92,22 @@ type Msg
 
 update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
-    case msg of
-        LoadGame (Err _) ->
-            ( model, Effect.none )
+    case ( msg, model ) of
+        ( LoadGame (Err LocalStorage.NotFound), _ ) ->
+            ( model
+            , Router.replace Router.ToCreateGame
+            )
 
-        LoadGame (Ok loadedGame) ->
-            ( { model | game = Just loadedGame }
+        ( LoadGame (Err (LocalStorage.DecodeError error)), _ ) ->
+            ( Failure error
+            , Effect.none
+            )
+
+        ( LoadGame (Ok loadedGame), _ ) ->
+            ( Succeed
+                { turns = gameToTurns loadedGame
+                , players = playersToDict loadedGame.players
+                }
             , Effect.none
             )
 
@@ -48,6 +116,71 @@ update msg model =
 -- V I E W
 
 
+viewDice : Palette.Color -> Icon -> Element msg
+viewDice color icon =
+    el
+        [ Font.color color
+        , Font.size 32
+        ]
+        (Element.html (viewIcon icon))
+
+
+viewTurn : Turn -> Player -> Element msg
+viewTurn turn player =
+    row
+        [ Element.width Element.fill
+        , Element.spacing 10
+        , Element.paddingEach
+            { top = 10
+            , right = 20
+            , bottom = 10
+            , left = 10
+            }
+        , Border.color Palette.silver
+        , Border.widthEach
+            { top = 1
+            , right = 0
+            , bottom = 0
+            , left = 0
+            }
+        , Font.size 24
+        ]
+        [ text (String.fromInt turn.index)
+        , viewDice Palette.concrete (Dice.toIcon turn.dice.white)
+        , viewDice Palette.pomegranate (Dice.toIcon turn.dice.red)
+        , viewDice (Dice.toColor turn.dice.event) square
+        , el [] (text (formatMilliseconds turn.duration))
+        ]
+        |> el
+            [ Element.width Element.fill
+            , Border.color (Player.toColor player.color)
+            , Border.widthEach
+                { top = 0
+                , right = 0
+                , bottom = 0
+                , left = 20
+                }
+            ]
+
+
 view : Model -> Element Msg
 view model =
-    text "LOG"
+    case model of
+        Loading ->
+            none
+
+        Failure error ->
+            text (Decode.errorToString error)
+
+        Succeed state ->
+            state.turns
+                |> List.filterMap
+                    (\turn ->
+                        Maybe.map
+                            (viewTurn turn)
+                            (Dict.Any.get turn.player state.players)
+                    )
+                |> column
+                    [ Element.width Element.fill
+                    , Element.height Element.fill
+                    ]

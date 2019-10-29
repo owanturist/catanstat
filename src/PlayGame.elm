@@ -9,8 +9,9 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input exposing (button)
+import Extra exposing (formatMilliseconds)
 import FontAwesome.Icon exposing (viewIcon)
-import FontAwesome.Solid exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo, listUl, square)
+import FontAwesome.Solid exposing (listUl, square)
 import Game exposing (Game)
 import ID exposing (ID)
 import LocalStorage
@@ -127,34 +128,12 @@ subscriptions _ =
 -- V I E W
 
 
-formatMilliseconds : Int -> String
-formatMilliseconds milliseconds =
-    let
-        seconds =
-            milliseconds // 1000
-
-        minutes =
-            seconds // 60
-
-        hours =
-            minutes // 60
-    in
-    if hours > 0 then
-        String.fromInt hours ++ "h " ++ String.fromInt (minutes - hours * 60) ++ "m"
-
-    else if minutes > 0 then
-        String.fromInt minutes ++ "m " ++ String.fromInt (seconds - minutes * 60) ++ "s"
-
-    else
-        String.fromInt seconds ++ "s"
-
-
 viewPlayer : Maybe Int -> Player -> Element Msg
 viewPlayer duration player =
     el
         [ Element.width Element.fill
         , Element.height (Element.px 60)
-        , Background.color (Player.paint player.color)
+        , Background.color (Player.toColor player.color)
         , Font.color Palette.clouds
         ]
         (case duration of
@@ -190,46 +169,24 @@ viewPlayers duration current players =
         )
 
 
-viewNumberDice : Dice.Number -> Element msg
-viewNumberDice dice =
-    case dice of
-        Dice.One ->
-            Element.html (viewIcon diceOne)
-
-        Dice.Two ->
-            Element.html (viewIcon diceTwo)
-
-        Dice.Three ->
-            Element.html (viewIcon diceThree)
-
-        Dice.Four ->
-            Element.html (viewIcon diceFour)
-
-        Dice.Five ->
-            Element.html (viewIcon diceFive)
-
-        Dice.Six ->
-            Element.html (viewIcon diceSix)
-
-
 viewDiceSide : Bool -> Dice -> Element Msg
 viewDiceSide vivid dice =
     let
-        ( fColor, label ) =
+        ( fColor, icon ) =
             case dice of
                 White white ->
                     ( Palette.concrete
-                    , viewNumberDice white
+                    , Dice.toIcon white
                     )
 
                 Red red ->
                     ( Palette.alizarin
-                    , viewNumberDice red
+                    , Dice.toIcon red
                     )
 
                 Event event ->
-                    ( Dice.paint event
-                    , Element.html (viewIcon square)
+                    ( Dice.toColor event
+                    , square
                     )
     in
     button
@@ -244,7 +201,7 @@ viewDiceSide vivid dice =
             Element.alpha 0.33
         ]
         { onPress = Just (Choose dice)
-        , label = label
+        , label = Element.html (viewIcon icon)
         }
 
 
@@ -272,7 +229,7 @@ viewResult ( whiteDice, redDice, eventDice ) current =
         , Element.height (Element.px 160)
         , Border.rounded 80
         , eventDice
-            |> Maybe.map Dice.paint
+            |> Maybe.map Dice.toColor
             |> Maybe.withDefault Palette.silver
             |> Background.color
         , Font.color Palette.clouds
