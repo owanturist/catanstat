@@ -62,6 +62,7 @@ type Msg
     = LoadGame (Result LocalStorage.Error Game)
     | Tick Time.Posix
     | Choose Dice
+    | Turn Player.Color Game.Dice
 
 
 update : Msg -> Model -> ( Model, Effect Msg )
@@ -95,6 +96,20 @@ update msg (Model game state) =
             , Effect.none
             )
 
+        Turn current finalDice ->
+            case game of
+                Nothing ->
+                    ( Model game state, Effect.none )
+
+                Just g ->
+                    let
+                        nextGame =
+                            { g | moves = Game.Move state.now current finalDice :: g.moves }
+                    in
+                    ( Model (Just nextGame) { state | dice = ( Nothing, Nothing, Nothing ) }
+                    , Api.saveGame nextGame
+                    )
+
 
 
 -- S U B S C R I P T I O N S
@@ -102,7 +117,7 @@ update msg (Model game state) =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Time.every 1000 Tick
+    Time.every 950 Tick
 
 
 
@@ -117,9 +132,12 @@ formatMilliseconds milliseconds =
 
         minutes =
             seconds // 60
+
+        hours =
+            minutes // 60
     in
-    if minutes > 99 then
-        String.fromInt minutes ++ "m"
+    if hours > 0 then
+        String.fromInt hours ++ "h " ++ String.fromInt (minutes - hours * 60) ++ "m"
 
     else if minutes > 0 then
         String.fromInt minutes ++ "m " ++ String.fromInt (seconds - minutes * 60) ++ "s"
@@ -149,29 +167,23 @@ viewPlayer duration player =
         )
 
 
-viewPlayers : Game -> State -> Element Msg
-viewPlayers game state =
-    let
-        current =
-            Game.getCurrentPlayer game
-    in
+viewPlayers : Int -> Player.Color -> List Player -> Element Msg
+viewPlayers duration current players =
     row
         [ Element.width Element.fill
         ]
-        (Cons.foldr
-            (\player acc ->
+        (List.map
+            (\player ->
                 viewPlayer
                     (if current == player.color then
-                        Just (Time.posixToMillis state.now - Time.posixToMillis game.startAt)
+                        Just duration
 
                      else
                         Nothing
                     )
                     player
-                    :: acc
             )
-            []
-            game.players
+            players
         )
 
 
@@ -233,8 +245,8 @@ viewDice toDice selected elements =
         )
 
 
-viewResult : ( Maybe Dice.Number, Maybe Dice.Number, Maybe Dice.Event ) -> Element msg
-viewResult ( whiteDice, redDice, eventDice ) =
+viewResult : ( Maybe Dice.Number, Maybe Dice.Number, Maybe Dice.Event ) -> Player.Color -> Element Msg
+viewResult ( whiteDice, redDice, eventDice ) current =
     button
         [ Element.centerX
         , Element.width (Element.px 160)
@@ -253,7 +265,7 @@ viewResult ( whiteDice, redDice, eventDice ) =
           else
             Element.alpha 1
         ]
-        { onPress = Nothing
+        { onPress = Maybe.map (Turn current) (Maybe.map3 Game.Dice whiteDice redDice eventDice)
         , label =
             Maybe.withDefault 0 (Maybe.map Dice.toInt whiteDice)
                 + Maybe.withDefault 0 (Maybe.map Dice.toInt redDice)
@@ -267,20 +279,34 @@ view (Model game state) =
     let
         ( white, red, event ) =
             state.dice
+
+        current =
+            Maybe.map Game.getCurrentPlayer game
+
+        duration =
+            case game of
+                Nothing ->
+                    0
+
+                Just { startAt, moves } ->
+                    List.head moves
+                        |> Maybe.map .endAt
+                        |> Maybe.withDefault startAt
+                        |> Time.posixToMillis
+                        |> (-) (Time.posixToMillis state.now)
     in
     column
         [ Element.width Element.fill
         , Element.height Element.fill
         , Element.spacing 10
         ]
-        [ case game of
-            Nothing ->
-                none
-
-            Just g ->
-                viewPlayers g state
+        [ game
+            |> Maybe.map (Cons.toList << .players)
+            |> Maybe.map2 (viewPlayers duration) current
+            |> Maybe.withDefault none
         , viewDice White white Dice.numbers
         , viewDice Red red Dice.numbers
         , viewDice Event event Dice.events
-        , viewResult state.dice
+        , Maybe.map (viewResult state.dice) current
+            |> Maybe.withDefault none
         ]

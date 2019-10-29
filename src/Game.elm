@@ -129,7 +129,7 @@ getCurrentPlayer game =
                 |> .color
 
         Just latest ->
-            Cons.tail game.players
+            Cons.toList game.players
                 |> getCurrentPlayerHelp latest.player
                 |> Maybe.withDefault (Cons.head game.players)
                 |> .color
