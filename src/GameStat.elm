@@ -9,6 +9,7 @@ import Element exposing (Element, column, el, link, none, row, table, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Extra exposing (ifelse)
 import FontAwesome.Icon exposing (Icon, viewIcon)
 import FontAwesome.Solid exposing (dice, listUl, square)
 import Game exposing (Game)
@@ -164,7 +165,7 @@ viewDiceSide : Palette.Color -> Icon -> Element msg
 viewDiceSide color icon =
     el
         [ Font.color color
-        , Font.size 50
+        , Font.size 32
         ]
         (Element.html (viewIcon icon))
 
@@ -190,6 +191,26 @@ viewLink route icon label =
         }
 
 
+viewTableCell : Bool -> Int -> Element msg -> Element msg
+viewTableCell first padY =
+    el
+        [ Element.height Element.fill
+        , Element.paddingXY 10 padY
+        , Border.widthEach
+            { top = 0
+            , right = ifelse first 1 0
+            , bottom = 1
+            , left = 0
+            }
+        , Border.color Palette.clouds
+        ]
+        << el
+            [ Element.centerY
+            , ifelse first Element.alignRight Element.alignLeft
+            , Border.color Palette.clouds
+            ]
+
+
 viewCombinationsNumbersTable : Int -> Dict Int Int -> Element msg
 viewCombinationsNumbersTable total combinationsNumbers =
     let
@@ -204,20 +225,21 @@ viewCombinationsNumbersTable total combinationsNumbers =
     in
     table
         [ Element.width Element.fill
+        , Font.size 16
         ]
         { data = data
         , columns =
-            [ { width = Element.fill
-              , header = text "Combination"
-              , view = text << String.fromInt << .combination
+            [ { width = Element.shrink
+              , header = none
+              , view = viewTableCell True 10 << text << String.fromInt << .combination
               }
             , { width = Element.fill
-              , header = text "Count"
-              , view = text << String.fromInt << .count
+              , header = none
+              , view = viewTableCell False 10 << text << String.fromInt << .count
               }
             , { width = Element.fill
-              , header = text "Percentage"
-              , view = text << percent total << .count
+              , header = none
+              , view = viewTableCell False 10 << text << percent total << .count
               }
             ]
         }
@@ -237,20 +259,25 @@ viewOverallEventsTable total overallEvents =
     in
     table
         [ Element.width Element.fill
+        , Font.size 16
         ]
         { data = data
         , columns =
-            [ { width = Element.fill
+            [ { width = Element.shrink
               , header = none
-              , view = \item -> viewDiceSide (Dice.toColor item.event) square
+              , view =
+                    \item ->
+                        square
+                            |> viewDiceSide (Dice.toColor item.event)
+                            |> viewTableCell True 5
               }
             , { width = Element.fill
               , header = none
-              , view = text << String.fromInt << .count
+              , view = viewTableCell False 5 << text << String.fromInt << .count
               }
             , { width = Element.fill
               , header = none
-              , view = text << percent total << .count
+              , view = viewTableCell False 5 << text << percent total << .count
               }
             ]
         }
@@ -270,20 +297,21 @@ viewOverallNumbersTable diceColor total overalNumbers =
     in
     table
         [ Element.width Element.fill
+        , Font.size 16
         ]
         { data = data
         , columns =
-            [ { width = Element.fill
+            [ { width = Element.shrink
               , header = none
-              , view = viewDiceSide diceColor << Dice.toIcon << .number
+              , view = viewTableCell True 5 << viewDiceSide diceColor << Dice.toIcon << .number
               }
             , { width = Element.fill
               , header = none
-              , view = text << String.fromInt << .count
+              , view = viewTableCell False 5 << text << String.fromInt << .count
               }
             , { width = Element.fill
               , header = none
-              , view = text << percent total << .count
+              , view = viewTableCell False 5 << text << percent total << .count
               }
             ]
         }
@@ -305,8 +333,11 @@ viewCombinationsTable combinationsEvents =
             List.map
                 (\( extractor, event ) ->
                     { width = Element.fill
-                    , header = viewDiceSide (Dice.toColor event) square
-                    , view = text << String.fromInt << extractor << .count
+                    , header =
+                        square
+                            |> viewDiceSide (Dice.toColor event)
+                            |> viewTableCell False 5
+                    , view = viewTableCell False 5 << text << String.fromInt << extractor << .count
                     }
                 )
                 [ ( .yellow, Dice.Yellow )
@@ -317,12 +348,13 @@ viewCombinationsTable combinationsEvents =
     in
     table
         [ Element.width Element.fill
+        , Font.size 16
         ]
         { data = data
         , columns =
-            { width = Element.fill
-            , header = none
-            , view = viewDiceSide Palette.pomegranate << Dice.toIcon << .number
+            { width = Element.shrink
+            , header = viewTableCell True 5 none
+            , view = viewTableCell True 5 << viewDiceSide Palette.pomegranate << Dice.toIcon << .number
             }
                 :: columns
         }

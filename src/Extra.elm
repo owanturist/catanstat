@@ -1,4 +1,4 @@
-module Extra exposing (formatMilliseconds)
+module Extra exposing (formatMilliseconds, ifelse)
 
 
 formatMilliseconds : Int -> String
@@ -21,3 +21,12 @@ formatMilliseconds milliseconds =
 
     else
         String.fromInt seconds ++ "s"
+
+
+ifelse : Bool -> a -> a -> a
+ifelse is onTrue onFalse =
+    if is then
+        onTrue
+
+    else
+        onFalse
