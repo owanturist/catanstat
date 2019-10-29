@@ -51,6 +51,11 @@ increment =
     Just << (+) 1 << Maybe.withDefault 0
 
 
+percent : Int -> Int -> String
+percent total x =
+    Round.round 2 (100 * toFloat x / toFloat total) ++ "%"
+
+
 calcCombinationsNumbers : List Game.Move -> Dict Int Int
 calcCombinationsNumbers moves =
     List.foldr
@@ -155,6 +160,15 @@ update msg model =
 -- V I E W
 
 
+viewDiceSide : Palette.Color -> Icon -> Element msg
+viewDiceSide color icon =
+    el
+        [ Font.color color
+        , Font.size 50
+        ]
+        (Element.html (viewIcon icon))
+
+
 viewLink : Router.Route -> Icon -> String -> Element msg
 viewLink route icon label =
     link
@@ -195,15 +209,15 @@ viewCombinationsNumbersTable total combinationsNumbers =
         , columns =
             [ { width = Element.fill
               , header = text "Combination"
-              , view = \item -> text (String.fromInt item.combination)
+              , view = text << String.fromInt << .combination
               }
             , { width = Element.fill
               , header = text "Count"
-              , view = \item -> text (String.fromInt item.count)
+              , view = text << String.fromInt << .count
               }
             , { width = Element.fill
               , header = text "Percentage"
-              , view = \item -> text (Round.round 2 (100 * toFloat item.count / toFloat total) ++ "%")
+              , view = text << percent total << .count
               }
             ]
         }
@@ -228,19 +242,15 @@ viewOverallEventsTable total overallEvents =
         , columns =
             [ { width = Element.fill
               , header = none
-              , view =
-                    \item ->
-                        viewIcon square
-                            |> Element.html
-                            |> el [ Font.color (Dice.toColor item.event) ]
+              , view = \item -> viewDiceSide (Dice.toColor item.event) square
               }
             , { width = Element.fill
               , header = none
-              , view = \item -> text (String.fromInt item.count)
+              , view = text << String.fromInt << .count
               }
             , { width = Element.fill
               , header = none
-              , view = \item -> text (Round.round 2 (100 * toFloat item.count / toFloat total) ++ "%")
+              , view = text << percent total << .count
               }
             ]
         }
@@ -265,20 +275,15 @@ viewOverallNumbersTable diceColor total overalNumbers =
         , columns =
             [ { width = Element.fill
               , header = none
-              , view =
-                    \item ->
-                        Dice.toIcon item.number
-                            |> viewIcon
-                            |> Element.html
-                            |> el [ Font.color diceColor ]
+              , view = viewDiceSide diceColor << Dice.toIcon << .number
               }
             , { width = Element.fill
               , header = none
-              , view = \item -> text (String.fromInt item.count)
+              , view = text << String.fromInt << .count
               }
             , { width = Element.fill
               , header = none
-              , view = \item -> text (Round.round 2 (100 * toFloat item.count / toFloat total) ++ "%")
+              , view = text << percent total << .count
               }
             ]
         }
@@ -300,11 +305,8 @@ viewCombinationsTable combinationsEvents =
             List.map
                 (\( extractor, event ) ->
                     { width = Element.fill
-                    , header =
-                        viewIcon square
-                            |> Element.html
-                            |> el [ Font.color (Dice.toColor event) ]
-                    , view = \item -> text (String.fromInt (extractor item.count))
+                    , header = viewDiceSide (Dice.toColor event) square
+                    , view = text << String.fromInt << extractor << .count
                     }
                 )
                 [ ( .yellow, Dice.Yellow )
@@ -320,12 +322,7 @@ viewCombinationsTable combinationsEvents =
         , columns =
             { width = Element.fill
             , header = none
-            , view =
-                \item ->
-                    Dice.toIcon item.number
-                        |> viewIcon
-                        |> Element.html
-                        |> el [ Font.color Palette.pomegranate ]
+            , view = viewDiceSide Palette.pomegranate << Dice.toIcon << .number
             }
                 :: columns
         }
