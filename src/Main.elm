@@ -278,8 +278,8 @@ view model =
         GameLogScreen gameID gameLog ->
             Element.map GameLogMsg (GameLog.view gameID gameLog)
 
-        GameStatScreen _ gameStat ->
-            Element.map GameStatMsg (GameStat.view gameStat)
+        GameStatScreen gameID gameStat ->
+            Element.map GameStatMsg (GameStat.view gameID gameStat)
 
 
 document : Model -> Browser.Document Msg

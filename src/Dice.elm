@@ -3,6 +3,7 @@ module Dice exposing
     , Number(..)
     , eventDecoder
     , eventEncoder
+    , eventToInt
     , events
     , numberDecoder
     , numberEncoder
