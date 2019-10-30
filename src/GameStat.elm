@@ -387,7 +387,7 @@ view gameID model =
                     [ Element.spacing 10
                     , Element.width Element.fill
                     ]
-                    [ viewLink (Router.ToPlayGame gameID) home
+                    [ viewLink Router.ToGameHistory home
                     , viewLink (Router.ToPlayGame gameID) dice
                     , viewLink (Router.ToGameLog gameID) alignJustify
                     , case game.status of
