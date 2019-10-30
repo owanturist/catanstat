@@ -8,11 +8,11 @@ phases:
       - echo Entered the install phase...
       - npm install
 
-  pre_build:
-    commands:
-      - echo Entered the pre_build phase...
-      - npm run lint
-      - CI=true npm run test
+  # pre_build:
+  #   commands:
+  #     - echo Entered the pre_build phase...
+  #     - npm run lint
+  #     - CI=true npm run test
 
   build:
     commands:
