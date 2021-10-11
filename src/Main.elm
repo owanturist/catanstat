@@ -253,9 +253,6 @@ middlewares model effect =
             , Effect.History.middleware model.navigation action
             )
 
-        Effect.Toast _ ->
-            ( model, Cmd.none )
-
 
 
 -- V I E W

@@ -1,4 +1,4 @@
-module Middleware exposing (Middleware, application, batch, map, middleware, none)
+module Middleware exposing (Middleware, application, batch, map, middleware)
 
 import Browser
 import Browser.Navigation
@@ -23,11 +23,6 @@ map tagger mid =
 middleware : custom -> Middleware custom
 middleware =
     Custom
-
-
-none : Middleware custom
-none =
-    Batch []
 
 
 batch : List (Middleware custom) -> Middleware custom

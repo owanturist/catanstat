@@ -2,7 +2,6 @@ module Effect exposing (Custom(..), Effect, batch, fromCmd, map, middleware, non
 
 import Effect.History
 import Effect.LocalStorage
-import Effect.Toast
 import Middleware exposing (Middleware)
 
 
@@ -14,7 +13,6 @@ type Custom msg
     = Cmd (Cmd msg)
     | LocalStorage (Effect.LocalStorage.Action msg)
     | History Effect.History.Action
-    | Toast Effect.Toast.Toast
 
 
 mapCustom : (a -> b) -> Custom a -> Custom b
@@ -28,9 +26,6 @@ mapCustom tagger custom =
 
         History history ->
             History history
-
-        Toast toast ->
-            Toast toast
 
 
 map : (a -> b) -> Effect a -> Effect b

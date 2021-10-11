@@ -1,4 +1,4 @@
-module Game exposing (Dice, Game, ID, Move, Status(..), create, decoder, encoder, generateID, getCurrentPlayer)
+module Game exposing (Dice, Game, ID, Move, Status(..), create, decoder, encoder, getCurrentPlayer)
 
 import Cons exposing (Cons)
 import Dice
