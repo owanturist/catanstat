@@ -1,4 +1,4 @@
-module LocalStorage exposing (Error(..), getItem, removeItem, setItem)
+module LocalStorage exposing (Error(..), getItem, setItem)
 
 import Effect exposing (Effect)
 import Effect.LocalStorage
@@ -32,10 +32,4 @@ getItem key decoder tagger =
 setItem : String -> Value -> Effect msg
 setItem key value =
     Effect.LocalStorage.setItem key (encode 0 value)
-        |> Effect.fromCmd
-
-
-removeItem : String -> Effect msg
-removeItem key =
-    Effect.LocalStorage.removeItem key
         |> Effect.fromCmd

@@ -1,4 +1,4 @@
-module Main exposing (main)
+module Main exposing (Model, Msg, Screen, main)
 
 import Browser
 import Browser.Navigation
@@ -252,9 +252,6 @@ middlewares model effect =
             ( model
             , Effect.History.middleware model.navigation action
             )
-
-        Effect.Toast _ ->
-            ( model, Cmd.none )
 
 
 

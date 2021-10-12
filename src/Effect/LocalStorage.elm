@@ -6,7 +6,6 @@ port module Effect.LocalStorage exposing
     , initial
     , map
     , middleware
-    , removeItem
     , setItem
     , subscriptions
     , update
@@ -24,9 +23,6 @@ port local_storage__get_item_done : (( String, Maybe String ) -> msg) -> Sub msg
 port local_storage__set_item : ( String, String ) -> Cmd msg
 
 
-port local_storage__remove_item : String -> Cmd msg
-
-
 getItem : String -> (Maybe String -> msg) -> Action msg
 getItem key tagger =
     Get key tagger
@@ -35,11 +31,6 @@ getItem key tagger =
 setItem : String -> String -> Cmd msg
 setItem key value =
     local_storage__set_item ( key, value )
-
-
-removeItem : String -> Cmd msg
-removeItem key =
-    local_storage__remove_item key
 
 
 type State msg

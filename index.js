@@ -16,10 +16,3 @@ if (ports.local_storage__set_item) {
         window.localStorage.setItem(payload[ 0 ], payload[ 1 ])
     })
 }
-
-if (ports.local_storage__remove_item) {
-    ports.local_storage__remove_item.subscribe(function(key) {
-        window.localStorage.removeItem(key)
-    })
-}
-

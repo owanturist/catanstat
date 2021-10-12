@@ -10,6 +10,7 @@
     "elm": "^0.19.1-3",
     "elm-analyse": "^0.16.5",
     "elm-format": "^0.8.2",
+    "elm-review": "^2.6.1",
     "html-webpack-plugin": "^3.2.0",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
@@ -20,7 +21,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --inline --port=3000 --host=0.0.0.0 --env.ENV=development",
     "prebuild": "npm run clear",
-    "build": "webpack --env.ENV=production"
+    "build": "webpack --env.ENV=production",
+    "review": "elm-review",
+    "review:fix": "elm-review --fix"
   },
   "repository": {
     "type": "git",

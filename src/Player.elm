@@ -7,7 +7,6 @@ module Player exposing
     , decoder
     , encoder
     , toColor
-    , x4
     , x6
     )
 

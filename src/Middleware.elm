@@ -1,63 +1,56 @@
-module Middleware exposing (Middleware, application, batch, map, middleware, none)
+module Middleware exposing (Middleware, application, batch, map, middleware)
 
 import Browser
 import Browser.Navigation
 import Url exposing (Url)
 
 
-type Middleware custom
-    = Custom custom
-    | Batch (List (Middleware custom))
+type Middleware mid
+    = Middleware (List mid)
+
+
+unpack : Middleware a -> List a
+unpack (Middleware middlewares) =
+    middlewares
 
 
 map : (a -> b) -> Middleware a -> Middleware b
-map tagger mid =
-    case mid of
-        Custom custom ->
-            Custom (tagger custom)
-
-        Batch many ->
-            Batch (List.map (map tagger) many)
+map tagger (Middleware middlewares) =
+    Middleware (List.map tagger middlewares)
 
 
-middleware : custom -> Middleware custom
+middleware : mid -> Middleware mid
 middleware =
-    Custom
+    Middleware << List.singleton
 
 
-none : Middleware custom
-none =
-    Batch []
+batch : List (Middleware mid) -> Middleware mid
+batch middlewares =
+    Middleware (List.concatMap unpack middlewares)
 
 
-batch : List (Middleware custom) -> Middleware custom
-batch =
-    Batch
-
-
-injectHelp : (model -> custom -> ( model, Cmd msg )) -> Middleware custom -> ( model, List (Cmd msg) ) -> ( model, List (Cmd msg) )
-injectHelp middlewares mid ( model, cmds ) =
-    case mid of
-        Custom custom ->
-            let
-                ( nextModel, cmd ) =
-                    middlewares model custom
-            in
-            ( nextModel, cmd :: cmds )
-
-        Batch many ->
-            List.foldr (injectHelp middlewares) ( model, cmds ) many
-
-
-inject : (model -> custom -> ( model, Cmd msg )) -> ( model, Middleware custom ) -> ( model, Cmd msg )
-inject middlewares ( model, mid ) =
-    Tuple.mapSecond Cmd.batch (injectHelp middlewares mid ( model, [] ))
+inject : (model -> mid -> ( model, Cmd msg )) -> ( model, Middleware mid ) -> ( model, Cmd msg )
+inject mid ( model, Middleware middlewares ) =
+    let
+        ( resultModel, resultCmds ) =
+            List.foldl
+                (\middl ( prevModel, cmds ) ->
+                    let
+                        ( nextModel, cmd ) =
+                            mid prevModel middl
+                    in
+                    ( nextModel, cmd :: cmds )
+                )
+                ( model, [] )
+                middlewares
+    in
+    ( resultModel, Cmd.batch resultCmds )
 
 
 application :
-    { init : flags -> Url -> Browser.Navigation.Key -> ( model, Middleware custom )
-    , update : msg -> model -> ( model, Middleware custom )
-    , middlewares : model -> custom -> ( model, Cmd msg )
+    { init : flags -> Url -> Browser.Navigation.Key -> ( model, Middleware mid )
+    , update : msg -> model -> ( model, Middleware mid )
+    , middlewares : model -> mid -> ( model, Cmd msg )
     , subscriptions : model -> Sub msg
     , view : model -> Browser.Document msg
     , onUrlRequest : Browser.UrlRequest -> msg
