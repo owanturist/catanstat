@@ -21,7 +21,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --inline --port=3000 --host=0.0.0.0 --env.ENV=development",
     "prebuild": "npm run clear",
-    "build": "webpack --env.ENV=production"
+    "build": "webpack --env.ENV=production",
+    "review": "elm-review",
+    "review:fix": "elm-review --fix"
   },
   "repository": {
     "type": "git",
