@@ -7,7 +7,7 @@ module.exports = {
   },
   plugins: [
     ['snowpack-plugin-elm', { optimize: 'build' }],
-    '@jadex/snowpack-plugin-tailwindcss-jit' // fix for https://github.com/tailwindlabs/tailwindcss/issues/3950
+    '@snowpack/plugin-postcss'
   ],
   exclude: ['**/node_modules/**/*', 'review/**/*.elm'],
   routes: [
@@ -23,7 +23,8 @@ module.exports = {
   },
   devOptions: {
     open: 'none',
-    port: 3000
+    port: 3000,
+    tailwindConfig: './tailwind.config.js'
   },
   optimize: {
     bundle: true,
