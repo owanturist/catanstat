@@ -24,5 +24,9 @@ module.exports = {
   devOptions: {
     open: 'none',
     port: 3000
+  },
+  optimize: {
+    bundle: true,
+    minify: true
   }
 }
