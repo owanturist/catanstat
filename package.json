@@ -2,11 +2,22 @@
   "private": true,
   "name": "catanstat",
   "scripts": {
-    "clear": "rm -rf ./build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel public/index.html --port 3000 --dist-dir build",
-    "prebuild": "npm run clear",
-    "build": "parcel build public/index.html --dist-dir build --no-cache",
+    "clean:build": "rm -rf ./build",
+    "clean:cache": "rm -rf ./.parcel-cache",
+    "copy:index-200": "cp build/index.html build/200.html",
+    "predev": "npm run clean:cache",
+    "dev": "parcel public/index.html --port 3000 --dist-dir .tmp-dev",
+    "postdev": "rm -rf ./.tmp-dev",
+    "prebuild": "npm run clean:cache && npm run clean:build",
+    "build": "parcel build public/index.html --dist-dir build",
+    "postbuild": "npm run copy:index-200",
+    "prestories": "npm run clean:cache",
+    "stories": "parcel public/stories.html --port 5000 --dist-dir .tmp-stories",
+    "poststories": "rm -rf ./.tmp-stories",
+    "prestories:build": "npm run clean:cache && npm run clean:build",
+    "stories:build": "parcel build public/stories.html --dist-dir build",
+    "poststories:build": "mv build/stories.html build/index.html && npm run copy:index-200",
     "review": "elm-review",
     "review:fix": "elm-review --fix"
   },
@@ -37,5 +48,6 @@
   },
   "dependencies": {
     "tailwindcss": "^2.2.17"
-  }
+  },
+  "browserslist": "> 0.5%, last 2 versions, not dead"
 }
