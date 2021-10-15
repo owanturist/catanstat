@@ -4,9 +4,9 @@
   "scripts": {
     "clear": "rm -rf ./build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel index.html --port 3000 --dist-dir build",
+    "dev": "parcel public/index.html --port 3000 --dist-dir build",
     "prebuild": "npm run clear",
-    "build": "parcel build index.html --dist-dir build --no-cache",
+    "build": "parcel build public/index.html --dist-dir build --no-cache",
     "review": "elm-review",
     "review:fix": "elm-review --fix"
   },

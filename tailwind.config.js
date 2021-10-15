@@ -1,4 +1,4 @@
 module.exports = {
   mode: 'jit',
-  purge: ['./index.html', './src/**/*.elm']
+  purge: ['./public/*.html', './src/**/*.elm']
 }
