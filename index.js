@@ -1,6 +1,4 @@
-import './styles.css'
-
-import { Elm } from './Main.elm'
+import { Elm } from './src/Main.elm'
 
 const { ports } = Elm.Main.init()
 

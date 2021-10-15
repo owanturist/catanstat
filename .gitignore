@@ -5,5 +5,8 @@ repl-temp-*
 # node generated files
 node_modules
 
+# cache
+.parcel-cache
+
 bin
 build
