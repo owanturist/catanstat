@@ -3,8 +3,6 @@ module Stories.GameStat.TurnsDuration exposing (stories)
 import Bulletproof
 import Bulletproof.Knob
 import GameStat.TurnsDuration as TurnsDuration
-import Html
-import Html.Attributes
 import Player
 import Random
 

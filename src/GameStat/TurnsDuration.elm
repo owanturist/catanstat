@@ -1,7 +1,9 @@
 module GameStat.TurnsDuration exposing (Model, view)
 
+import Chart
+import Chart.Attributes
 import Html exposing (Html)
-import LineChart
+import Html.Attributes
 import Player exposing (Player)
 
 
@@ -19,38 +21,93 @@ type alias Model =
 -- V I E W
 
 
-type alias Turn =
-    { index : Int
-    , duration : Int
-    , player : Player
-    }
+type alias Round =
+    List Int
 
 
-buildTurnsDurationData : List Int -> List Player -> List Turn
-buildTurnsDurationData turns players =
+getTurnDurationFor : Int -> Round -> Maybe Int
+getTurnDurationFor index round =
+    List.head (List.drop index round)
+
+
+buildRounds : List Int -> List Player -> List Round
+buildRounds turns players =
     let
-        totalTurnsCount =
-            List.length turns
+        totalPlayersCount =
+            List.length players
 
-        totalRoundsCount =
-            -- that's fine if it is longer than turns
-            1 + totalTurnsCount // List.length players
+        buildRoundsInner : List Int -> List Round -> List Round
+        buildRoundsInner remainingTurns acc =
+            if List.isEmpty remainingTurns then
+                acc
 
-        indexesSequence =
-            List.range 1 totalTurnsCount
-
-        playersSequence =
-            List.concat (List.repeat totalRoundsCount players)
+            else
+                buildRoundsInner
+                    (List.drop totalPlayersCount remainingTurns)
+                    (List.take totalPlayersCount remainingTurns :: acc)
     in
-    List.map3 Turn indexesSequence turns playersSequence
+    List.reverse (buildRoundsInner turns [])
+
+
+playerToBarColor : Player.Color -> String
+playerToBarColor color =
+    case color of
+        Player.White ->
+            Chart.Attributes.gray
+
+        Player.Red ->
+            Chart.Attributes.red
+
+        Player.Blue ->
+            Chart.Attributes.blue
+
+        Player.Yellow ->
+            Chart.Attributes.yellow
+
+        Player.Green ->
+            Chart.Attributes.green
+
+        Player.Brown ->
+            Chart.Attributes.brown
 
 
 view : Model -> Html msg
 view { turns, players } =
     let
-        durationData =
-            buildTurnsDurationData turns players
+        totalPlayersCount =
+            List.length players
     in
-    Html.div []
-        [ LineChart.view1 (toFloat << .index) (toFloat << .duration) durationData
+    Html.div
+        [ Html.Attributes.class "w-[400px] p-2"
+        ]
+        [ Chart.chart
+            [ Chart.Attributes.width 400
+            , Chart.Attributes.height 300
+            ]
+            [ Chart.xAxis
+                [ Chart.Attributes.noArrow
+                ]
+            , Chart.xLabels []
+            , Chart.yAxis
+                [ Chart.Attributes.noArrow
+                ]
+            , Chart.bars
+                [ Chart.Attributes.margin 0
+                , Chart.Attributes.spacing 0
+                ]
+                (List.indexedMap
+                    (\index player ->
+                        let
+                            playerIndex =
+                                modBy totalPlayersCount index
+                        in
+                        Chart.barMaybe
+                            (Maybe.map toFloat << getTurnDurationFor playerIndex)
+                            [ Chart.Attributes.color (playerToBarColor player.color)
+                            ]
+                    )
+                    players
+                )
+                (buildRounds turns players)
+            ]
         ]
