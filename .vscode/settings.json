@@ -14,5 +14,12 @@
   "elmLS.elmReviewPath": "./node_modules/.bin/elm-review",
   "[elm]": {
     "editor.formatOnSave": true
-  }
+  },
+  "tailwindCSS.includeLanguages": {
+    "elm": "html"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["\\bclass\\s+\\[([^)]*)\\]", "\"([^\"]*)\""], // TW.class
+    ["\\bclass\\s+([^)]*)", "\"([^\"]*)\""] // Html.class
+  ]
 }
