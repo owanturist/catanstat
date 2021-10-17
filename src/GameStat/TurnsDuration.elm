@@ -206,6 +206,14 @@ viewTotalDurationTable turns players =
                 )
                 (buildPlayersDurationData turns players)
             )
+        , Html.tfoot
+            []
+            [ Html.tr []
+                [ Html.td [] []
+                , Html.td [] [ Html.text "Total" ]
+                , Html.td [] [ Html.text (formatMilliseconds totalDuration) ]
+                ]
+            ]
         ]
 
 
