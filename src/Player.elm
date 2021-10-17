@@ -7,6 +7,7 @@ module Player exposing
     , decoder
     , encoder
     , toColor
+    , toHex
     , x6
     )
 
@@ -105,6 +106,34 @@ toColor color =
 
         Brown ->
             Palette.pumpkin
+
+
+toHex : Color -> String
+toHex color =
+    case color of
+        White ->
+            -- gray-300
+            "#d1d5db"
+
+        Red ->
+            -- red-400
+            "#f87171"
+
+        Blue ->
+            -- blue-400
+            "#60a5fa"
+
+        Yellow ->
+            -- yellow-400
+            "#fbbf24"
+
+        Green ->
+            -- green-400
+            "#34d399"
+
+        Brown ->
+            -- yellow-800
+            "#92400e"
 
 
 

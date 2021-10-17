@@ -2,7 +2,8 @@ module Stories.GameStat exposing (stories)
 
 import Bulletproof
 import Bulletproof.Knob
-import GameStat.TurnsDuration as TurnsDuration
+import GameStat.TotalDurationTable as TotalDurationTable
+import GameStat.TurnsDurationChart as TurnsDurationChart
 import Player
 import Random
 
@@ -19,12 +20,32 @@ stories =
         ( turns, _ ) =
             Random.step (Random.list maxTurns turnGenerator) (Random.initialSeed 0)
     in
-    [ Bulletproof.story "TurnsDuration"
+    [ Bulletproof.story "TotalDurationTable"
         (\playersCount turnsCount ->
-            TurnsDuration.view
-                { players = List.take playersCount Player.x6
-                , turns = List.take turnsCount turns
-                }
+            TotalDurationTable.view
+                (List.take turnsCount turns)
+                (List.take playersCount Player.x6)
+                |> Bulletproof.fromHtml
+        )
+        |> Bulletproof.Knob.int "Players count"
+            4
+            [ Bulletproof.Knob.range
+            , Bulletproof.Knob.min 2
+            , Bulletproof.Knob.max 6
+            ]
+        |> Bulletproof.Knob.int "Turns count"
+            40
+            [ Bulletproof.Knob.range
+            , Bulletproof.Knob.min 0
+            , Bulletproof.Knob.max maxTurns
+            ]
+
+    --
+    , Bulletproof.story "TurnsDurationChart"
+        (\playersCount turnsCount ->
+            TurnsDurationChart.view
+                (List.take turnsCount turns)
+                (List.take playersCount Player.x6)
                 |> Bulletproof.fromHtml
         )
         |> Bulletproof.Knob.int "Players count"
