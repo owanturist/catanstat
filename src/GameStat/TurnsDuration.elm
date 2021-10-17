@@ -3,10 +3,13 @@ module GameStat.TurnsDuration exposing (Model, view)
 import Chart
 import Chart.Attributes
 import Chart.Svg
+import Extra exposing (formatMilliseconds)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Lazy
+import Icon
 import Player exposing (Player)
+import Round
 
 
 
@@ -47,6 +50,28 @@ buildTurnsDurationData turns players =
             List.concat (List.repeat totalRoundsCount players)
     in
     List.map3 Turn indexes turns playersSequence
+
+
+buildPlayersDurationData : List Int -> List Player -> List ( Player, Int )
+buildPlayersDurationData turns players =
+    let
+        totalPlayersCount =
+            List.length players
+
+        countPlayerDuration : Int -> List Int -> Int
+        countPlayerDuration acc remainingTurns =
+            case List.head remainingTurns of
+                Nothing ->
+                    acc
+
+                Just duration ->
+                    countPlayerDuration
+                        (acc + duration)
+                        (List.drop totalPlayersCount remainingTurns)
+    in
+    List.indexedMap
+        (\index player -> ( player, countPlayerDuration 0 (List.drop index turns) ))
+        players
 
 
 playerToBarColor : Player.Color -> String
@@ -100,8 +125,8 @@ viewBar turn =
         }
 
 
-viewChart : List Int -> List Player -> Html msg
-viewChart turns players =
+viewTurnsDurationChart : List Int -> List Player -> Html msg
+viewTurnsDurationChart turns players =
     let
         xMax =
             List.length turns
@@ -147,10 +172,48 @@ viewChart turns players =
         ]
 
 
+viewTotalDurationTable : List Int -> List Player -> Html msg
+viewTotalDurationTable turns players =
+    let
+        totalDuration =
+            List.sum turns
+
+        formatPercent : Int -> String
+        formatPercent duration =
+            Round.round 2 (100 * toFloat duration / toFloat totalDuration) ++ "%"
+    in
+    Html.table
+        []
+        [ Html.thead []
+            [ Html.tr []
+                [ Html.td [] []
+                , Html.td [] [ Html.text "Name" ]
+                , Html.td [] [ Html.text "Total duration" ]
+                , Html.td [] [ Html.text "Percent" ]
+                ]
+            ]
+        , Html.tbody []
+            (List.map
+                (\( player, duration ) ->
+                    Html.tr []
+                        [ Html.td
+                            [ Html.Attributes.style "color" (playerToBarColor player.color) ]
+                            [ Icon.square ]
+                        , Html.td [] [ Html.text player.name ]
+                        , Html.td [] [ Html.text (formatMilliseconds duration) ]
+                        , Html.td [] [ Html.text (formatPercent duration) ]
+                        ]
+                )
+                (buildPlayersDurationData turns players)
+            )
+        ]
+
+
 view : Model -> Html msg
 view { turns, players } =
     Html.div
         [ Html.Attributes.class "w-[400px] p-2"
         ]
-        [ Html.Lazy.lazy2 viewChart turns players
+        [ Html.Lazy.lazy2 viewTurnsDurationChart turns players
+        , Html.Lazy.lazy2 viewTotalDurationTable turns players
         ]
