@@ -10,7 +10,8 @@ import Html exposing (Html)
 type alias Combination =
     { value : Int
     , real : Int
-    , ideal : Float
+    , idealMin : Int
+    , idealMax : Int
     }
 
 
@@ -38,7 +39,7 @@ buildCombinations : List ( Dice.Number, Dice.Number ) -> List Combination
 buildCombinations turns =
     let
         totalTurnsCount =
-            max 1 (List.length turns)
+            List.length turns
 
         turnsDict =
             List.foldl
@@ -58,12 +59,13 @@ buildCombinations turns =
     List.map
         (\value ->
             let
-                idealCombinaiton =
+                ideal =
                     Maybe.withDefault 0 (Dict.get value idealCombinaitons)
             in
             { value = value
             , real = Maybe.withDefault 0 (Dict.get value turnsDict)
-            , ideal = idealCombinaiton * toFloat totalTurnsCount
+            , idealMin = floor (ideal * toFloat totalTurnsCount)
+            , idealMax = ceiling (ideal * toFloat totalTurnsCount)
             }
         )
         (List.range 2 12)
@@ -71,6 +73,10 @@ buildCombinations turns =
 
 view : List ( Dice.Number, Dice.Number ) -> Html msg
 view turns =
+    let
+        combinations =
+            buildCombinations turns
+    in
     Chart.chart
         [ Chart.Attributes.width 400
         , Chart.Attributes.height 300
@@ -101,9 +107,17 @@ view turns =
             , Chart.Attributes.x1 (\{ value } -> toFloat value - 0.5)
             ]
             [ Chart.bar (toFloat << .real) []
-            , Chart.bar .ideal
-                [ Chart.Attributes.striped []
+            , Chart.stacked
+                [ Chart.bar
+                    (\{ idealMin, idealMax } -> toFloat (idealMax - idealMin))
+                    [ Chart.Attributes.color Chart.Attributes.pink
+                    , Chart.Attributes.striped [ Chart.Attributes.spacing 6 ]
+                    ]
+                , Chart.bar (toFloat << .idealMin)
+                    [ Chart.Attributes.borderWidth 1
+                    , Chart.Attributes.opacity 0
+                    ]
                 ]
             ]
-            (buildCombinations turns)
+            combinations
         ]
