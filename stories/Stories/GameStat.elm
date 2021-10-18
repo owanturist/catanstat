@@ -3,6 +3,7 @@ module Stories.GameStat exposing (stories)
 import Bulletproof
 import Bulletproof.Knob
 import Dice
+import GameStat.DiceDistributionChart as DiceDistributionChart
 import GameStat.TotalDurationTable as TotalDurationTable
 import GameStat.TurnsDurationChart as TurnsDurationChart
 import GameStat.TurnsValueChart as TurnsValueChart
@@ -76,6 +77,21 @@ stories =
         (\turnsCount ->
             TurnsValueChart.view
                 (List.take turnsCount doublceDiceTurns)
+                |> Bulletproof.fromHtml
+        )
+        |> Bulletproof.Knob.int "Turns count"
+            40
+            [ Bulletproof.Knob.range
+            , Bulletproof.Knob.min 0
+            , Bulletproof.Knob.max maxTurns
+            ]
+
+    --
+    , Bulletproof.story "DiceDistributionChart"
+        (\turnsCount ->
+            List.take turnsCount doublceDiceTurns
+                |> List.map (\( red, white ) -> { red = red, white = white })
+                |> DiceDistributionChart.view
                 |> Bulletproof.fromHtml
         )
         |> Bulletproof.Knob.int "Turns count"
