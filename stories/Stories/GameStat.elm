@@ -4,6 +4,7 @@ import Bulletproof
 import Bulletproof.Knob
 import Dice
 import GameStat.DiceDistributionChart as DiceDistributionChart
+import GameStat.EventsDistributionChart as EventsDistributionChart
 import GameStat.TotalDurationTable as TotalDurationTable
 import GameStat.TurnsDurationChart as TurnsDurationChart
 import GameStat.TurnsValueChart as TurnsValueChart
@@ -25,11 +26,25 @@ stories =
                 Dice.One
                 [ Dice.Two, Dice.Three, Dice.Four, Dice.Five, Dice.Six ]
 
+        eventGenerator =
+            Random.uniform
+                Dice.Black
+                [ Dice.Black, Dice.Black, Dice.Yellow, Dice.Blue, Dice.Green ]
+
         ( turns, _ ) =
-            Random.step (Random.list maxTurns turnGenerator) (Random.initialSeed 0)
+            Random.step
+                (Random.list maxTurns turnGenerator)
+                (Random.initialSeed 0)
 
         ( doublceDiceTurns, _ ) =
-            Random.step (Random.list maxTurns (Random.pair diceGenerator diceGenerator)) (Random.initialSeed 0)
+            Random.step
+                (Random.list maxTurns (Random.pair diceGenerator diceGenerator))
+                (Random.initialSeed 0)
+
+        ( eventDiceTurns, _ ) =
+            Random.step
+                (Random.list maxTurns eventGenerator)
+                (Random.initialSeed 0)
     in
     [ Bulletproof.story "TotalDurationTable"
         (\playersCount turnsCount ->
@@ -92,6 +107,20 @@ stories =
             List.take turnsCount doublceDiceTurns
                 |> List.map (\( red, white ) -> { red = red, white = white })
                 |> DiceDistributionChart.view
+                |> Bulletproof.fromHtml
+        )
+        |> Bulletproof.Knob.int "Turns count"
+            40
+            [ Bulletproof.Knob.range
+            , Bulletproof.Knob.min 0
+            , Bulletproof.Knob.max maxTurns
+            ]
+
+    --
+    , Bulletproof.story "EventsDistributionChart"
+        (\turnsCount ->
+            List.take turnsCount eventDiceTurns
+                |> EventsDistributionChart.view
                 |> Bulletproof.fromHtml
         )
         |> Bulletproof.Knob.int "Turns count"

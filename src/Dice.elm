@@ -17,7 +17,6 @@ import FontAwesome.Icon exposing (Icon)
 import FontAwesome.Solid exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
-import Palette
 
 
 
@@ -150,20 +149,24 @@ events =
     [ Yellow, Blue, Green, Black, Black, Black ]
 
 
-toColor : Event -> Palette.Color
+toColor : Event -> String
 toColor event =
     case event of
         Yellow ->
-            Palette.sunFlower
+            -- yellow-600
+            "#d97706"
 
         Blue ->
-            Palette.peterRiver
+            -- blue-600
+            "#2563eb"
 
         Green ->
-            Palette.nephritis
+            -- green-600
+            "#059669"
 
         Black ->
-            Palette.midnightBlue
+            -- gray-700
+            "#374151"
 
 
 toIcon : Number -> Icon
