@@ -60,12 +60,12 @@ buildCombinations turns =
         (\value ->
             let
                 ideal =
-                    Maybe.withDefault 0 (Dict.get value idealCombinaitons)
+                    toFloat totalTurnsCount * Maybe.withDefault 0 (Dict.get value idealCombinaitons)
             in
             { value = value
             , real = Maybe.withDefault 0 (Dict.get value turnsDict)
-            , idealMin = floor (ideal * toFloat totalTurnsCount)
-            , idealMax = ceiling (ideal * toFloat totalTurnsCount)
+            , idealMin = floor ideal
+            , idealMax = ceiling ideal
             }
         )
         (List.range 2 12)

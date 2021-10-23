@@ -44,7 +44,7 @@ stories =
         ( eventDiceTurns, _ ) =
             Random.step
                 (Random.list maxTurns eventGenerator)
-                (Random.initialSeed 0)
+                (Random.initialSeed 2)
     in
     [ Bulletproof.story "TotalDurationTable"
         (\playersCount turnsCount ->
