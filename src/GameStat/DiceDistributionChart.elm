@@ -3,63 +3,40 @@ module GameStat.DiceDistributionChart exposing (view)
 import Chart
 import Chart.Attributes
 import Dice
-import Dict exposing (Dict)
+import GameStat.Combination as Combination
 import Html exposing (Html)
 
 
-type alias Distribution =
-    { value : Int
-    , white : Int
-    , red : Int
+distributor : Combination.Distributor Dice.Number
+distributor =
+    [ Dice.One
+    , Dice.Two
+    , Dice.Three
+    , Dice.Four
+    , Dice.Five
+    , Dice.Six
+    ]
+        |> List.map (\number -> ( number, 1 / 6 ))
+        |> Combination.fromIdeals (String.fromInt << Dice.toInt)
+
+
+type alias Turn value =
+    { red : value
+    , white : value
     }
 
 
-collectDistribution : List Turn -> List Distribution
-collectDistribution turns =
-    let
-        collectPerDice : (Turn -> Dice.Number) -> Dict Int Int
-        collectPerDice extract =
-            List.foldl
-                (\dice acc ->
-                    let
-                        value =
-                            Dice.toInt (extract dice)
-
-                        count =
-                            Maybe.withDefault 0 (Dict.get value acc)
-                    in
-                    Dict.insert value (count + 1) acc
-                )
-                Dict.empty
-                turns
-
-        whites =
-            collectPerDice .white
-
-        reds =
-            collectPerDice .red
-    in
-    List.map
-        (\value ->
-            { value = value
-            , white = Maybe.withDefault 0 (Dict.get value whites)
-            , red = Maybe.withDefault 0 (Dict.get value reds)
-            }
-        )
-        (List.range 1 6)
-
-
-type alias Turn =
-    { red : Dice.Number
-    , white : Dice.Number
-    }
-
-
-view : List Turn -> Html msg
+view : List (Turn Dice.Number) -> Html msg
 view turns =
     let
+        combinationsRed =
+            Combination.toCombinations distributor (List.map .red turns)
+
+        combinationsWhite =
+            Combination.toCombinations distributor (List.map .white turns)
+
         combinations =
-            collectDistribution turns
+            List.map2 Turn combinationsRed combinationsWhite
     in
     Chart.chart
         [ Chart.Attributes.width 400
@@ -87,16 +64,31 @@ view turns =
             , Chart.Attributes.ints
             ]
         , Chart.bars
-            [ Chart.Attributes.x1 (\{ value } -> toFloat value - 0.5)
-            , Chart.Attributes.margin 0.25
+            [ Chart.Attributes.margin 0.25
             ]
-            [ Chart.bar (toFloat << .white)
+            [ Chart.bar (toFloat << .real << .white)
                 [ Chart.Attributes.color Chart.Attributes.darkGray
-                , Chart.Attributes.borderWidth 1
                 , Chart.Attributes.opacity 0.5
                 ]
-            , Chart.bar (toFloat << .red)
+            , Chart.bar (toFloat << .real << .red)
                 [ Chart.Attributes.color Chart.Attributes.red
+                ]
+            ]
+            combinations
+        , Chart.bars
+            [ Chart.Attributes.margin 0.25
+            ]
+            [ Chart.stacked
+                [ Chart.bar
+                    (\{ white } -> toFloat (white.idealMax - white.idealMin))
+                    [ Chart.Attributes.color Chart.Attributes.pink
+                    , Chart.Attributes.striped [ Chart.Attributes.spacing 6 ]
+                    ]
+                , Chart.bar (toFloat << .idealMin << .white)
+                    [ Chart.Attributes.color Chart.Attributes.pink
+                    , Chart.Attributes.borderWidth 1
+                    , Chart.Attributes.opacity 0
+                    ]
                 ]
             ]
             combinations
