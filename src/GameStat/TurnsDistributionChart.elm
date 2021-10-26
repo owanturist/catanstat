@@ -1,4 +1,4 @@
-module GameStat.TurnsValueChart exposing (view)
+module GameStat.TurnsDistributionChart exposing (view)
 
 import Chart
 import Chart.Attributes

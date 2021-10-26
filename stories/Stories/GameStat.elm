@@ -6,8 +6,8 @@ import Dice
 import GameStat.DiceDistributionChart as DiceDistributionChart
 import GameStat.EventsDistributionChart as EventsDistributionChart
 import GameStat.TotalDurationTable as TotalDurationTable
+import GameStat.TurnsDistributionChart as TurnsDistributionChart
 import GameStat.TurnsDurationChart as TurnsDurationChart
-import GameStat.TurnsValueChart as TurnsValueChart
 import Player
 import Random
 
@@ -88,9 +88,9 @@ stories =
             ]
 
     --
-    , Bulletproof.story "TurnsValueChart"
+    , Bulletproof.story "TurnsDistributionChart"
         (\turnsCount ->
-            TurnsValueChart.view
+            TurnsDistributionChart.view
                 (List.take turnsCount doublceDiceTurns)
                 |> Bulletproof.fromHtml
         )
