@@ -6,8 +6,8 @@ import Dict exposing (Dict)
 type alias Combination value =
     { value : value
     , real : Int
-    , idealMin : Int
-    , idealMax : Int
+    , ideal : Int
+    , idealGap : Int
     }
 
 
@@ -58,11 +58,14 @@ toCombinations (Distributor toKey values distributions) turns =
 
                 ideal =
                     toFloat totalTurnsCount * Maybe.withDefault 0 (Dict.get key distributions)
+
+                idealMin =
+                    floor ideal
             in
             { value = value
             , real = Maybe.withDefault 0 (Dict.get key counts)
-            , idealMin = floor ideal
-            , idealMax = ceiling ideal
+            , ideal = idealMin
+            , idealGap = ceiling ideal - idealMin
             }
         )
         values

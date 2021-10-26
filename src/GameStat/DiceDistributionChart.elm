@@ -80,11 +80,11 @@ view turns =
             ]
             [ Chart.stacked
                 [ Chart.bar
-                    (\{ white } -> toFloat (white.idealMax - white.idealMin))
+                    (toFloat << .idealGap << .white)
                     [ Chart.Attributes.color Chart.Attributes.pink
                     , Chart.Attributes.striped [ Chart.Attributes.spacing 6 ]
                     ]
-                , Chart.bar (toFloat << .idealMin << .white)
+                , Chart.bar (toFloat << .ideal << .white)
                     [ Chart.Attributes.color Chart.Attributes.pink
                     , Chart.Attributes.borderWidth 1
                     , Chart.Attributes.opacity 0

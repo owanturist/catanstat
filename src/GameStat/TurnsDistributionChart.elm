@@ -67,11 +67,11 @@ view turns =
             [ Chart.bar (toFloat << .real) []
             , Chart.stacked
                 [ Chart.bar
-                    (\{ idealMin, idealMax } -> toFloat (idealMax - idealMin))
+                    (toFloat << .idealGap)
                     [ Chart.Attributes.color Chart.Attributes.pink
                     , Chart.Attributes.striped [ Chart.Attributes.spacing 6 ]
                     ]
-                , Chart.bar (toFloat << .idealMin)
+                , Chart.bar (toFloat << .ideal)
                     [ Chart.Attributes.borderWidth 1
                     , Chart.Attributes.opacity 0
                     ]
