@@ -3,20 +3,12 @@ module GameStat.TurnsDistributionChart exposing (view)
 import Chart
 import Chart.Attributes
 import Dice
-import Dict exposing (Dict)
+import GameStat.Combination as Combination
 import Html exposing (Html)
 
 
-type alias Combination =
-    { value : Int
-    , real : Int
-    , idealMin : Int
-    , idealMax : Int
-    }
-
-
-idealCombinaitons : Dict Int Float
-idealCombinaitons =
+distributor : Combination.Distributor Int
+distributor =
     [ ( 2, 1 ) --- 1+1
     , ( 3, 2 ) --- 1+2 2+1
     , ( 4, 3 ) --- 1+3 2+2 3+1
@@ -31,51 +23,17 @@ idealCombinaitons =
 
     -- total:      36
     ]
-        |> List.map (Tuple.mapSecond (\count -> count / 36))
-        |> Dict.fromList
-
-
-buildCombinations : List ( Dice.Number, Dice.Number ) -> List Combination
-buildCombinations turns =
-    let
-        totalTurnsCount =
-            List.length turns
-
-        turnsDict =
-            List.foldl
-                (\( left, right ) acc ->
-                    let
-                        key =
-                            Dice.toInt left + Dice.toInt right
-
-                        value =
-                            Maybe.withDefault 0 (Dict.get key acc)
-                    in
-                    Dict.insert key (value + 1) acc
-                )
-                Dict.empty
-                turns
-    in
-    List.map
-        (\value ->
-            let
-                ideal =
-                    toFloat totalTurnsCount * Maybe.withDefault 0 (Dict.get value idealCombinaitons)
-            in
-            { value = value
-            , real = Maybe.withDefault 0 (Dict.get value turnsDict)
-            , idealMin = floor ideal
-            , idealMax = ceiling ideal
-            }
-        )
-        (List.range 2 12)
+        |> List.map (\( result, count ) -> ( result, count / 36 ))
+        |> Combination.fromIdeals String.fromInt
 
 
 view : List ( Dice.Number, Dice.Number ) -> Html msg
 view turns =
     let
         combinations =
-            buildCombinations turns
+            turns
+                |> List.map (\( left, right ) -> Dice.toInt left + Dice.toInt right)
+                |> Combination.toCombinations distributor
     in
     Chart.chart
         [ Chart.Attributes.width 400

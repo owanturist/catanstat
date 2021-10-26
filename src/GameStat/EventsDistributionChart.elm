@@ -3,73 +3,25 @@ module GameStat.EventsDistributionChart exposing (view)
 import Chart
 import Chart.Attributes
 import Dice
-import Dict exposing (Dict)
+import GameStat.Combination as Combination
 import Html exposing (Html)
 
 
-type alias Combination =
-    { value : Dice.Event
-    , real : Int
-    , idealMin : Int
-    , idealMax : Int
-    }
-
-
-idealCombinaitons : Dict String Float
-idealCombinaitons =
+distributor : Combination.Distributor Dice.Event
+distributor =
     [ ( Dice.Yellow, 0.5 / 3 )
     , ( Dice.Blue, 0.5 / 3 )
     , ( Dice.Green, 0.5 / 3 )
     , ( Dice.Black, 0.5 )
     ]
-        |> List.map (Tuple.mapFirst Dice.toColor)
-        |> Dict.fromList
-
-
-collectDistribution : List Dice.Event -> List Combination
-collectDistribution turns =
-    let
-        totalTurnsCount =
-            List.length turns
-
-        counts =
-            List.foldl
-                (\event acc ->
-                    let
-                        color =
-                            Dice.toColor event
-
-                        count =
-                            Maybe.withDefault 0 (Dict.get color acc)
-                    in
-                    Dict.insert color (count + 1) acc
-                )
-                Dict.empty
-                turns
-    in
-    List.map
-        (\event ->
-            let
-                color =
-                    Dice.toColor event
-
-                ideal =
-                    toFloat totalTurnsCount * Maybe.withDefault 0 (Dict.get color idealCombinaitons)
-            in
-            { value = event
-            , real = Maybe.withDefault 0 (Dict.get color counts)
-            , idealMin = floor ideal
-            , idealMax = ceiling ideal
-            }
-        )
-        [ Dice.Yellow, Dice.Blue, Dice.Green, Dice.Black ]
+        |> Combination.fromIdeals Dice.toColor
 
 
 view : List Dice.Event -> Html msg
 view turns =
     let
         combinations =
-            collectDistribution turns
+            Combination.toCombinations distributor turns
     in
     Chart.chart
         [ Chart.Attributes.width 400
