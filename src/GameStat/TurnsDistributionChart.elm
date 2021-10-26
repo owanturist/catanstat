@@ -52,6 +52,7 @@ view turns =
             [ Chart.Attributes.withGrid
             , Chart.Attributes.ints
             , Chart.Attributes.amount 11
+            , Chart.Attributes.fontSize 12
             ]
         , Chart.yAxis
             [ Chart.Attributes.noArrow
@@ -59,12 +60,15 @@ view turns =
         , Chart.yLabels
             [ Chart.Attributes.withGrid
             , Chart.Attributes.ints
+            , Chart.Attributes.fontSize 12
             ]
         , Chart.bars
             [ Chart.Attributes.ungroup
             , Chart.Attributes.x1 (\{ value } -> toFloat value - 0.5)
             ]
-            [ Chart.bar (toFloat << .real) []
+            [ Chart.bar (toFloat << .real)
+                [ Chart.Attributes.roundTop 0.25
+                ]
             , Chart.stacked
                 [ Chart.bar
                     (toFloat << .idealGap)

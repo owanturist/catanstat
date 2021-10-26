@@ -2,7 +2,7 @@ module GameStat.TurnsDurationChart exposing (view)
 
 import Chart
 import Chart.Attributes
-import Chart.Svg
+import Extra exposing (formatMilliseconds)
 import Html exposing (Html)
 import Player exposing (Player)
 
@@ -12,8 +12,7 @@ import Player exposing (Player)
 
 
 type alias Turn =
-    { index : Int
-    , duration : Int
+    { duration : Int
     , player : Player
     }
 
@@ -28,73 +27,46 @@ buildTurnsDurationData turns players =
             -- that's fine if it is longer than turns
             1 + totalTurnsCount // List.length players
 
-        indexes =
-            List.range 1 totalTurnsCount
-
         playersSequence =
             List.concat (List.repeat totalRoundsCount players)
     in
-    List.map3 Turn indexes turns playersSequence
+    List.map2 Turn turns playersSequence
 
 
-viewBar : Turn -> Chart.Element Turn msg
-viewBar turn =
-    let
-        color =
-            Player.toHex turn.player.color
-
-        position =
-            { x1 = toFloat turn.index - 0.4
-            , x2 = toFloat turn.index + 0.4
-            , y1 = 0
-            , y2 = toFloat turn.duration
-            }
-    in
-    Chart.custom
-        { name = turn.player.name
-        , color = color
-        , position = position
-        , format = always "ms"
-        , data = turn
-        , render =
-            \plane ->
-                Chart.Svg.bar plane
-                    [ Chart.Attributes.color color
-                    , Chart.Attributes.roundTop 1
-                    ]
-                    position
-        }
+viewBar : Int -> Turn -> Chart.Element Turn msg
+viewBar index turn =
+    Chart.bars
+        [ Chart.Attributes.x1 (\_ -> toFloat (index + 1))
+        , Chart.Attributes.margin 0.25
+        , Chart.Attributes.ungroup
+        ]
+        [ Chart.bar (toFloat << .duration)
+            [ Chart.Attributes.color (Player.toHex turn.player.color)
+            , Chart.Attributes.roundTop 0.25
+            ]
+        ]
+        [ turn ]
 
 
 view : List Int -> List Player -> Html msg
 view turns players =
-    let
-        xMax =
-            List.length turns
-
-        yMax =
-            Maybe.withDefault 0 (List.maximum turns)
-    in
     Chart.chart
         [ Chart.Attributes.width 400
         , Chart.Attributes.height 300
         , Chart.Attributes.margin
             { top = 0
             , bottom = 20
-            , left = 0
+            , left = 50
             , right = 10
             }
 
         -- x-axis range
         , Chart.Attributes.range
-            [ Chart.Attributes.lowest 0.5 Chart.Attributes.exactly
-            , Chart.Attributes.highest (toFloat xMax + 0.5) Chart.Attributes.orHigher
+            [ Chart.Attributes.lowest 1 Chart.Attributes.exactly
+            , Chart.Attributes.highest 10 Chart.Attributes.orHigher
             ]
-
-        -- y-axis domain
         , Chart.Attributes.domain
-            [ Chart.Attributes.lowest 0 Chart.Attributes.exactly
-            , Chart.Attributes.highest (toFloat yMax) Chart.Attributes.orHigher
+            [ Chart.Attributes.highest 60000 Chart.Attributes.orHigher
             ]
         ]
         [ Chart.xAxis
@@ -103,11 +75,16 @@ view turns players =
         , Chart.xLabels
             [ Chart.Attributes.withGrid
             , Chart.Attributes.ints
+            , Chart.Attributes.fontSize 12
             ]
         , Chart.yAxis
             [ Chart.Attributes.noArrow
             ]
+        , Chart.yLabels
+            [ Chart.Attributes.format (formatMilliseconds << floor)
+            , Chart.Attributes.fontSize 12
+            ]
         , buildTurnsDurationData turns players
-            |> List.map viewBar
+            |> List.indexedMap viewBar
             |> Chart.list
         ]

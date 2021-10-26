@@ -42,6 +42,7 @@ view turns =
         , Chart.yLabels
             [ Chart.Attributes.withGrid
             , Chart.Attributes.ints
+            , Chart.Attributes.fontSize 12
             ]
         , List.indexedMap
             (\index combination ->
@@ -56,6 +57,7 @@ view turns =
                     ]
                     [ Chart.bar (toFloat << .real)
                         [ Chart.Attributes.color color
+                        , Chart.Attributes.roundTop 0.25
                         ]
                     , Chart.stacked
                         [ Chart.bar

@@ -55,6 +55,7 @@ view turns =
             [ Chart.Attributes.withGrid
             , Chart.Attributes.ints
             , Chart.Attributes.amount 6
+            , Chart.Attributes.fontSize 12
             ]
         , Chart.yAxis
             [ Chart.Attributes.noArrow
@@ -62,6 +63,7 @@ view turns =
         , Chart.yLabels
             [ Chart.Attributes.withGrid
             , Chart.Attributes.ints
+            , Chart.Attributes.fontSize 12
             ]
         , Chart.bars
             [ Chart.Attributes.margin 0.25
@@ -69,9 +71,11 @@ view turns =
             [ Chart.bar (toFloat << .real << .white)
                 [ Chart.Attributes.color Chart.Attributes.darkGray
                 , Chart.Attributes.opacity 0.5
+                , Chart.Attributes.roundTop 0.25
                 ]
             , Chart.bar (toFloat << .real << .red)
                 [ Chart.Attributes.color Chart.Attributes.red
+                , Chart.Attributes.roundTop 0.25
                 ]
             ]
             combinations
