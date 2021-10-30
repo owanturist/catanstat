@@ -3,9 +3,11 @@ module GameStat.TotalDurationTable exposing (view)
 import Extra exposing (formatMilliseconds)
 import Html exposing (Html)
 import Html.Attributes
+import ID
 import Icon
 import Player exposing (Player)
 import Round
+import Table
 
 
 buildPlayersDurationData : List Int -> List Player -> List ( Player, Int )
@@ -40,36 +42,24 @@ view turns players =
         formatPercent duration =
             Round.round 2 (100 * toFloat duration / toFloat totalDuration) ++ "%"
     in
-    Html.table
-        []
-        [ Html.thead []
-            [ Html.tr []
-                [ Html.td [] []
-                , Html.td [] [ Html.text "Name" ]
-                , Html.td [] [ Html.text "Total duration" ]
-                , Html.td [] [ Html.text "Percent" ]
-                ]
-            ]
-        , Html.tbody []
-            (List.map
-                (\( player, duration ) ->
-                    Html.tr []
-                        [ Html.td
-                            [ Html.Attributes.style "color" (Player.toHex player.color) ]
-                            [ Icon.square ]
-                        , Html.td [] [ Html.text player.name ]
-                        , Html.td [] [ Html.text (formatMilliseconds duration) ]
-                        , Html.td [] [ Html.text (formatPercent duration) ]
-                        ]
-                )
-                (buildPlayersDurationData turns players)
-            )
-        , Html.tfoot
+    Table.empty
+        |> Table.withKey (ID.toString << .id << Tuple.first)
+        |> Table.withColumn
             []
-            [ Html.tr []
-                [ Html.td [] []
-                , Html.td [] [ Html.text "Total" ]
-                , Html.td [] [ Html.text (formatMilliseconds totalDuration) ]
+            (\( player, _ ) ->
+                [ Html.span
+                    [ Html.Attributes.style "color" (Player.toHex player.color)
+                    ]
+                    [ Icon.square ]
                 ]
-            ]
-        ]
+            )
+        |> Table.withColumn
+            [ Html.text "Name" ]
+            (\( player, _ ) -> [ Html.text player.name ])
+        |> Table.withColumn
+            [ Html.text "Total duration" ]
+            (\( _, duration ) -> [ Html.text (formatMilliseconds duration) ])
+        |> Table.withColumn
+            [ Html.text "Percent" ]
+            (\( _, duration ) -> [ Html.text (formatPercent duration) ])
+        |> Table.render (buildPlayersDurationData turns players)
