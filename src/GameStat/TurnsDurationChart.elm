@@ -18,19 +18,19 @@ type alias Turn =
 
 
 buildTurnsDurationData : List Int -> List Player -> List Turn
-buildTurnsDurationData turns players =
+buildTurnsDurationData turnsDuration players =
     let
         totalTurnsCount =
-            List.length turns
+            List.length turnsDuration
 
         totalRoundsCount =
-            -- that's fine if it is longer than turns
+            -- that's fine if it is longer than turnsDuration
             1 + totalTurnsCount // List.length players
 
         playersSequence =
             List.concat (List.repeat totalRoundsCount players)
     in
-    List.map2 Turn turns playersSequence
+    List.map2 Turn turnsDuration playersSequence
 
 
 viewBar : Int -> Turn -> Chart.Element Turn msg
@@ -49,7 +49,7 @@ viewBar index turn =
 
 
 view : List Int -> List Player -> Html msg
-view turns players =
+view turnsDuration players =
     Chart.chart
         [ Chart.Attributes.width 400
         , Chart.Attributes.height 300
@@ -84,7 +84,7 @@ view turns players =
             [ Chart.Attributes.format (formatMilliseconds << floor)
             , Chart.Attributes.fontSize 12
             ]
-        , buildTurnsDurationData turns players
+        , buildTurnsDurationData turnsDuration players
             |> List.indexedMap viewBar
             |> Chart.list
         ]

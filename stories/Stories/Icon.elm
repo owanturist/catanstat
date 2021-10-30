@@ -31,7 +31,7 @@ story =
                     , ( "diceOne", Icon.diceOne )
                     , ( "diceTwo", Icon.diceTwo )
                     , ( "diceThree", Icon.diceThree )
-                    , ( "diceFoure", Icon.diceFoure )
+                    , ( "diceFour", Icon.diceFour )
                     , ( "diceFive", Icon.diceFive )
                     , ( "diceSix", Icon.diceSix )
                     ]

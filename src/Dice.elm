@@ -5,6 +5,7 @@ module Dice exposing
     , eventEncoder
     , eventToInt
     , events
+    , fromInt
     , numberDecoder
     , numberEncoder
     , numbers
@@ -13,8 +14,8 @@ module Dice exposing
     , toInt
     )
 
-import FontAwesome.Icon exposing (Icon)
-import FontAwesome.Solid exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo)
+import Html exposing (Html)
+import Icon exposing (diceFive, diceFour, diceOne, diceSix, diceThree, diceTwo)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 
@@ -52,6 +53,31 @@ toInt number =
 
         Six ->
             6
+
+
+fromInt : Int -> Maybe Number
+fromInt int =
+    case int of
+        1 ->
+            Just One
+
+        2 ->
+            Just Two
+
+        3 ->
+            Just Three
+
+        4 ->
+            Just Four
+
+        5 ->
+            Just Five
+
+        6 ->
+            Just Six
+
+        _ ->
+            Nothing
 
 
 numberEncoder : Number -> Value
@@ -169,7 +195,7 @@ toColor event =
             "#374151"
 
 
-toIcon : Number -> Icon
+toIcon : Number -> Html msg
 toIcon number =
     case number of
         One ->

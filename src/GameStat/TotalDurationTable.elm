@@ -11,7 +11,7 @@ import Table
 
 
 buildPlayersDurationData : List Int -> List Player -> List ( Player, Int )
-buildPlayersDurationData turns players =
+buildPlayersDurationData turnsDuration players =
     let
         totalPlayersCount =
             List.length players
@@ -28,15 +28,15 @@ buildPlayersDurationData turns players =
                         (List.drop totalPlayersCount remainingTurns)
     in
     List.indexedMap
-        (\index player -> ( player, countPlayerDuration 0 (List.drop index turns) ))
+        (\index player -> ( player, countPlayerDuration 0 (List.drop index turnsDuration) ))
         players
 
 
 view : List Int -> List Player -> Html msg
-view turns players =
+view turnsDuration players =
     let
         totalDuration =
-            List.sum turns
+            List.sum turnsDuration
 
         formatPercent : Int -> String
         formatPercent duration =
@@ -57,9 +57,9 @@ view turns players =
             [ Html.text "Name" ]
             (\( player, _ ) -> [ Html.text player.name ])
         |> Table.withColumn
-            [ Html.text "Total duration" ]
+            [ Html.text "Duration" ]
             (\( _, duration ) -> [ Html.text (formatMilliseconds duration) ])
         |> Table.withColumn
             [ Html.text "Percent" ]
             (\( _, duration ) -> [ Html.text (formatPercent duration) ])
-        |> Table.render (buildPlayersDurationData turns players)
+        |> Table.render (buildPlayersDurationData turnsDuration players)
