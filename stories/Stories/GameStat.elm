@@ -140,7 +140,7 @@ stories =
     , Bulletproof.story "EventsDieDistributionChart"
         (\turnsCount ->
             List.take turnsCount diceAndEventTurns
-                |> EventsDieDistributionChart.viewEventsPerDie
+                |> EventsDieDistributionChart.view
                 |> Bulletproof.fromHtml
         )
         |> Bulletproof.Knob.int "Turns count"

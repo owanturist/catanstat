@@ -1,12 +1,10 @@
-module GameStat.EventsDieDistributionChart exposing (viewEventsPerDie)
+module GameStat.EventsDieDistributionChart exposing (view)
 
 import Chart
 import Chart.Attributes
-import Chart.Svg
 import Dice
 import Dict exposing (Dict)
 import Html exposing (Html)
-import Html.Attributes
 import Svg
 import Svg.Attributes
 
@@ -34,8 +32,8 @@ collectEventsPerDie turns =
         turns
 
 
-viewEventsPerDie : List ( Dice.Number, Dice.Event ) -> Html msg
-viewEventsPerDie turns =
+view : List ( Dice.Number, Dice.Event ) -> Html msg
+view turns =
     let
         eventsPerDie =
             collectEventsPerDie turns
