@@ -1,4 +1,4 @@
-module GameStat.EventsDieDistributionChart exposing (view)
+module GameStat.EventsDieDistributionChart exposing (Turn, view)
 
 import Chart
 import Chart.Attributes
@@ -9,13 +9,13 @@ import Svg
 import Svg.Attributes
 
 
-collectEventsPerDie : List ( Dice.Number, Dice.Event ) -> Dict Int (Dict String Int)
+collectEventsPerDie : List Turn -> Dict Int (Dict String Int)
 collectEventsPerDie turns =
     List.foldl
-        (\( die, event ) dict ->
+        (\{ red, event } dict ->
             let
                 num =
-                    Dice.toInt die
+                    Dice.toInt red
 
                 color =
                     Dice.toColor event
@@ -32,7 +32,13 @@ collectEventsPerDie turns =
         turns
 
 
-view : List ( Dice.Number, Dice.Event ) -> Html msg
+type alias Turn =
+    { red : Dice.Number
+    , event : Dice.Event
+    }
+
+
+view : List Turn -> Html msg
 view turns =
     let
         eventsPerDie =

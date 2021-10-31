@@ -1,4 +1,4 @@
-module GameStat.DiceDistributionChart exposing (view)
+module GameStat.DiceDistributionChart exposing (Turn, view)
 
 import Chart
 import Chart.Attributes

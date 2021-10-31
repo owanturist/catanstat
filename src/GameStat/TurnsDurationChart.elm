@@ -2,6 +2,7 @@ module GameStat.TurnsDurationChart exposing (view)
 
 import Chart
 import Chart.Attributes
+import Cons exposing (Cons)
 import Extra exposing (formatMilliseconds)
 import Html exposing (Html)
 import Player exposing (Player)
@@ -37,7 +38,7 @@ viewBar : Int -> Turn -> Chart.Element Turn msg
 viewBar index turn =
     Chart.bars
         [ Chart.Attributes.x1 (\_ -> toFloat (index + 1))
-        , Chart.Attributes.margin 0.25
+        , Chart.Attributes.margin 0.1
         , Chart.Attributes.ungroup
         ]
         [ Chart.bar (toFloat << .duration)
@@ -48,8 +49,8 @@ viewBar index turn =
         [ turn ]
 
 
-view : List Int -> List Player -> Html msg
-view turnsDuration players =
+view : Cons Player -> List Int -> Html msg
+view players turnsDuration =
     Chart.chart
         [ Chart.Attributes.width 400
         , Chart.Attributes.height 300
@@ -84,7 +85,8 @@ view turnsDuration players =
             [ Chart.Attributes.format (formatMilliseconds << floor)
             , Chart.Attributes.fontSize 12
             ]
-        , buildTurnsDurationData turnsDuration players
+        , Cons.toList players
+            |> buildTurnsDurationData turnsDuration
             |> List.indexedMap viewBar
             |> Chart.list
         ]

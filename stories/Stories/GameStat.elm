@@ -2,15 +2,20 @@ module Stories.GameStat exposing (stories)
 
 import Bulletproof
 import Bulletproof.Knob
+import Cons
 import Dice
+import Game
+import GameStat
 import GameStat.DiceDistributionChart as DiceDistributionChart
 import GameStat.EventsDieDistributionChart as EventsDieDistributionChart
 import GameStat.EventsDistributionChart as EventsDistributionChart
 import GameStat.TotalDurationTable as TotalDurationTable
 import GameStat.TurnsDistributionChart as TurnsDistributionChart
 import GameStat.TurnsDurationChart as TurnsDurationChart
-import Player
+import ID
+import Player exposing (Player)
 import Random
+import Request
 
 
 stories : List Bulletproof.Story
@@ -19,7 +24,12 @@ stories =
         maxTurns =
             200
 
-        turnGenerator =
+        takePlayers amount =
+            List.take amount Player.x6
+                |> Cons.fromList
+                |> Maybe.withDefault (Cons.singleton (Player (ID.fromInt 0) Player.Red "Red"))
+
+        durationGenerator =
             Random.int (1 * 60 * 1000) (5 * 60 * 1000)
 
         dieGenerator =
@@ -32,31 +42,31 @@ stories =
                 Dice.Black
                 [ Dice.Black, Dice.Black, Dice.Yellow, Dice.Blue, Dice.Green ]
 
-        ( turns, _ ) =
+        ( durationTurns, _ ) =
             Random.step
-                (Random.list maxTurns turnGenerator)
+                (Random.list maxTurns durationGenerator)
                 (Random.initialSeed 0)
 
-        ( doublceDiceTurns, _ ) =
+        ( redTurns, _ ) =
             Random.step
-                (Random.list maxTurns (Random.pair dieGenerator dieGenerator))
-                (Random.initialSeed 0)
+                (Random.list maxTurns dieGenerator)
+                (Random.initialSeed 1)
 
-        ( eventsTurns, _ ) =
+        ( whiteTurns, _ ) =
             Random.step
-                (Random.list maxTurns eventGenerator)
+                (Random.list maxTurns dieGenerator)
                 (Random.initialSeed 2)
 
-        ( diceAndEventTurns, _ ) =
+        ( eventTurns, _ ) =
             Random.step
-                (Random.list maxTurns (Random.pair dieGenerator eventGenerator))
-                (Random.initialSeed 4)
+                (Random.list maxTurns eventGenerator)
+                (Random.initialSeed 3)
     in
     [ Bulletproof.story "TotalDurationTable"
         (\playersCount turnsCount ->
             TotalDurationTable.view
-                (List.take turnsCount turns)
-                (List.take playersCount Player.x6)
+                (takePlayers playersCount)
+                (List.take turnsCount durationTurns)
                 |> Bulletproof.fromHtml
         )
         |> Bulletproof.Knob.int "Players count"
@@ -76,8 +86,8 @@ stories =
     , Bulletproof.story "TurnsDurationChart"
         (\playersCount turnsCount ->
             TurnsDurationChart.view
-                (List.take turnsCount turns)
-                (List.take playersCount Player.x6)
+                (takePlayers playersCount)
+                (List.take turnsCount durationTurns)
                 |> Bulletproof.fromHtml
         )
         |> Bulletproof.Knob.int "Players count"
@@ -96,8 +106,9 @@ stories =
     --
     , Bulletproof.story "TurnsDistributionChart"
         (\turnsCount ->
-            TurnsDistributionChart.view
-                (List.take turnsCount doublceDiceTurns)
+            List.map2 TurnsDistributionChart.Turn whiteTurns redTurns
+                |> List.take turnsCount
+                |> TurnsDistributionChart.view
                 |> Bulletproof.fromHtml
         )
         |> Bulletproof.Knob.int "Turns count"
@@ -110,8 +121,8 @@ stories =
     --
     , Bulletproof.story "DiceDistributionChart"
         (\turnsCount ->
-            List.take turnsCount doublceDiceTurns
-                |> List.map (\( red, white ) -> { red = red, white = white })
+            List.map2 DiceDistributionChart.Turn whiteTurns redTurns
+                |> List.take turnsCount
                 |> DiceDistributionChart.view
                 |> Bulletproof.fromHtml
         )
@@ -125,7 +136,7 @@ stories =
     --
     , Bulletproof.story "EventsDistributionChart"
         (\turnsCount ->
-            List.take turnsCount eventsTurns
+            List.take turnsCount eventTurns
                 |> EventsDistributionChart.view
                 |> Bulletproof.fromHtml
         )
@@ -139,10 +150,56 @@ stories =
     --
     , Bulletproof.story "EventsDieDistributionChart"
         (\turnsCount ->
-            List.take turnsCount diceAndEventTurns
+            List.map2 EventsDieDistributionChart.Turn redTurns eventTurns
+                |> List.take turnsCount
                 |> EventsDieDistributionChart.view
                 |> Bulletproof.fromHtml
         )
+        |> Bulletproof.Knob.int "Turns count"
+            40
+            [ Bulletproof.Knob.range
+            , Bulletproof.Knob.min 0
+            , Bulletproof.Knob.max maxTurns
+            ]
+
+    --
+    , Bulletproof.story "GameState | Loading"
+        (GameStat.Loading
+            |> GameStat.view (ID.fromInt 0)
+            |> Bulletproof.fromHtml
+        )
+
+    --
+    , Bulletproof.story "GameState | Failure"
+        (GameStat.Failure Request.NetworkError
+            |> GameStat.view (ID.fromInt 0)
+            |> Bulletproof.fromHtml
+        )
+
+    --
+    , Bulletproof.story "GameState | Succeed"
+        (\playersCount turnsCount ->
+            let
+                turns =
+                    List.map4 Game.Turn
+                        durationTurns
+                        whiteTurns
+                        redTurns
+                        eventTurns
+            in
+            { players = takePlayers playersCount
+            , turns = List.take turnsCount turns
+            }
+                |> GameStat.Succeed
+                |> GameStat.view (ID.fromInt 0)
+                |> Bulletproof.fromHtml
+        )
+        |> Bulletproof.Knob.int "Players count"
+            4
+            [ Bulletproof.Knob.range
+            , Bulletproof.Knob.min 2
+            , Bulletproof.Knob.max 6
+            ]
         |> Bulletproof.Knob.int "Turns count"
             40
             [ Bulletproof.Knob.range

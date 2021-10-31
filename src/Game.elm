@@ -1,4 +1,16 @@
-module Game exposing (Dice, Game, ID, Move, Status(..), create, decoder, encoder, getCurrentPlayer)
+module Game exposing
+    ( Dice
+    , Game
+    , ID
+    , Move
+    , Statistic
+    , Status(..)
+    , Turn
+    , create
+    , decoder
+    , encoder
+    , getCurrentPlayer
+    )
 
 import Cons exposing (Cons)
 import Dice
@@ -169,3 +181,17 @@ getCurrentPlayer game =
 create : Cons Player -> Time.Posix -> Game
 create players posix =
     Game (generateID posix) posix InGame players []
+
+
+type alias Turn =
+    { duration : Int
+    , white : Dice.Number
+    , red : Dice.Number
+    , event : Dice.Event
+    }
+
+
+type alias Statistic =
+    { players : Cons Player
+    , turns : List Turn
+    }

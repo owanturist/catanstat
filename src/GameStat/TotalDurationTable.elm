@@ -1,5 +1,6 @@
 module GameStat.TotalDurationTable exposing (view)
 
+import Cons exposing (Cons)
 import Extra exposing (formatMilliseconds)
 import Html exposing (Html)
 import Html.Attributes
@@ -32,8 +33,8 @@ buildPlayersDurationData turnsDuration players =
         players
 
 
-view : List Int -> List Player -> Html msg
-view turnsDuration players =
+view : Cons Player -> List Int -> Html msg
+view players turnsDuration =
     let
         totalDuration =
             List.sum turnsDuration
@@ -62,4 +63,4 @@ view turnsDuration players =
         |> Table.withColumn
             [ Html.text "Percent" ]
             (\( _, duration ) -> [ Html.text (formatPercent duration) ])
-        |> Table.render (buildPlayersDurationData turnsDuration players)
+        |> Table.render (buildPlayersDurationData turnsDuration (Cons.toList players))

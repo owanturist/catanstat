@@ -1,131 +1,35 @@
-module GameStat exposing (Model, Msg, init, update, view)
+module GameStat exposing (Model(..), Msg, init, update, view)
 
 import Api
-import Dice
-import Dict exposing (Dict)
-import Dict.Any exposing (AnyDict)
-import Effect exposing (Effect)
-import Element exposing (Element, column, el, link, none, row, table, text)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Font as Font
-import Extra exposing (formatMilliseconds, ifelse)
-import FontAwesome.Attributes
-import FontAwesome.Icon exposing (Icon, viewIcon)
-import FontAwesome.Solid exposing (alignJustify, dice, home, square)
-import Game exposing (Game)
-import Json.Decode as Decode
-import LocalStorage
-import Palette
-import Round
-import Router
-import Time
+import Effect exposing (Custom(..), Effect)
+import Game
+import GameStat.DiceDistributionChart as DiceDistributionChart
+import GameStat.EventsDieDistributionChart as EventsDieDistributionChart
+import GameStat.EventsDistributionChart as EventsDistributionChart
+import GameStat.TotalDurationTable as TotalDurationTable
+import GameStat.TurnsDistributionChart as TurnsDistributionChart
+import GameStat.TurnsDurationChart as TurnsDurationChart
+import Html exposing (Html)
+import Html.Events
+import Html.Lazy
+import Request
 
 
 
 -- M O D E L
 
 
-type alias CombinationsEvents =
-    { yellow : Int
-    , blue : Int
-    , green : Int
-    , black : Int
-    }
-
-
-emptyCombinationsEvents : CombinationsEvents
-emptyCombinationsEvents =
-    CombinationsEvents 0 0 0 0
-
-
-type alias State =
-    { total : Int
-    , combinationsNumbers : Dict Int Int
-    , overallWhite : AnyDict Int Dice.Number Int
-    , overallRed : AnyDict Int Dice.Number Int
-    , overallEvents : AnyDict Int Dice.Event Int
-    , combinationsEvents : AnyDict Int Dice.Number CombinationsEvents
-    }
-
-
-increment : Maybe Int -> Maybe Int
-increment =
-    Just << (+) 1 << Maybe.withDefault 0
-
-
-percent : Int -> Int -> String
-percent total x =
-    if total == 0 then
-        "0%"
-
-    else
-        Round.round 2 (100 * toFloat x / toFloat total) ++ "%"
-
-
-calcCombinationsNumbers : List Game.Move -> Dict Int Int
-calcCombinationsNumbers moves =
-    List.foldr
-        (\{ dice } -> Dict.update (Dice.toInt dice.white + Dice.toInt dice.red) increment)
-        Dict.empty
-        moves
-
-
-calcOverallEvents : List Game.Move -> AnyDict Int Dice.Event Int
-calcOverallEvents moves =
-    List.foldr
-        (\{ dice } -> Dict.Any.update dice.event increment)
-        (Dict.Any.empty Dice.eventToInt)
-        moves
-
-
-calcOverallNumbers : (Game.Dice -> Dice.Number) -> List Game.Move -> AnyDict Int Dice.Number Int
-calcOverallNumbers extractor moves =
-    List.foldr
-        (\{ dice } -> Dict.Any.update (extractor dice) increment)
-        (Dict.Any.empty Dice.toInt)
-        moves
-
-
-calcCombinationsEvents : List Game.Move -> AnyDict Int Dice.Number CombinationsEvents
-calcCombinationsEvents moves =
-    List.foldr
-        (\{ dice } ->
-            Dict.Any.update dice.red
-                (\events ->
-                    let
-                        cobminations =
-                            Maybe.withDefault emptyCombinationsEvents events
-                    in
-                    case dice.event of
-                        Dice.Yellow ->
-                            Just { cobminations | yellow = cobminations.yellow + 1 }
-
-                        Dice.Blue ->
-                            Just { cobminations | blue = cobminations.blue + 1 }
-
-                        Dice.Green ->
-                            Just { cobminations | green = cobminations.green + 1 }
-
-                        Dice.Black ->
-                            Just { cobminations | black = cobminations.black + 1 }
-                )
-        )
-        (Dict.Any.empty Dice.toInt)
-        moves
-
-
 type Model
     = Loading
-    | Failure Decode.Error
-    | Succeed Game State
+    | Failure Request.Error
+    | Succeed Game.Statistic
 
 
 init : Game.ID -> ( Model, Effect Msg )
 init gameID =
     ( Loading
-    , Api.loadGame gameID
-        |> Effect.map LoadGame
+    , Api.loadGameStatistic gameID
+        |> Request.send LoadGameDone
     )
 
 
@@ -134,31 +38,23 @@ init gameID =
 
 
 type Msg
-    = LoadGame (Result LocalStorage.Error Game)
+    = LoadGame Game.ID
+    | LoadGameDone (Result Request.Error Game.Statistic)
 
 
-update : Msg -> Model -> ( Model, Effect Msg )
-update msg model =
-    case ( msg, model ) of
-        ( LoadGame (Err LocalStorage.NotFound), _ ) ->
-            ( model
-            , Router.replace Router.ToCreateGame
-            )
+update : Msg -> ( Model, Effect Msg )
+update msg =
+    case msg of
+        LoadGame gameID ->
+            init gameID
 
-        ( LoadGame (Err (LocalStorage.DecodeError error)), _ ) ->
+        LoadGameDone (Err error) ->
             ( Failure error
             , Effect.none
             )
 
-        ( LoadGame (Ok loadedGame), _ ) ->
-            ( Succeed loadedGame
-                { total = List.length loadedGame.moves
-                , combinationsNumbers = calcCombinationsNumbers loadedGame.moves
-                , overallWhite = calcOverallNumbers .white loadedGame.moves
-                , overallRed = calcOverallNumbers .red loadedGame.moves
-                , overallEvents = calcOverallEvents loadedGame.moves
-                , combinationsEvents = calcCombinationsEvents loadedGame.moves
-                }
+        LoadGameDone (Ok statistic) ->
+            ( Succeed statistic
             , Effect.none
             )
 
@@ -167,246 +63,57 @@ update msg model =
 -- V I E W
 
 
-viewDiceSide : Palette.Color -> Icon -> Element msg
-viewDiceSide color icon =
-    el
-        [ Font.color color
-        , Font.size 32
-        ]
-        (Element.html (viewIcon icon))
+viewLoading : Html msg
+viewLoading =
+    Html.text "Loading..."
 
 
-viewLink : Router.Route -> Icon -> Element msg
-viewLink route icon =
-    link
-        [ Element.padding 10
-        , Border.rounded 6
-        , Background.color Palette.amethyst
-        , Font.color Palette.clouds
-        ]
-        { url = Router.toPath route
-        , label =
-            icon
-                |> FontAwesome.Icon.viewStyled
-                    [ FontAwesome.Attributes.fw
-                    ]
-                |> Element.html
-        }
-
-
-viewTableCell : Bool -> Int -> Element msg -> Element msg
-viewTableCell first padY =
-    el
-        [ Element.height Element.fill
-        , Element.paddingXY 10 padY
-        , Border.widthEach
-            { top = 0
-            , right = ifelse first 1 0
-            , bottom = 1
-            , left = 0
-            }
-        , Border.color Palette.clouds
-        ]
-        << el
-            [ Element.centerY
-            , ifelse first Element.alignRight Element.alignLeft
-            , Border.color Palette.clouds
+viewFailure : Game.ID -> Request.Error -> Html Msg
+viewFailure gameID error =
+    -- TODO handle error
+    Html.div []
+        [ Html.h2 [] [ Html.text "Something went wrong" ]
+        , Html.button
+            [ Html.Events.onClick (LoadGame gameID)
             ]
-
-
-viewCombinationsNumbersTable : Int -> Dict Int Int -> Element msg
-viewCombinationsNumbersTable total combinationsNumbers =
-    let
-        data =
-            List.map
-                (\combination ->
-                    { combination = combination
-                    , count = Maybe.withDefault 0 (Dict.get combination combinationsNumbers)
-                    }
-                )
-                (List.range 2 12)
-    in
-    table
-        [ Element.width Element.fill
-        , Font.size 16
-        ]
-        { data = data
-        , columns =
-            [ { width = Element.shrink
-              , header = none
-              , view = viewTableCell True 10 << text << String.fromInt << .combination
-              }
-            , { width = Element.fill
-              , header = none
-              , view = viewTableCell False 10 << text << String.fromInt << .count
-              }
-            , { width = Element.fill
-              , header = none
-              , view = viewTableCell False 10 << text << percent total << .count
-              }
+            [ Html.text "Try again"
             ]
-        }
-
-
-viewOverallEventsTable : Int -> AnyDict Int Dice.Event Int -> Element msg
-viewOverallEventsTable total overallEvents =
-    let
-        data =
-            List.map
-                (\event ->
-                    { event = event
-                    , count = Maybe.withDefault 0 (Dict.Any.get event overallEvents)
-                    }
-                )
-                [ Dice.Yellow, Dice.Blue, Dice.Green, Dice.Black ]
-    in
-    table
-        [ Element.width Element.fill
-        , Font.size 16
         ]
-        { data = data
-        , columns =
-            [ { width = Element.shrink
-              , header = none
-              , view =
-                    \item ->
-                        square
-                            |> viewDiceSide (Dice.toColor item.event)
-                            |> viewTableCell True 5
-              }
-            , { width = Element.fill
-              , header = none
-              , view = viewTableCell False 5 << text << String.fromInt << .count
-              }
-            , { width = Element.fill
-              , header = none
-              , view = viewTableCell False 5 << text << percent total << .count
-              }
-            ]
-        }
 
 
-viewOverallNumbersTable : Palette.Color -> Int -> AnyDict Int Dice.Number Int -> Element msg
-viewOverallNumbersTable diceColor total overalNumbers =
+viewSucceed : Game.Statistic -> Html msg
+viewSucceed statistic =
     let
-        data =
-            List.map
-                (\number ->
-                    { number = number
-                    , count = Maybe.withDefault 0 (Dict.Any.get number overalNumbers)
-                    }
-                )
-                Dice.numbers
+        turnsDuration =
+            List.map .duration statistic.turns
+
+        turnsWhite =
+            List.map .white statistic.turns
+
+        turnsRed =
+            List.map .red statistic.turns
+
+        turnsEvent =
+            List.map .event statistic.turns
     in
-    table
-        [ Element.width Element.fill
-        , Font.size 16
+    Html.div []
+        [ TotalDurationTable.view statistic.players turnsDuration
+        , TurnsDurationChart.view statistic.players turnsDuration
+        , TurnsDistributionChart.view (List.map2 TurnsDistributionChart.Turn turnsWhite turnsRed)
+        , DiceDistributionChart.view (List.map2 DiceDistributionChart.Turn turnsWhite turnsRed)
+        , EventsDieDistributionChart.view (List.map2 EventsDieDistributionChart.Turn turnsRed turnsEvent)
+        , EventsDistributionChart.view turnsEvent
         ]
-        { data = data
-        , columns =
-            [ { width = Element.shrink
-              , header = none
-              , view = viewTableCell True 5 << viewDiceSide diceColor << Dice.toIcon << .number
-              }
-            , { width = Element.fill
-              , header = none
-              , view = viewTableCell False 5 << text << String.fromInt << .count
-              }
-            , { width = Element.fill
-              , header = none
-              , view = viewTableCell False 5 << text << percent total << .count
-              }
-            ]
-        }
 
 
-viewCombinationsTable : AnyDict Int Dice.Number CombinationsEvents -> Element msg
-viewCombinationsTable combinationsEvents =
-    let
-        data =
-            List.map
-                (\number ->
-                    { number = number
-                    , count = Maybe.withDefault emptyCombinationsEvents (Dict.Any.get number combinationsEvents)
-                    }
-                )
-                Dice.numbers
-
-        columns =
-            List.map
-                (\( extractor, event ) ->
-                    { width = Element.fill
-                    , header =
-                        square
-                            |> viewDiceSide (Dice.toColor event)
-                            |> viewTableCell False 5
-                    , view = viewTableCell False 5 << text << String.fromInt << extractor << .count
-                    }
-                )
-                [ ( .yellow, Dice.Yellow )
-                , ( .blue, Dice.Blue )
-                , ( .green, Dice.Green )
-                , ( .black, Dice.Black )
-                ]
-    in
-    table
-        [ Element.width Element.fill
-        , Font.size 16
-        ]
-        { data = data
-        , columns =
-            { width = Element.shrink
-            , header = viewTableCell True 5 none
-            , view = viewTableCell True 5 << viewDiceSide Palette.pomegranate << Dice.toIcon << .number
-            }
-                :: columns
-        }
-
-
-view : Game.ID -> Model -> Element Msg
+view : Game.ID -> Model -> Html Msg
 view gameID model =
     case model of
         Loading ->
-            none
+            viewLoading
 
         Failure error ->
-            el
-                [ Element.width Element.fill
-                , Font.family [ Font.monospace ]
-                , Font.size 10
-                ]
-                (text (Decode.errorToString error))
+            viewFailure gameID error
 
-        Succeed game state ->
-            column
-                [ Element.padding 10
-                , Element.spacing 20
-                , Element.width Element.fill
-                ]
-                [ row
-                    [ Element.spacing 10
-                    , Element.width Element.fill
-                    ]
-                    [ viewLink Router.ToGameHistory home
-                    , viewLink (Router.ToPlayGame gameID) dice
-                    , viewLink (Router.ToGameLog gameID) alignJustify
-                    , case game.status of
-                        Game.InGame ->
-                            none
-
-                        Game.Finished endAt _ ->
-                            Time.posixToMillis endAt
-                                - Time.posixToMillis game.startAt
-                                |> formatMilliseconds
-                                |> text
-                                |> el
-                                    [ Element.alignRight
-                                    , Font.color Palette.wetAsphalt
-                                    ]
-                    ]
-                , viewCombinationsNumbersTable state.total state.combinationsNumbers
-                , viewOverallNumbersTable Palette.concrete state.total state.overallWhite
-                , viewOverallNumbersTable Palette.pomegranate state.total state.overallRed
-                , viewOverallEventsTable state.total state.overallEvents
-                , viewCombinationsTable state.combinationsEvents
-                ]
+        Succeed statistic ->
+            Html.Lazy.lazy viewSucceed statistic

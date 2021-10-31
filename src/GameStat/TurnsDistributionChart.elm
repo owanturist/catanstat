@@ -1,4 +1,4 @@
-module GameStat.TurnsDistributionChart exposing (view)
+module GameStat.TurnsDistributionChart exposing (Turn, view)
 
 import Chart
 import Chart.Attributes
@@ -27,12 +27,18 @@ distributor =
         |> Combination.fromIdeals String.fromInt
 
 
-view : List ( Dice.Number, Dice.Number ) -> Html msg
+type alias Turn =
+    { white : Dice.Number
+    , red : Dice.Number
+    }
+
+
+view : List Turn -> Html msg
 view turns =
     let
         combinations =
             turns
-                |> List.map (\( left, right ) -> Dice.toInt left + Dice.toInt right)
+                |> List.map (\{ white, red } -> Dice.toInt white + Dice.toInt red)
                 |> Combination.toCombinations distributor
     in
     Chart.chart
