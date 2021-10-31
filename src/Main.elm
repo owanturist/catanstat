@@ -6,6 +6,7 @@ import CreateGame
 import Effect exposing (Effect)
 import Effect.History
 import Effect.LocalStorage
+import Effect.Request
 import Element exposing (Element, none)
 import FontAwesome.Styles
 import Game
@@ -251,6 +252,11 @@ middlewares model effect =
         Effect.History action ->
             ( model
             , Effect.History.middleware model.navigation action
+            )
+
+        Effect.Request config ->
+            ( model
+            , Effect.Request.middleware config
             )
 
 

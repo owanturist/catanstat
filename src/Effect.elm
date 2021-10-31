@@ -2,6 +2,7 @@ module Effect exposing (Custom(..), Effect, batch, fromCmd, map, middleware, non
 
 import Effect.History
 import Effect.LocalStorage
+import Effect.Request
 import Middleware exposing (Middleware)
 
 
@@ -13,6 +14,7 @@ type Custom msg
     = Cmd (Cmd msg)
     | LocalStorage (Effect.LocalStorage.Action msg)
     | History Effect.History.Action
+    | Request (Effect.Request.Config msg)
 
 
 mapCustom : (a -> b) -> Custom a -> Custom b
@@ -26,6 +28,9 @@ mapCustom tagger custom =
 
         History history ->
             History history
+
+        Request config ->
+            Request (Effect.Request.map tagger config)
 
 
 map : (a -> b) -> Effect a -> Effect b
