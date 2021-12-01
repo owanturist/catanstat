@@ -7,9 +7,11 @@ module Player exposing
     , decoder
     , encoder
     , toColor
+    , toHex
     , x6
     )
 
+import ID exposing (ID)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode exposing (Value)
 import Palette
@@ -106,12 +108,41 @@ toColor color =
             Palette.pumpkin
 
 
+toHex : Color -> String
+toHex color =
+    case color of
+        White ->
+            -- gray-300
+            "#d1d5db"
+
+        Red ->
+            -- red-400
+            "#f87171"
+
+        Blue ->
+            -- blue-400
+            "#60a5fa"
+
+        Yellow ->
+            -- yellow-400
+            "#fbbf24"
+
+        Green ->
+            -- green-400
+            "#34d399"
+
+        Brown ->
+            -- yellow-800
+            "#92400e"
+
+
 
 -- P L A Y E R
 
 
 type alias Player =
-    { color : Color
+    { id : ID { player : () }
+    , color : Color
     , name : String
     }
 
@@ -126,20 +157,21 @@ encoder player =
 
 decoder : Decoder Player
 decoder =
-    Decode.map2 Player
+    Decode.map3 Player
+        (Decode.index 0 ID.decoder)
         (Decode.index 0 colorDecoder)
         (Decode.index 1 Decode.string)
 
 
 x4 : List Player
 x4 =
-    [ Player Red "Red"
-    , Player Blue "Blue"
-    , Player White "White"
-    , Player Yellow "Yellow"
+    [ Player (ID.fromInt 0) Red "Red"
+    , Player (ID.fromInt 1) Blue "Blue"
+    , Player (ID.fromInt 2) White "White"
+    , Player (ID.fromInt 3) Yellow "Yellow"
     ]
 
 
 x6 : List Player
 x6 =
-    x4 ++ [ Player Green "Green", Player Brown "Brown" ]
+    x4 ++ [ Player (ID.fromInt 4) Green "Green", Player (ID.fromInt 5) Brown "Brown" ]
