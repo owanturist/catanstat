@@ -3,21 +3,6 @@
   "editor.quickSuggestions": {
     "strings": true
   },
-  "elm.analyseEnabled": true,
-  "elm.analyseCommand": "./node_modules/.bin/elm-analyse",
-  "elm.analysePort": "3030",
-  "elm.includeUserFunctionDocumentation": true,
-  "elm.includeParamsInUserAutocomplete": true,
-  "elm.showSuggestionsInElmSyntax": true,
-  "elmLS.elmFormatPath": "./node_modules/.bin/elm-format",
-  "elmLS.elmPath": "./node_modules/.bin/elm",
-  "elmLS.elmReviewPath": "./node_modules/.bin/elm-review",
-  "[elm]": {
-    "editor.formatOnSave": true
-  },
-  "tailwindCSS.includeLanguages": {
-    "elm": "html"
-  },
   "tailwindCSS.experimental.classRegex": [
     ["\\bclass\\s+\\[([^)]*)\\]", "\"([^\"]*)\""], // TW.class
     ["\\bclass\\s+([^)]*)", "\"([^\"]*)\""] // Html.class
