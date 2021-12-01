@@ -1,4 +1,12 @@
 import React from 'react'
+import { Routes, Route, Outlet } from 'react-router-dom'
+
+const Template: React.VFC = () => (
+  <div>
+    <h1>Template</h1>
+    <Outlet />
+  </div>
+)
 
 export const App: React.VFC = () => {
   const [count, setCount] = React.useState(0)
@@ -14,8 +22,14 @@ export const App: React.VFC = () => {
   }, [])
 
   return (
-    <div className="bg-gray-200 p-3">
+    <div className="bg-gray-200 p-3 text-red-500">
       <h1>Hello World {count}</h1>
+      <Routes>
+        <Route element={<Template />}>
+          <Route index element={<div>Home</div>} />
+          <Route path="about" element={<div>About</div>} />
+        </Route>
+      </Routes>
     </div>
   )
 }
