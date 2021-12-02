@@ -25,6 +25,7 @@
   "homepage": "https://github.com/owanturist/catanstat#readme",
   "devDependencies": {
     "@types/react": "^17.0.37",
+    "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "^17.0.11",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/parser": "^5.5.0",
@@ -41,8 +42,12 @@
     "prettier": "^2.5.0"
   },
   "dependencies": {
+    "classnames": "^2.3.1",
     "react": "^17.0.2",
+    "react-beautiful-dnd": "^13.1.0",
     "react-dom": "^17.0.2",
+    "react-inner-store": "^1.0.0-beta.5",
+    "react-query": "^3.34.0",
     "react-router-dom": "^6.0.2",
     "tailwindcss": "^2.2.17"
   },

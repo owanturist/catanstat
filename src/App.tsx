@@ -1,35 +1,47 @@
 import React from 'react'
-import { Routes, Route, Outlet } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { InnerStore } from 'react-inner-store'
 
-const Template: React.VFC = () => (
-  <div>
-    <h1>Template</h1>
-    <Outlet />
-  </div>
-)
+import * as StartGame from './StartGame'
+
+const queryClient = new QueryClient()
+
+const LazyComponent = <TProps,>({
+  init,
+  component
+}: {
+  init(): TProps
+  component: React.FC<TProps>
+}): React.ReactElement => {
+  const propsRef = React.useRef<TProps>()
+
+  if (propsRef.current == null) {
+    propsRef.current = init()
+  }
+
+  return React.createElement(component, propsRef.current)
+}
 
 export const App: React.VFC = () => {
-  const [count, setCount] = React.useState(0)
-
-  React.useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCount(x => x + 1)
-    }, 1000)
-
-    return () => {
-      clearInterval(intervalId)
-    }
-  }, [])
-
   return (
-    <div className="bg-gray-200 p-3 text-red-500">
-      <h1>Hello World {count}</h1>
+    <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route element={<Template />}>
-          <Route index element={<div>Home</div>} />
-          <Route path="about" element={<div>About</div>} />
-        </Route>
+        <Route path="/" element={<div>TODO home screen</div>} />
+        <Route
+          path="/start"
+          element={
+            <LazyComponent
+              init={() => ({
+                store: InnerStore.of(StartGame.State.init())
+              })}
+              component={StartGame.View}
+            />
+          }
+        />
+        <Route path="/game" element={<div>TODO game</div>} />
+        <Route path="*" element={<div>TODO 404</div>} />
       </Routes>
-    </div>
+    </QueryClientProvider>
   )
 }
