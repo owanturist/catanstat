@@ -17,7 +17,6 @@
     "strings": true
   },
   "tailwindCSS.experimental.classRegex": [
-    ["\\bclass\\s+\\[([^)]*)\\]", "\"([^\"]*)\""], // TW.class
-    ["\\bclass\\s+([^)]*)", "\"([^\"]*)\""] // Html.class
+    ["\\bcx\\(([^)]*)\\)", "'([^']*)'"] // cx
   ]
 }
