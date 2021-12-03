@@ -78,9 +78,11 @@ const ViewPlayer: React.VFC<{
               'flex justify-center items-center w-10 h-10 border rounded-md text-xl bg-white text-center text-gray-500 transition-colors cursor-pointer',
               'hover:bg-gray-50 active:bg-gray-100',
               'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
-              player.color.text,
               !isActive && 'opacity-50'
             )}
+            style={{
+              color: player.color.hex
+            }}
           >
             <input
               type="checkbox"
@@ -108,7 +110,7 @@ const ViewPlayer: React.VFC<{
 
           <span
             className={cx(
-              'flex justify-center items-center w-6 h-10 rounded-md text-xl text-center cursor-[grab] transition-colors',
+              'flex justify-center items-center w-6 h-10 rounded-md text-xl text-center cursor-[grab] select-none transition-colors',
               'hover:text-gray-500',
               'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
               isDragging ? 'text-gray-500' : 'text-gray-300'
@@ -136,11 +138,24 @@ export const View: React.VFC<{
         }
       }}
     >
-      <div className="h-screen w-screen flex justify-center items-center text-gray-700">
-        <form className="p-3 rounded-md shadow-lg w-full max-w-md bg-white space-y-3 border border-gray-50">
+      <div
+        className={cx(
+          'h-full flex flex-col text-gray-700 justify-center items-center',
+          'sm:py-4'
+        )}
+      >
+        <form
+          className={cx(
+            'flex flex-col flex-1 max-h-full p-3 w-full bg-white space-y-3',
+            'sm:flex-grow-0 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
+          )}
+        >
           <Droppable droppableId="droppable">
             {provided => (
-              <div ref={provided.innerRef} className="-m-1">
+              <div
+                ref={provided.innerRef}
+                className="flex-1 -m-1 min-h-0 overflow-y-auto"
+              >
                 {state.players.map((player, index) => (
                   <ViewPlayer
                     key={player.color.id}
@@ -153,7 +168,7 @@ export const View: React.VFC<{
             )}
           </Droppable>
 
-          <div className="border-t" />
+          <div className="hidden sm:border-t sm:block" />
 
           <footer>
             <button
