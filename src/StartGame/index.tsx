@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast'
 
 import * as Icon from '../Icon'
 import { Color } from '../domain'
+import { useStartGame } from '../api'
 
 abstract class Player {
   abstract readonly color: Color
@@ -134,6 +135,14 @@ export const View: React.VFC<{
   store: InnerStore<State>
 }> = React.memo(({ store }) => {
   const [state, setState] = useInnerState(store)
+  const { isLoading, startGame } = useStartGame({
+    onError() {
+      toast.error('Failed to start game')
+    },
+    onSuccess(gameId) {
+      toast.success(`Game started with id: ${gameId}`)
+    }
+  })
 
   return (
     <DragDropContext
@@ -157,10 +166,21 @@ export const View: React.VFC<{
           onSubmit={event => {
             event.preventDefault()
 
+            if (isLoading) {
+              return
+            }
+
             const activePlayers = State.getActivePlayers(state)
 
             if (activePlayers.length < 2) {
               toast.error('Needs at least 2 players')
+            } else {
+              startGame(
+                activePlayers.map(player => ({
+                  color: player.color.id,
+                  name: player.name.getState()
+                }))
+              )
             }
           }}
         >
