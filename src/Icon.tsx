@@ -4,10 +4,11 @@ import cx from 'classnames'
 const iconClassName = cx('block overflow-visible h-[1em]')
 
 export const Drag: React.VFC = () => (
-  <svg className={iconClassName} viewBox="0 0 320 512">
+  <svg className={iconClassName} viewBox="0 0 16 16">
     <path
+      fillRule="evenodd"
       fill="currentColor"
-      d="M96 32H32A32 32 0 000 64v64a32 32 0 0032 32h64a32 32 0 0032-32V64a32 32 0 00-32-32zm0 160H32a32 32 0 00-32 32v64a32 32 0 0032 32h64a32 32 0 0032-32v-64a32 32 0 00-32-32zm0 160H32a32 32 0 00-32 32v64a32 32 0 0032 32h64a32 32 0 0032-32v-64a32 32 0 00-32-32zM288 32h-64a32 32 0 00-32 32v64a32 32 0 0032 32h64a32 32 0 0032-32V64a32 32 0 00-32-32zm0 160h-64a32 32 0 00-32 32v64a32 32 0 0032 32h64a32 32 0 0032-32v-64a32 32 0 00-32-32zm0 160h-64a32 32 0 00-32 32v64a32 32 0 0032 32h64a32 32 0 0032-32v-64a32 32 0 00-32-32z"
+      d="M10 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm1-5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm1-5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM6 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"
     />
   </svg>
 )

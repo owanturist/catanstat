@@ -8,15 +8,13 @@ import { Color } from '../domain'
 
 abstract class Player {
   abstract readonly color: Color
-  abstract readonly defaultName: string
   abstract readonly name: InnerStore<string>
   abstract readonly isActive: InnerStore<boolean>
 
-  public static init(color: Color, name: string): Player {
+  public static init(color: Color): Player {
     return {
       color,
-      defaultName: name,
-      name: InnerStore.of(name),
+      name: InnerStore.of(color.label),
       isActive: InnerStore.of<boolean>(true)
     }
   }
@@ -28,12 +26,12 @@ export abstract class State {
   public static init(): State {
     return {
       players: [
-        Player.init(Color.Red, 'Red'),
-        Player.init(Color.Blue, 'Blue'),
-        Player.init(Color.White, 'White'),
-        Player.init(Color.Yellow, 'Yellow'),
-        Player.init(Color.Green, 'Green'),
-        Player.init(Color.Brown, 'Brown')
+        Player.init(Color.red),
+        Player.init(Color.blue),
+        Player.init(Color.white),
+        Player.init(Color.yellow),
+        Player.init(Color.green),
+        Player.init(Color.brown)
       ]
     }
   }
@@ -43,21 +41,14 @@ export abstract class State {
     destinationIndex: number,
     state: State
   ): State {
-    const source = state.players[sourceIndex]
-
-    if (source == null) {
+    if (sourceIndex === destinationIndex) {
       return state
     }
 
-    const players = state.players
-      .filter((_, index) => index !== sourceIndex)
-      .flatMap((player, index) => {
-        if (index === destinationIndex) {
-          return [source, player]
-        }
+    const players = state.players.slice()
+    const source = players.splice(sourceIndex, 1)
 
-        return player
-      })
+    players.splice(destinationIndex, 0, ...source)
 
     return { ...state, players }
   }
@@ -71,12 +62,12 @@ const ViewPlayer: React.VFC<{
   const [isActive, setIsActive] = useInnerState(player.isActive)
 
   return (
-    <Draggable key={player.color} draggableId={player.color} index={index}>
+    <Draggable draggableId={player.color.id} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }, { isDragging }) => (
         <div
           ref={innerRef}
           className={cx(
-            'flex flex-row gap-2 p-2 pr-1 bg-white rounded-md transition-shadow',
+            'flex flex-row gap-2 p-1 bg-white rounded-md transition-shadow',
             isDragging ? 'shadow-md' : 'shadow-none'
           )}
           {...draggableProps}
@@ -86,7 +77,8 @@ const ViewPlayer: React.VFC<{
             className={cx(
               'flex justify-center items-center w-10 h-10 border rounded-md text-xl bg-white text-center text-gray-500 transition-colors cursor-pointer',
               'hover:bg-gray-50 active:bg-gray-100',
-              'focus-visible:ring-2 focus-visible:outline-none',
+              'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
+              player.color.text,
               !isActive && 'opacity-50'
             )}
           >
@@ -104,11 +96,11 @@ const ViewPlayer: React.VFC<{
           <input
             className={cx(
               'block flex-1 px-4 h-10 border rounded-md',
-              'focus-visible:ring-2 focus-visible:outline-none',
+              'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
               'read-only:opacity-50'
             )}
             type="text"
-            placeholder={player.defaultName}
+            placeholder={player.color.label}
             readOnly={!isActive}
             value={name}
             onChange={event => setName(event.target.value)}
@@ -116,9 +108,9 @@ const ViewPlayer: React.VFC<{
 
           <span
             className={cx(
-              'flex justify-center items-center w-10 h-10 rounded-md text-xl text-center cursor-[grab] transition-colors',
+              'flex justify-center items-center w-6 h-10 rounded-md text-xl text-center cursor-[grab] transition-colors',
               'hover:text-gray-500',
-              'focus-visible:ring-2 focus-visible:outline-none',
+              'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
               isDragging ? 'text-gray-500' : 'text-gray-300'
             )}
             {...dragHandleProps}
@@ -145,19 +137,37 @@ export const View: React.VFC<{
       }}
     >
       <div className="h-screen w-screen flex justify-center items-center text-gray-700">
-        <Droppable droppableId="droppable">
-          {provided => (
-            <div
-              ref={provided.innerRef}
-              className="p-2 rounded-md shadow-lg w-full max-w-md"
+        <form className="p-3 rounded-md shadow-lg w-full max-w-md bg-white space-y-3 border border-gray-50">
+          <Droppable droppableId="droppable">
+            {provided => (
+              <div ref={provided.innerRef} className="-m-1">
+                {state.players.map((player, index) => (
+                  <ViewPlayer
+                    key={player.color.id}
+                    index={index}
+                    player={player}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+
+          <div className="border-t" />
+
+          <footer>
+            <button
+              type="submit"
+              className={cx(
+                'block w-full p-2 rounded-md border bg-white font-semibold transition-colors',
+                'hover:bg-gray-50 active:bg-gray-100',
+                'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none'
+              )}
             >
-              {state.players.map((player, index) => (
-                <ViewPlayer key={player.color} index={index} player={player} />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+              Start Game
+            </button>
+          </footer>
+        </form>
       </div>
     </DragDropContext>
   )
