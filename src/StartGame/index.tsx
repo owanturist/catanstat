@@ -2,6 +2,7 @@ import React from 'react'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { InnerStore, useInnerState } from 'react-inner-store'
 import cx from 'classnames'
+import { toast } from 'react-hot-toast'
 
 import * as Icon from '../Icon'
 import { Color } from '../domain'
@@ -51,6 +52,10 @@ export abstract class State {
     players.splice(destinationIndex, 0, ...source)
 
     return { ...state, players }
+  }
+
+  public static getActivePlayers(state: State): Array<Player> {
+    return state.players.filter(player => player.isActive.getState())
   }
 }
 
@@ -149,6 +154,15 @@ export const View: React.VFC<{
             'flex flex-col flex-1 max-h-full p-3 w-full bg-white space-y-3',
             'sm:flex-grow-0 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
           )}
+          onSubmit={event => {
+            event.preventDefault()
+
+            const activePlayers = State.getActivePlayers(state)
+
+            if (activePlayers.length < 2) {
+              toast.error('Needs at least 2 players')
+            }
+          }}
         >
           <Droppable droppableId="droppable">
             {provided => (

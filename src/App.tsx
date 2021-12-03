@@ -1,6 +1,7 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { Toaster } from 'react-hot-toast'
 import { InnerStore } from 'react-inner-store'
 
 import * as StartGame from './StartGame'
@@ -42,6 +43,8 @@ export const App: React.VFC = () => {
         <Route path="/game" element={<div>TODO game</div>} />
         <Route path="*" element={<div>TODO 404</div>} />
       </Routes>
+
+      <Toaster position="top-right" />
     </QueryClientProvider>
   )
 }
