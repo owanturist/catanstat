@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { InnerStore, useInnerState } from 'react-inner-store'
 import cx from 'classnames'
@@ -134,13 +135,14 @@ const ViewPlayer: React.VFC<{
 export const View: React.VFC<{
   store: InnerStore<State>
 }> = React.memo(({ store }) => {
+  const navigate = useNavigate()
   const [state, setState] = useInnerState(store)
   const { isLoading, startGame } = useStartGame({
     onError() {
       toast.error('Failed to start game')
     },
     onSuccess(gameId) {
-      toast.success(`Game started with id: ${gameId}`)
+      navigate(`/game/${gameId}`)
     }
   })
 

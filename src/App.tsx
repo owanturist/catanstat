@@ -6,8 +6,16 @@ import { InnerStore } from 'react-inner-store'
 
 import { Shell } from './Shell'
 import * as StartGame from './StartGame'
+import * as GameRoom from './GameRoom'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      retryOnMount: true
+    }
+  }
+})
 
 const LazyComponent = <TProps,>({
   init,
@@ -33,7 +41,7 @@ export const App: React.VFC = () => {
           <Route index element={<div>TODO home screen</div>} />
 
           <Route
-            path="/start"
+            path="start"
             element={
               <LazyComponent
                 init={() => ({
@@ -44,7 +52,9 @@ export const App: React.VFC = () => {
             }
           />
 
-          <Route path="/game" element={<div>TODO game</div>} />
+          <Route path="game">
+            <Route path=":gameId" element={<GameRoom.View />} />
+          </Route>
 
           <Route path="*" element={<div>TODO 404</div>} />
         </Route>

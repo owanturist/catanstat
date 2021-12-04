@@ -1,5 +1,7 @@
+export type ColorId = 'red' | 'blue' | 'yellow' | 'white' | 'brown' | 'green'
+
 export abstract class Color {
-  abstract readonly id: 'red' | 'blue' | 'yellow' | 'white' | 'brown' | 'green'
+  abstract readonly id: ColorId
   abstract readonly label: string
   abstract readonly hex: string
 
@@ -32,5 +34,18 @@ export abstract class Color {
     id: 'green',
     label: 'Green',
     hex: '#8ac926'
+  }
+
+  private static readonly COLORS_MAP: Record<ColorId, Color> = {
+    red: Color.red,
+    blue: Color.blue,
+    yellow: Color.yellow,
+    white: Color.white,
+    brown: Color.brown,
+    green: Color.green
+  }
+
+  public static fromId(colorId: ColorId): Color {
+    return this.COLORS_MAP[colorId]
   }
 }

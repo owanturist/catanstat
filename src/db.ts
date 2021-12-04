@@ -1,7 +1,7 @@
 import Dexie from 'dexie'
 import { differenceInMilliseconds } from 'date-fns'
 
-import { Color } from './domain'
+import { ColorId } from './domain'
 
 // P U B L I C   E N T I T I E S
 
@@ -20,7 +20,7 @@ export abstract class Game {
 export abstract class Player {
   abstract id: number
   abstract name: string
-  abstract color: Color['id']
+  abstract color: ColorId
 }
 
 export abstract class Dice {
@@ -206,7 +206,7 @@ export const next_turn = async (game_id: number, dice: Dice): Promise<void> => {
   ])
 }
 
-export const get_game = async (game_id: number): Promise<null | Game> => {
+export const get_game = async (game_id: number): Promise<Game> => {
   const [game, players, turns] = await Promise.all([
     GameEntity.get_by_id(game_id),
     db.players.where('game_id').equals(game_id).toArray(),
@@ -222,7 +222,7 @@ export const get_game = async (game_id: number): Promise<null | Game> => {
 
 export interface PlayerPayload {
   name: string
-  color: Color['id']
+  color: ColorId
 }
 
 export const start_game = async (
