@@ -16,7 +16,7 @@ export const useStartGame = ({
     number,
     Error,
     ReadonlyArray<DB.PlayerPayload>
-  >(DB.startGame, { onError, onSuccess })
+  >(DB.start_game, { onError, onSuccess })
 
   return {
     isLoading,

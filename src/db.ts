@@ -1,10 +1,13 @@
-/* eslint-disable no-undefined */
-
 import Dexie from 'dexie'
+
+const cast_id = <T>(payload: T): T & { id: number } => {
+  return payload as T & { id: number }
+}
 
 interface GameEntity {
   id: number
   players_count: number
+  turns_count: number
   start_time: Date
   end_time: null | Date
 }
@@ -19,6 +22,7 @@ interface PlayerEntity {
 interface TurnEntity {
   id: number
   game_id: number
+  player_id: number
   white_die: null | number
   red_die: null | number
   event_die: null | string
@@ -44,7 +48,7 @@ const db = new (class DB extends Dexie {
     this.version(1).stores({
       games: '++id',
       players: '++id, game_id',
-      turns: '++id, game_id',
+      turns: '++id, game_id, player_id',
       turn_statuses: '++id, turn_id'
     })
   }
@@ -52,12 +56,12 @@ const db = new (class DB extends Dexie {
 
 export interface Turn {
   id: number
-  whiteDie: number | null
-  redDie: number | null
-  eventDie: string | null
-  isPaused: boolean
-  durationMs: number
-  durationSince: Date
+  white_die: number | null
+  red_die: number | null
+  event_die: string | null
+  is_paused: boolean
+  duration_ms: number
+  duration_since: Date
 }
 
 export interface Player {
@@ -68,36 +72,70 @@ export interface Player {
 
 export interface Game {
   id: number
-  startTime: Date
-  endTime: null | Date
+  start_time: Date
+  end_time: null | Date
   players: ReadonlyArray<Player>
   turns: ReadonlyArray<Turn>
 }
 
-const getTurnStatus = (
-  turnId: number
-): Promise<{
-  is_paused: boolean
-  duration_ms: number
-  duration_since: null | Date
-}> => {
+/**
+ * Creates new not paused turn
+ */
+const start_new_turn = async ({
+  game_id,
+  player_id
+}: {
+  game_id: number
+  player_id: number
+}): Promise<number> => {
+  const game = await get_game_entity(game_id)
+
+  await db.games.update(game_id, {
+    turns_count: game.turns_count + 1
+  })
+
+  return db.turns
+    .add(
+      cast_id({
+        game_id,
+        player_id,
+        white_die: null,
+        red_die: null,
+        event_die: null
+      })
+    )
+    .then(turn_id => {
+      return db.turn_statuses.add(
+        cast_id({
+          turn_id,
+          is_paused: false,
+          start_time: game.turns_count === 0 ? game.start_time : new Date(),
+          end_time: null
+        })
+      )
+    })
+}
+
+const get_turn_status = (
+  turn_id: number
+): Promise<Pick<Turn, 'is_paused' | 'duration_ms' | 'duration_since'>> => {
   return db.turn_statuses
     .where('turn_id')
-    .equals(turnId)
+    .equals(turn_id)
     .toArray()
-    .then(turnStatuses => {
+    .then(turn_statuses => {
       let is_paused = false
       let duration_ms = 0
-      let duration_since: null | Date = null
+      // it always gets re-defined
+      let duration_since = new Date()
 
-      for (const turnStatus of turnStatuses) {
-        if (turnStatus.end_time == null) {
+      for (const status of turn_statuses) {
+        if (status.end_time == null) {
           // only the last turn status is has no end time
-          is_paused = turnStatus.is_paused
-          duration_since = turnStatus.start_time
+          is_paused = status.is_paused
+          duration_since = status.start_time
         } else {
-          duration_ms +=
-            turnStatus.end_time.getTime() - turnStatus.start_time.getTime()
+          duration_ms += status.end_time.getTime() - status.start_time.getTime()
         }
       }
 
@@ -105,49 +143,40 @@ const getTurnStatus = (
     })
 }
 
-export const getGame = (gameId: number): Promise<null | Game> => {
+const get_game_entity = (game_id: number): Promise<GameEntity> => {
+  return db.games.get(game_id).then(game => {
+    if (game == null) {
+      return Promise.reject(new Error(`Game with id ${game_id} not found`))
+    }
+
+    return game
+  })
+}
+
+export const get_game = (game_id: number): Promise<null | Game> => {
   return Promise.all([
-    db.games.get(gameId),
-    db.players.where('game_id').equals(gameId).toArray(),
+    get_game_entity(game_id).then(
+      ({ players_count, turns_count, ...game }) => game
+    ),
+
+    db.players
+      .where('game_id')
+      .equals(game_id)
+      .toArray()
+      .then(players => players.map(({ game_id: _, ...player }) => player)),
+
     db.turns
       .where('game_id')
-      .equals(gameId)
+      .equals(game_id)
       .toArray()
       .then(turns => {
         return Promise.all(
-          turns.map(turn =>
-            getTurnStatus(turn.id).then(turnStatus => ({
-              ...turn,
-              ...turnStatus
-            }))
+          turns.map(({ game_id: _, player_id, ...turn }) =>
+            get_turn_status(turn.id).then(status => ({ ...turn, ...status }))
           )
         )
       })
-  ]).then(([game, players, turns]) => {
-    if (game == null) {
-      return null
-    }
-
-    return {
-      id: game.id,
-      startTime: game.start_time,
-      endTime: game.end_time,
-      players: players.map(player => ({
-        id: player.id,
-        name: player.name,
-        color: player.color
-      })),
-      turns: turns.map(turn => ({
-        id: turn.id,
-        whiteDie: turn.white_die,
-        redDie: turn.red_die,
-        eventDie: turn.event_die,
-        isPaused: turn.is_paused,
-        durationMs: turn.duration_ms,
-        durationSince: turn.duration_since ?? game.start_time
-      }))
-    }
-  })
+  ]).then(([game, players, turns]) => ({ ...game, players, turns }))
 }
 
 export interface PlayerPayload {
@@ -155,21 +184,37 @@ export interface PlayerPayload {
   color: string
 }
 
-export const startGame = async (
+export const start_game = async (
   players: ReadonlyArray<PlayerPayload>
 ): Promise<number> => {
-  const game_id = await db.games.add({
-    id: undefined!,
-    players_count: players.length,
-    start_time: new Date(),
-    end_time: null
-  })
+  if (players.length < 2) {
+    return Promise.reject(
+      new Error('Not enough players, minimum 2 are required')
+    )
+  }
 
-  await Promise.all(
-    players.map(({ name, color }) => {
-      return db.players.add({ id: undefined!, game_id, name, color })
+  const start_time = new Date()
+  const game_id = await db.games.add(
+    cast_id({
+      players_count: players.length,
+      turns_count: 0,
+      start_time,
+      end_time: null
     })
   )
+
+  const [first_player, ...rest_players] = players.map(player =>
+    db.players.add(cast_id({ game_id, ...player }))
+  )
+
+  await Promise.all([
+    start_new_turn({
+      game_id,
+      player_id: await first_player!
+    }),
+
+    Promise.all(rest_players)
+  ])
 
   return game_id
 }
