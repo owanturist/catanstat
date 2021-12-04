@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { Toaster } from 'react-hot-toast'
 import { InnerStore } from 'react-inner-store'
 
+import { Shell } from './Shell'
 import * as StartGame from './StartGame'
 
 const queryClient = new QueryClient()
@@ -28,20 +29,25 @@ export const App: React.VFC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route path="/" element={<div>TODO home screen</div>} />
-        <Route
-          path="/start"
-          element={
-            <LazyComponent
-              init={() => ({
-                store: InnerStore.of(StartGame.State.init())
-              })}
-              component={StartGame.View}
-            />
-          }
-        />
-        <Route path="/game" element={<div>TODO game</div>} />
-        <Route path="*" element={<div>TODO 404</div>} />
+        <Route path="/" element={<Shell />}>
+          <Route index element={<div>TODO home screen</div>} />
+
+          <Route
+            path="/start"
+            element={
+              <LazyComponent
+                init={() => ({
+                  store: InnerStore.of(StartGame.State.init())
+                })}
+                component={StartGame.View}
+              />
+            }
+          />
+
+          <Route path="/game" element={<div>TODO game</div>} />
+
+          <Route path="*" element={<div>TODO 404</div>} />
+        </Route>
       </Routes>
 
       <Toaster position="top-right" />
