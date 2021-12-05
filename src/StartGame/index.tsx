@@ -9,12 +9,12 @@ import * as Icon from '../Icon'
 import { Color } from '../domain'
 import { useStartGame } from '../api'
 
-abstract class Player {
+abstract class PlayerInfo {
   abstract readonly color: Color
   abstract readonly name: InnerStore<string>
   abstract readonly isActive: InnerStore<boolean>
 
-  public static init(color: Color): Player {
+  public static init(color: Color): PlayerInfo {
     return {
       color,
       name: InnerStore.of(color.label),
@@ -24,17 +24,17 @@ abstract class Player {
 }
 
 export abstract class State {
-  abstract readonly players: ReadonlyArray<Player>
+  abstract readonly players: ReadonlyArray<PlayerInfo>
 
   public static init(): State {
     return {
       players: [
-        Player.init(Color.red),
-        Player.init(Color.blue),
-        Player.init(Color.white),
-        Player.init(Color.yellow),
-        Player.init(Color.green),
-        Player.init(Color.brown)
+        PlayerInfo.init(Color.red),
+        PlayerInfo.init(Color.blue),
+        PlayerInfo.init(Color.white),
+        PlayerInfo.init(Color.yellow),
+        PlayerInfo.init(Color.green),
+        PlayerInfo.init(Color.brown)
       ]
     }
   }
@@ -56,14 +56,14 @@ export abstract class State {
     return { ...state, players }
   }
 
-  public static getActivePlayers(state: State): Array<Player> {
+  public static getActivePlayers(state: State): Array<PlayerInfo> {
     return state.players.filter(player => player.isActive.getState())
   }
 }
 
 const ViewPlayer: React.VFC<{
   index: number
-  player: Player
+  player: PlayerInfo
 }> = React.memo(({ index, player }) => {
   const [name, setName] = useInnerState(player.name)
   const [isActive, setIsActive] = useInnerState(player.isActive)

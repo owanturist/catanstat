@@ -53,7 +53,17 @@ export const App: React.VFC = () => {
           />
 
           <Route path="game">
-            <Route path=":gameId" element={<GameRoom.View />} />
+            <Route
+              path=":gameId"
+              element={
+                <LazyComponent
+                  init={() => ({
+                    store: InnerStore.of(GameRoom.State.init())
+                  })}
+                  component={GameRoom.View}
+                />
+              }
+            />
           </Route>
 
           <Route path="*" element={<div>TODO 404</div>} />

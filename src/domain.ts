@@ -49,3 +49,7 @@ export abstract class Color {
     return this.COLORS_MAP[colorId]
   }
 }
+
+export type DieNumber = 1 | 2 | 3 | 4 | 5 | 6
+
+export type DieEvent = 'yellow' | 'blue' | 'green' | 'black'

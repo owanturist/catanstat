@@ -1,7 +1,7 @@
 import Dexie from 'dexie'
 import { differenceInMilliseconds } from 'date-fns'
 
-import { ColorId } from './domain'
+import { ColorId, DieNumber, DieEvent } from './domain'
 
 // P U B L I C   E N T I T I E S
 
@@ -24,9 +24,9 @@ export abstract class Player {
 }
 
 export abstract class Dice {
-  abstract white_die: number
-  abstract red_die: number
-  abstract event_die: string
+  abstract white_die: DieNumber
+  abstract red_die: DieNumber
+  abstract event_die: DieEvent
 }
 
 export abstract class Turn extends Dice {
