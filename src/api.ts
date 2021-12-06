@@ -1,12 +1,9 @@
-import { useQuery, useMutation } from 'react-query'
+import { QueryKey, useQuery, useMutation, useQueryClient } from 'react-query'
 
-import { Color } from './domain'
+import { Color, DieEvent, DieNumber } from './domain'
 import * as DB from './db'
 
-export const useStartGame = ({
-  onError,
-  onSuccess
-}: {
+export const useStartGame = (options: {
   onError(error: Error): void
   onSuccess(gameId: number): void
 }): {
@@ -17,7 +14,7 @@ export const useStartGame = ({
     number,
     Error,
     ReadonlyArray<DB.PlayerPayload>
-  >(DB.start_game, { onError, onSuccess })
+  >(DB.start_game, options)
 
   return {
     isLoading,
@@ -84,6 +81,8 @@ const decodeTurn = (turn: DB.Turn, players: Map<number, Player>): Turn => ({
   eventDie: turn.event_die
 })
 
+const gameQueryKey = (gameId: number): QueryKey => ['games', gameId]
+
 export const useQueryGame = (
   gameId: number
 ): {
@@ -92,7 +91,7 @@ export const useQueryGame = (
   error: null | Error
 } => {
   const { data, isLoading, error } = useQuery<DB.Game, Error>({
-    queryKey: ['games', gameId],
+    queryKey: gameQueryKey(gameId),
     queryFn: () => DB.get_game(gameId)
   })
 
@@ -100,5 +99,49 @@ export const useQueryGame = (
     isLoading,
     game: data ? decodeGame(data) : null,
     error
+  }
+}
+
+export interface Dice {
+  whiteDie: DieNumber
+  redDie: DieNumber
+  eventDie: DieEvent
+}
+
+export const useCompleteGameTurn = (
+  gameId: number,
+  {
+    onError,
+    onSuccess
+  }: {
+    onError(error: Error): void
+    onSuccess(): void
+  }
+): {
+  isLoading: boolean
+  completeGameTurn(dice: Dice): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<number, Error, Dice>(
+    ({ whiteDie, redDie, eventDie }) => {
+      return DB.next_turn(gameId, {
+        white_die: whiteDie,
+        red_die: redDie,
+        event_die: eventDie
+      })
+    },
+    {
+      onError,
+      async onSuccess() {
+        await queryClient.invalidateQueries(gameQueryKey(gameId))
+
+        onSuccess()
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    completeGameTurn: mutate
   }
 }

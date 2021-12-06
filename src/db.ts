@@ -178,7 +178,10 @@ const create_players = async (
   }
 }
 
-export const next_turn = async (game_id: number, dice: Dice): Promise<void> => {
+export const next_turn = async (
+  game_id: number,
+  dice: Dice
+): Promise<number> => {
   const game = await GameEntity.get_by_id(game_id)
 
   const now = new Date()
@@ -187,7 +190,7 @@ export const next_turn = async (game_id: number, dice: Dice): Promise<void> => {
     : differenceInMilliseconds(now, game.current_turn_duration_since)
   const total_turn_duration = game.current_turn_duration_ms + turn_duration_diff
 
-  await Promise.all([
+  const [next_turn_id] = await Promise.all([
     db.turns.add(
       cast_id({
         ...dice,
@@ -204,6 +207,8 @@ export const next_turn = async (game_id: number, dice: Dice): Promise<void> => {
       current_turn_duration_since: now
     })
   ])
+
+  return next_turn_id
 }
 
 export const get_game = async (game_id: number): Promise<Game> => {
@@ -216,7 +221,7 @@ export const get_game = async (game_id: number): Promise<Game> => {
   return {
     ...game,
     players: players.map(PlayerEntity.toPublic),
-    turns: turns.map(TurnEntity.toPublic)
+    turns: turns.map(TurnEntity.toPublic).reverse()
   }
 }
 

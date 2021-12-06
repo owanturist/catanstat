@@ -2,8 +2,9 @@ import cx from 'classnames'
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { InnerStore, useGetInnerState, useInnerState } from 'react-inner-store'
+import { toast } from 'react-hot-toast'
 
-import { useQueryGame } from '../api'
+import { useCompleteGameTurn, useQueryGame } from '../api'
 import * as Icon from '../Icon'
 import { DieEvent, DieNumber } from '../domain'
 
@@ -28,6 +29,7 @@ export abstract class State {
 }
 
 type Dice<TDie> = ReadonlyArray<{
+  placeholder?: boolean
   value: TDie
   icon: React.ReactElement
 }>
@@ -52,10 +54,20 @@ const RED_DICE = NUMBER_DICE.map(({ value, icon }) => ({
 }))
 
 const EVENT_DICE: Dice<DieEvent> = [
+  {
+    placeholder: true,
+    value: 'black',
+    icon: <Icon.DieClear className="opacity-0" />
+  },
   { value: 'yellow', icon: <Icon.DieClear className="text-yellow-400" /> },
   { value: 'blue', icon: <Icon.DieClear className="text-blue-500" /> },
   { value: 'green', icon: <Icon.DieClear className="text-green-500" /> },
-  { value: 'black', icon: <Icon.DieClear className="text-gray-800" /> }
+  { value: 'black', icon: <Icon.DieClear className="text-gray-800" /> },
+  {
+    placeholder: true,
+    value: 'black',
+    icon: <Icon.DieClear className="opacity-0" />
+  }
 ]
 
 const ViewDie = <TDie extends DieNumber | DieEvent>({
@@ -77,37 +89,81 @@ const ViewDie = <TDie extends DieNumber | DieEvent>({
       role="radiogroup"
       aria-labelledby={name}
     >
-      {dice.map(({ value, icon }, index) => (
+      {dice.map(({ placeholder, value, icon }, index) => (
         <li key={index}>
-          <label className="block cursor-pointer">
-            <input
-              className="sr-only peer"
-              type="radio"
-              name={name}
-              readOnly={isReadonly}
-              value={value}
-              checked={state === value}
-              onChange={() => setState(value)}
-            />
-            {React.cloneElement(icon, {
-              className: cx(
-                icon.props.className,
-                'opacity-50 transition-opacity peer-checked:opacity-100 peer-focus-visible:ring'
-              )
-            })}
-          </label>
+          {placeholder ? (
+            icon
+          ) : (
+            <label className="block cursor-pointer">
+              <input
+                className="sr-only peer"
+                type="radio"
+                name={name}
+                readOnly={isReadonly}
+                value={value}
+                checked={state === value}
+                onChange={() => setState(value)}
+              />
+              {React.cloneElement(icon, {
+                className: cx(
+                  icon.props.className,
+                  'opacity-50 transition-opacity peer-checked:opacity-100 peer-focus-visible:ring'
+                )
+              })}
+            </label>
+          )}
         </li>
       ))}
     </ol>
   )
 }
 
+const ViewCompleteTurnButton: React.VFC<{
+  state: State
+}> = React.memo(({ state }) => {
+  const whiteDie = useGetInnerState(state.whiteDie)
+  const redDie = useGetInnerState(state.redDie)
+  const eventDie = useGetInnerState(state.eventDie)
+
+  return (
+    <button
+      type="submit"
+      className={cx(
+        'block w-28 h-28 rounded-full transition text-white text-7xl outline-none leading-none',
+        'focus-visible:ring-4',
+        {
+          'opacity-50': whiteDie == null || redDie == null || eventDie == null,
+          'bg-gray-400 ring-gray-300': eventDie == null,
+          'bg-yellow-400 ring-yellow-200': eventDie === 'yellow',
+          'bg-blue-500 ring-blue-300': eventDie === 'blue',
+          'bg-green-500 ring-green-300': eventDie === 'green',
+          'bg-gray-800 ring-gray-500': eventDie === 'black'
+        }
+      )}
+    >
+      {(whiteDie ?? 0) + (redDie ?? 0)}
+    </button>
+  )
+})
+
 export const View: React.VFC<{
   store: InnerStore<State>
 }> = React.memo(({ store }) => {
-  const { gameId } = useParams<'gameId'>()
-  const { isLoading, error, game } = useQueryGame(Number(gameId))
   const state = useGetInnerState(store)
+  const params = useParams<'gameId'>()
+  const gameId = Number(params.gameId)
+  const { isLoading, error, game } = useQueryGame(gameId)
+  const { isLoading: isTurnCompleting, completeGameTurn } = useCompleteGameTurn(
+    gameId,
+    {
+      onError() {
+        toast.error('Failed to complete turn')
+      },
+      onSuccess() {
+        State.reset(state)
+      }
+    }
+  )
 
   if (isLoading) {
     return null
@@ -121,41 +177,67 @@ export const View: React.VFC<{
 
   return (
     <div className="p-3 space-y-2">
-      <div className="flex">
-        {game.players.map(player => (
-          <div
-            key={player.id}
-            className={cx(
-              'flex-1 flex flex-col items-center p-3 border border-transparent transition-colors',
-              currentPlayer?.id === player.id && 'border-gray-300'
-            )}
-          >
-            <Icon.User
-              className="text-2xl"
-              style={{ color: player.color.hex }}
-            />
-          </div>
-        ))}
-      </div>
+      <form
+        onSubmit={event => {
+          event.preventDefault()
 
-      <ViewDie
-        name="white-dice"
-        isReadonly={false}
-        dice={WHITE_DICE}
-        store={state.whiteDie}
-      />
-      <ViewDie
-        name="red-dice"
-        isReadonly={false}
-        dice={RED_DICE}
-        store={state.redDie}
-      />
-      <ViewDie
-        name="event-dice"
-        isReadonly={false}
-        dice={EVENT_DICE}
-        store={state.eventDie}
-      />
+          if (isTurnCompleting) {
+            return
+          }
+
+          const whiteDie = state.whiteDie.getState()
+          const redDie = state.redDie.getState()
+          const eventDie = state.eventDie.getState()
+
+          if (whiteDie == null || redDie == null || eventDie == null) {
+            toast.error('Please select all dice')
+          } else {
+            completeGameTurn({
+              whiteDie,
+              redDie,
+              eventDie
+            })
+          }
+        }}
+      >
+        <div className="flex">
+          {game.players.map(player => (
+            <div
+              key={player.id}
+              className={cx(
+                'flex-1 flex flex-col items-center p-3 border border-transparent transition-colors',
+                currentPlayer?.id === player.id && 'border-gray-300'
+              )}
+            >
+              <Icon.User
+                className="text-2xl"
+                style={{ color: player.color.hex }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <ViewDie
+          name="white-dice"
+          isReadonly={isTurnCompleting}
+          dice={WHITE_DICE}
+          store={state.whiteDie}
+        />
+        <ViewDie
+          name="red-dice"
+          isReadonly={isTurnCompleting}
+          dice={RED_DICE}
+          store={state.redDie}
+        />
+        <ViewDie
+          name="event-dice"
+          isReadonly={isTurnCompleting}
+          dice={EVENT_DICE}
+          store={state.eventDie}
+        />
+
+        <ViewCompleteTurnButton state={state} />
+      </form>
     </div>
   )
 })
