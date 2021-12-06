@@ -43,7 +43,7 @@ const NUMBER_DICE: Dice<DieNumber> = [
 
 const WHITE_DICE = NUMBER_DICE.map(({ value, icon }) => ({
   value,
-  icon: React.cloneElement(icon, { className: cx('text-gray-600') })
+  icon: React.cloneElement(icon, { className: cx('text-gray-400') })
 }))
 
 const RED_DICE = NUMBER_DICE.map(({ value, icon }) => ({
@@ -52,39 +52,49 @@ const RED_DICE = NUMBER_DICE.map(({ value, icon }) => ({
 }))
 
 const EVENT_DICE: Dice<DieEvent> = [
-  { value: 'yellow', icon: <Icon.DieClear className="text-yellow-600" /> },
-  { value: 'blue', icon: <Icon.DieClear className="text-blue-600" /> },
-  { value: 'green', icon: <Icon.DieClear className="text-green-600" /> },
-  { value: 'black', icon: <Icon.DieClear className="text-gray-800" /> },
-  { value: 'black', icon: <Icon.DieClear className="text-gray-800" /> },
+  { value: 'yellow', icon: <Icon.DieClear className="text-yellow-400" /> },
+  { value: 'blue', icon: <Icon.DieClear className="text-blue-500" /> },
+  { value: 'green', icon: <Icon.DieClear className="text-green-500" /> },
   { value: 'black', icon: <Icon.DieClear className="text-gray-800" /> }
 ]
 
 const ViewDie = <TDie extends DieNumber | DieEvent>({
   isReadonly,
+  name,
   dice,
   store
 }: {
   isReadonly: boolean
+  name: string
   dice: Dice<TDie>
   store: InnerStore<null | TDie>
 }): ReturnType<React.VFC> => {
   const [state, setState] = useInnerState(store)
 
   return (
-    <ol className="flex justify-between text-6xl">
+    <ol
+      className="flex justify-between text-6xl"
+      role="radiogroup"
+      aria-labelledby={name}
+    >
       {dice.map(({ value, icon }, index) => (
         <li key={index}>
-          <label className={cx('block', state !== value && 'opacity-50')}>
-            {icon}
+          <label className="block cursor-pointer">
             <input
-              className="sr-only"
+              className="sr-only peer"
               type="radio"
+              name={name}
               readOnly={isReadonly}
               value={value}
               checked={state === value}
               onChange={() => setState(value)}
             />
+            {React.cloneElement(icon, {
+              className: cx(
+                icon.props.className,
+                'opacity-50 transition-opacity peer-checked:opacity-100 peer-focus-visible:ring'
+              )
+            })}
           </label>
         </li>
       ))}
@@ -128,9 +138,24 @@ export const View: React.VFC<{
         ))}
       </div>
 
-      <ViewDie isReadonly={false} dice={WHITE_DICE} store={state.whiteDie} />
-      <ViewDie isReadonly={false} dice={RED_DICE} store={state.redDie} />
-      <ViewDie isReadonly={false} dice={EVENT_DICE} store={state.eventDie} />
+      <ViewDie
+        name="white-dice"
+        isReadonly={false}
+        dice={WHITE_DICE}
+        store={state.whiteDie}
+      />
+      <ViewDie
+        name="red-dice"
+        isReadonly={false}
+        dice={RED_DICE}
+        store={state.redDie}
+      />
+      <ViewDie
+        name="event-dice"
+        isReadonly={false}
+        dice={EVENT_DICE}
+        store={state.eventDie}
+      />
     </div>
   )
 })

@@ -79,27 +79,28 @@ const ViewPlayer: React.VFC<{
           )}
           {...draggableProps}
         >
-          <label
-            tabIndex={0}
-            className={cx(
-              'flex justify-center items-center w-10 h-10 border rounded-md text-xl bg-white text-center text-gray-500 transition-colors cursor-pointer',
-              'hover:bg-gray-50 active:bg-gray-100',
-              'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
-              !isActive && 'opacity-50'
-            )}
-            style={{
-              color: player.color.hex
-            }}
-          >
+          <label>
             <input
               type="checkbox"
-              className="sr-only"
-              tabIndex={-1}
+              className="sr-only peer"
+              name={`player-${player.color.id}-active`}
               checked={isActive}
               formNoValidate
               onChange={event => setIsActive(event.target.checked)}
             />
-            {isActive ? <Icon.User /> : <Icon.UserOff />}
+            <div
+              className={cx(
+                'flex justify-center items-center w-10 h-10 border rounded-md text-xl bg-white text-center text-gray-500 transition cursor-pointer',
+                'hover:bg-gray-50 active:bg-gray-100',
+                'ring-gray-200 peer-focus-visible:ring-2 peer-focus-visible:outline-none',
+                'opacity-50 peer-checked:opacity-100'
+              )}
+              style={{
+                color: player.color.hex
+              }}
+            >
+              {isActive ? <Icon.User /> : <Icon.UserOff />}
+            </div>
           </label>
 
           <input
@@ -109,6 +110,7 @@ const ViewPlayer: React.VFC<{
               'read-only:opacity-50'
             )}
             type="text"
+            name={`player-${player.color.id}-name`}
             placeholder={player.color.label}
             readOnly={!isActive}
             value={name}

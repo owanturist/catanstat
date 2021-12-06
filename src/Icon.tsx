@@ -1,7 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 
-const iconClassName = cx('block overflow-visible h-[1em]')
+const iconClassName = cx('block overflow-visible h-[1em] leading-none')
 
 export type IconProps = Omit<
   React.SVGProps<SVGSVGElement>,
@@ -52,7 +52,7 @@ export const DieClear: React.VFC<IconProps> = ({ className, ...props }) => (
   >
     <path
       fill="currentColor"
-      d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48z"
+      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM224 64z"
     />
   </svg>
 )
