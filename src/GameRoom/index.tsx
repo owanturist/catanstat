@@ -45,28 +45,66 @@ const NUMBER_DICE: Dice<DieNumber> = [
 
 const WHITE_DICE = NUMBER_DICE.map(({ value, icon }) => ({
   value,
-  icon: React.cloneElement(icon, { className: cx('text-gray-400') })
+  icon: React.cloneElement(icon, {
+    className: cx('text-gray-100'),
+    stroke: 'rgb(156, 163, 175)' // text-gray-400
+  })
 }))
 
 const RED_DICE = NUMBER_DICE.map(({ value, icon }) => ({
   value,
-  icon: React.cloneElement(icon, { className: cx('text-red-600') })
+  icon: React.cloneElement(icon, {
+    className: cx('text-red-600'),
+    stroke: 'rgb(153, 27, 27)' // text-red-800
+  })
 }))
 
 const EVENT_DICE: Dice<DieEvent> = [
   {
     placeholder: true,
     value: 'black',
-    icon: <Icon.DieClear className="opacity-0" />
+    icon: <Icon.DieClear className="text-gray-100" />
   },
-  { value: 'yellow', icon: <Icon.DieClear className="text-yellow-400" /> },
-  { value: 'blue', icon: <Icon.DieClear className="text-blue-500" /> },
-  { value: 'green', icon: <Icon.DieClear className="text-green-500" /> },
-  { value: 'black', icon: <Icon.DieClear className="text-gray-800" /> },
+  {
+    value: 'yellow',
+    icon: (
+      <Icon.DieClear
+        className="text-yellow-400"
+        stroke="rgb(245, 158, 11)" // text-yellow-500
+      />
+    )
+  },
+  {
+    value: 'blue',
+    icon: (
+      <Icon.DieClear
+        className="text-blue-500"
+        stroke="rgb(37, 99, 235)" // text-blue-600
+      />
+    )
+  },
+  {
+    value: 'green',
+    icon: (
+      <Icon.DieClear
+        className="text-green-500"
+        stroke="rgb(5, 150, 105)" // text-green-600
+      />
+    )
+  },
+  {
+    value: 'black',
+    icon: (
+      <Icon.DieClear
+        className="text-gray-600"
+        stroke="rgb(31, 41, 55)" // text-gray-800
+      />
+    )
+  },
   {
     placeholder: true,
     value: 'black',
-    icon: <Icon.DieClear className="opacity-0" />
+    icon: <Icon.DieClear className="text-gray-100" />
   }
 ]
 
@@ -85,7 +123,7 @@ const ViewDie = <TDie extends DieNumber | DieEvent>({
 
   return (
     <ol
-      className="flex justify-between text-6xl"
+      className="flex justify-between text-[61.8px]"
       role="radiogroup"
       aria-labelledby={name}
     >
@@ -94,7 +132,7 @@ const ViewDie = <TDie extends DieNumber | DieEvent>({
           {placeholder ? (
             icon
           ) : (
-            <label className="block cursor-pointer">
+            <label className="block cursor-pointer relative">
               <input
                 className="sr-only peer"
                 type="radio"
@@ -104,10 +142,15 @@ const ViewDie = <TDie extends DieNumber | DieEvent>({
                 checked={state === value}
                 onChange={() => setState(value)}
               />
+
+              {/* focus ring */}
+              <span className="absolute inset-0 m-auto w-12 h-12 rounded-md ring-offset-4 peer-focus-visible:ring ring-gray-300" />
+
               {React.cloneElement(icon, {
                 className: cx(
                   icon.props.className,
-                  'opacity-50 transition-opacity peer-checked:opacity-100 peer-focus-visible:ring'
+                  state != null && 'opacity-25',
+                  'relative transition-opacity peer-checked:opacity-100'
                 )
               })}
             </label>
@@ -132,12 +175,11 @@ const ViewCompleteTurnButton: React.VFC<{
         'block w-28 h-28 rounded-full transition text-white text-7xl outline-none leading-none',
         'focus-visible:ring-4',
         {
-          'opacity-50': whiteDie == null || redDie == null || eventDie == null,
           'bg-gray-400 ring-gray-300': eventDie == null,
           'bg-yellow-400 ring-yellow-200': eventDie === 'yellow',
           'bg-blue-500 ring-blue-300': eventDie === 'blue',
           'bg-green-500 ring-green-300': eventDie === 'green',
-          'bg-gray-800 ring-gray-500': eventDie === 'black'
+          'bg-gray-600 ring-gray-400': eventDie === 'black'
         }
       )}
     >
