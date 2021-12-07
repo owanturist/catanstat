@@ -145,3 +145,67 @@ export const useCompleteGameTurn = (
     completeGameTurn: mutate
   }
 }
+
+export const usePauseGame = (
+  gameId: number,
+  {
+    onError,
+    onSuccess
+  }: {
+    onError(error: Error): void
+    onSuccess(): void
+  }
+): {
+  isLoading: boolean
+  pauseGame(): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<number, Error>(
+    () => DB.pause_game(gameId),
+    {
+      onError,
+      async onSuccess() {
+        await queryClient.invalidateQueries(gameQueryKey(gameId))
+
+        onSuccess()
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    pauseGame: mutate
+  }
+}
+
+export const useResumeGame = (
+  gameId: number,
+  {
+    onError,
+    onSuccess
+  }: {
+    onError(error: Error): void
+    onSuccess(): void
+  }
+): {
+  isLoading: boolean
+  resumeGame(): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<number, Error>(
+    () => DB.resume_game(gameId),
+    {
+      onError,
+      async onSuccess() {
+        await queryClient.invalidateQueries(gameQueryKey(gameId))
+
+        onSuccess()
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    resumeGame: mutate
+  }
+}

@@ -211,6 +211,37 @@ export const next_turn = async (
   return next_turn_id
 }
 
+export const pause_game = async (game_id: number): Promise<number> => {
+  const game = await GameEntity.get_by_id(game_id)
+
+  if (!game.is_paused) {
+    const now = new Date()
+
+    await db.games.update(game_id, {
+      is_paused: true,
+      current_turn_duration_since: now,
+      current_turn_duration_ms:
+        game.current_turn_duration_ms +
+        differenceInMilliseconds(now, game.current_turn_duration_since)
+    })
+  }
+
+  return game_id
+}
+
+export const resume_game = async (game_id: number): Promise<number> => {
+  const game = await GameEntity.get_by_id(game_id)
+
+  if (game.is_paused) {
+    await db.games.update(game_id, {
+      is_paused: false,
+      current_turn_duration_since: new Date()
+    })
+  }
+
+  return game_id
+}
+
 export const get_game = async (game_id: number): Promise<Game> => {
   const [game, players, turns] = await Promise.all([
     GameEntity.get_by_id(game_id),

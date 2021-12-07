@@ -3,8 +3,14 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { InnerStore, useGetInnerState, useInnerState } from 'react-inner-store'
 import { toast } from 'react-hot-toast'
+import { formatDistanceStrict, subMilliseconds } from 'date-fns'
 
-import { useCompleteGameTurn, useQueryGame } from '../api'
+import {
+  useCompleteGameTurn,
+  useQueryGame,
+  usePauseGame,
+  useResumeGame
+} from '../api'
 import * as Icon from '../Icon'
 import { DieEvent, DieNumber } from '../domain'
 
@@ -123,7 +129,7 @@ const ViewDie = <TDie extends DieNumber | DieEvent>({
 
   return (
     <ol
-      className="flex justify-between text-[61.8px]"
+      className="flex gap-2 justify-between text-5xl"
       role="radiogroup"
       aria-labelledby={name}
     >
@@ -132,7 +138,7 @@ const ViewDie = <TDie extends DieNumber | DieEvent>({
           {placeholder ? (
             icon
           ) : (
-            <label className="block cursor-pointer relative">
+            <label className="block cursor-pointer p-px">
               <input
                 className="sr-only peer"
                 type="radio"
@@ -143,14 +149,11 @@ const ViewDie = <TDie extends DieNumber | DieEvent>({
                 onChange={() => setState(value)}
               />
 
-              {/* focus ring */}
-              <span className="absolute inset-0 m-auto w-12 h-12 rounded-md ring-offset-4 peer-focus-visible:ring ring-gray-300" />
-
               {React.cloneElement(icon, {
                 className: cx(
                   icon.props.className,
                   state != null && 'opacity-25',
-                  'relative transition-opacity peer-checked:opacity-100'
+                  'transition-opacity peer-checked:opacity-100 peer-focus-visible:ring rounded-lg'
                 )
               })}
             </label>
@@ -206,6 +209,30 @@ export const View: React.VFC<{
       }
     }
   )
+  const { pauseGame } = usePauseGame(gameId, {
+    onError() {
+      toast.error('Failed to pause game')
+    },
+    onSuccess() {
+      toast.success('Game paused')
+    }
+  })
+  const { resumeGame } = useResumeGame(gameId, {
+    onError() {
+      toast.error('Failed to resume game')
+    },
+    onSuccess() {
+      toast.success('Game resumed')
+    }
+  })
+
+  const [now, setNow] = React.useState(() => new Date())
+
+  React.useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 300)
+
+    return () => clearInterval(interval)
+  }, [])
 
   if (isLoading) {
     return null
@@ -218,8 +245,9 @@ export const View: React.VFC<{
   const currentPlayer = game.turns[0]?.player ?? game.players[0]
 
   return (
-    <div className="p-3 space-y-2">
+    <div className="p-3">
       <form
+        className="space-y-2"
         onSubmit={event => {
           event.preventDefault()
 
@@ -255,6 +283,18 @@ export const View: React.VFC<{
                 className="text-2xl"
                 style={{ color: player.color.hex }}
               />
+
+              {currentPlayer?.id === player.id && (
+                <span>
+                  {formatDistanceStrict(
+                    subMilliseconds(
+                      game.currentTurnDurationSince,
+                      game.currentTurnDurationMs
+                    ),
+                    game.isPaused ? game.currentTurnDurationSince : now
+                  )}
+                </span>
+              )}
             </div>
           ))}
         </div>
@@ -278,7 +318,22 @@ export const View: React.VFC<{
           store={state.eventDie}
         />
 
-        <ViewCompleteTurnButton state={state} />
+        <div className="flex justify-center">
+          <button
+            type="button"
+            className="p-3 bg-gray-300"
+            onClick={() => {
+              if (game.isPaused) {
+                resumeGame()
+              } else {
+                pauseGame()
+              }
+            }}
+          >
+            {game.isPaused ? 'Resume' : 'Pause'}
+          </button>
+          <ViewCompleteTurnButton state={state} />
+        </div>
       </form>
     </div>
   )
