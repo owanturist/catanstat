@@ -54,14 +54,14 @@ export const DieClear: React.VFC<IconProps> = ({
 }) => (
   <svg
     className={cx(iconClassName, className)}
-    viewBox="0 0 448 512"
+    viewBox="0 0 448 448"
     {...props}
   >
     <path
       fill="currentColor"
       stroke={stroke}
       strokeWidth={strokeWidth}
-      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM224 64z"
+      d="M384 0H64A64 64 0 0 0 0 64v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V64a64 64 0 0 0-64-64zM224 64z"
     />
   </svg>
 )
@@ -74,14 +74,14 @@ export const DieOne: React.VFC<IconProps> = ({
 }) => (
   <svg
     className={cx(iconClassName, className)}
-    viewBox="0 0 448 512"
+    viewBox="0 0 448 448"
     {...props}
   >
     <path
       fill="currentColor"
       stroke={stroke}
       strokeWidth={strokeWidth}
-      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM224 288a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
+      d="M384 0H64A64 64 0 0 0 0 64v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V64a64 64 0 0 0-64-64zM224 256a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
     />
   </svg>
 )
@@ -94,14 +94,14 @@ export const DieTwo: React.VFC<IconProps> = ({
 }) => (
   <svg
     className={cx(iconClassName, className)}
-    viewBox="0 0 448 512"
+    viewBox="0 0 448 448"
     {...props}
   >
     <path
       fill="currentColor"
       stroke={stroke}
       strokeWidth={strokeWidth}
-      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM128 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm192 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
+      d="M384 0H64A64 64 0 0 0 0 64v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V64a64 64 0 0 0-64-64zM128 160a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm192 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
     />
   </svg>
 )
@@ -114,14 +114,14 @@ export const DieThree: React.VFC<IconProps> = ({
 }) => (
   <svg
     className={cx(iconClassName, className)}
-    viewBox="0 0 448 512"
+    viewBox="0 0 448 448"
     {...props}
   >
     <path
       fill="currentColor"
       stroke={stroke}
       strokeWidth={strokeWidth}
-      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM128 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
+      d="M384 0H64A64 64 0 0 0 0 64v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V64a64 64 0 0 0-64-64zM128 160a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
     />
   </svg>
 )
@@ -134,14 +134,14 @@ export const DieFour: React.VFC<IconProps> = ({
 }) => (
   <svg
     className={cx(iconClassName, className)}
-    viewBox="0 0 448 512"
+    viewBox="0 0 448 448"
     {...props}
   >
     <path
       fill="currentColor"
       stroke={stroke}
       strokeWidth={strokeWidth}
-      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM128 384a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm192 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
+      d="M384 0H64A64 64 0 0 0 0 64v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V64a64 64 0 0 0-64-64zM128 352a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm192 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
     />
   </svg>
 )
@@ -154,14 +154,14 @@ export const DieFive: React.VFC<IconProps> = ({
 }) => (
   <svg
     className={cx(iconClassName, className)}
-    viewBox="0 0 448 512"
+    viewBox="0 0 448 448"
     {...props}
   >
     <path
       fill="currentColor"
       stroke={stroke}
       strokeWidth={strokeWidth}
-      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM128 384a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
+      d="M384 0H64A64 64 0 0 0 0 64v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V64a64 64 0 0 0-64-64zM128 352a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm96 96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-192a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
     />
   </svg>
 )
@@ -174,14 +174,14 @@ export const DieSix: React.VFC<IconProps> = ({
 }) => (
   <svg
     className={cx(iconClassName, className)}
-    viewBox="0 0 448 512"
+    viewBox="0 0 448 448"
     {...props}
   >
     <path
       fill="currentColor"
       stroke={stroke}
       strokeWidth={strokeWidth}
-      d="M384 32H64A64 64 0 0 0 0 96v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V96a64 64 0 0 0-64-64zM128 384a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm192 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
+      d="M384 0H64A64 64 0 0 0 0 64v320a64 64 0 0 0 64 64h320a64 64 0 0 0 64-64V64a64 64 0 0 0-64-64zM128 352a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm192 192a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64zm0-96a32 32 0 1 1 0-64 32 32 0 0 1 0 64z"
     />
   </svg>
 )
