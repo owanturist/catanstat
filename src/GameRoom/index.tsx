@@ -176,7 +176,7 @@ const ViewCompleteTurnButton: React.VFC<{
     <button
       type="submit"
       className={cx(
-        'block w-28 h-28 rounded-full transition text-white text-7xl outline-none leading-none',
+        'block w-20 h-20 rounded-full transition text-white text-5xl outline-none leading-none',
         'focus-visible:ring-4',
         {
           'bg-gray-400 ring-gray-300': eventDie == null,
@@ -261,7 +261,7 @@ export const View: React.VFC<{
   const currentPlayer = game.turns[0]?.player ?? game.players[0]
 
   return (
-    <div className="p-3">
+    <div className="p-3 h-full overflow-hidden">
       <form
         className="space-y-2"
         onSubmit={event => {
@@ -324,20 +324,42 @@ export const View: React.VFC<{
           store={state.eventDie}
         />
 
-        <div className="flex justify-center">
-          <button
-            type="button"
-            className="p-3 bg-gray-300"
-            onClick={() => {
-              if (game.isPaused) {
-                resumeGame()
-              } else {
-                pauseGame()
-              }
-            }}
-          >
-            {game.isPaused ? 'Resume' : 'Pause'}
-          </button>
+        <div className="flex justify-center items-center gap-4">
+          <div className="relative">
+            <span
+              className={cx(
+                'absolute h-14 w-14 p-2 box-content rounded-full border-gray-300 transition-colors duration-500',
+                'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2',
+                game.isPaused
+                  ? 'border-opacity-80 border-[9900px]'
+                  : 'border-opacity-0'
+              )}
+            />
+
+            <button
+              type="button"
+              className={cx(
+                'flex justify-center items-center h-14 w-14 relative rounded-full border-2 text-2xl transition-colors duration-300',
+                'outline-none focus-visible:ring-4',
+                game.isPaused
+                  ? 'ring-green-200 border-green-400 bg-green-400 text-white'
+                  : 'ring-gray-300 border-gray-400 text-gray-400 bg-white'
+              )}
+              onClick={() => {
+                if (game.isPaused) {
+                  resumeGame()
+                } else {
+                  pauseGame()
+                }
+              }}
+            >
+              {game.isPaused ? (
+                <Icon.Play className="translate-x-0.5" />
+              ) : (
+                <Icon.Pause />
+              )}
+            </button>
+          </div>
           <ViewCompleteTurnButton state={state} />
         </div>
       </form>
