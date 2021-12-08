@@ -7,10 +7,11 @@ import { differenceInMilliseconds } from 'date-fns'
 
 import { formatDurationMs, useEvery } from '../utils'
 import {
-  useCompleteGameTurn,
+  useCompleteTurn,
   useQueryGame,
   usePauseGame,
-  useResumeGame
+  useResumeGame,
+  useCompleteGame
 } from '../api'
 import * as Icon from '../Icon'
 import { DieEvent, DieNumber } from '../domain'
@@ -199,7 +200,7 @@ export const View: React.VFC<{
   const params = useParams<'gameId'>()
   const gameId = Number(params.gameId)
   const { isLoading, error, game } = useQueryGame(gameId)
-  const { isLoading: isTurnCompleting, completeGameTurn } = useCompleteGameTurn(
+  const { isLoading: isTurnCompleting, completeTurn } = useCompleteTurn(
     gameId,
     {
       onError() {
@@ -210,6 +211,21 @@ export const View: React.VFC<{
       }
     }
   )
+  const { isLoading: isGameCompleting, completeGame } = useCompleteGame(
+    gameId,
+    {
+      onError() {
+        toast.error('Failed to complete game')
+      },
+      onSuccess() {
+        State.reset(state)
+        toast.success('Game completed!')
+      }
+    }
+  )
+
+  const isTurnReadonly = isTurnCompleting || isGameCompleting
+
   const { pauseGame } = usePauseGame(gameId, {
     onError() {
       toast.error('Failed to pause game')
@@ -267,7 +283,7 @@ export const View: React.VFC<{
         onSubmit={event => {
           event.preventDefault()
 
-          if (isTurnCompleting) {
+          if (isTurnReadonly) {
             return
           }
 
@@ -275,10 +291,12 @@ export const View: React.VFC<{
           const redDie = state.redDie.getState()
           const eventDie = state.eventDie.getState()
 
-          if (whiteDie == null || redDie == null || eventDie == null) {
+          if (game.winnerPlayerId != null) {
+            toast.error('Game is already over')
+          } else if (whiteDie == null || redDie == null || eventDie == null) {
             toast.error('Please select all dice')
           } else {
-            completeGameTurn({
+            completeTurn({
               whiteDie,
               redDie,
               eventDie
@@ -307,19 +325,19 @@ export const View: React.VFC<{
 
         <ViewDie
           name="white-dice"
-          isReadonly={isTurnCompleting}
+          isReadonly={isTurnReadonly}
           dice={WHITE_DICE}
           store={state.whiteDie}
         />
         <ViewDie
           name="red-dice"
-          isReadonly={isTurnCompleting}
+          isReadonly={isTurnReadonly}
           dice={RED_DICE}
           store={state.redDie}
         />
         <ViewDie
           name="event-dice"
-          isReadonly={isTurnCompleting}
+          isReadonly={isTurnReadonly}
           dice={EVENT_DICE}
           store={state.eventDie}
         />
@@ -330,7 +348,7 @@ export const View: React.VFC<{
               className={cx(
                 'absolute h-14 w-14 p-2 box-content rounded-full border-gray-300 transition-colors duration-500',
                 'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2',
-                game.isPaused
+                game.isPaused && game.winnerPlayerId == null
                   ? 'border-opacity-80 border-[9900px]'
                   : 'border-opacity-0'
               )}
@@ -341,26 +359,63 @@ export const View: React.VFC<{
               className={cx(
                 'flex justify-center items-center h-14 w-14 relative rounded-full border-2 text-2xl transition-colors duration-300',
                 'outline-none focus-visible:ring-4',
-                game.isPaused
+                game.isPaused && game.winnerPlayerId == null
                   ? 'ring-green-200 border-green-400 bg-green-400 text-white'
                   : 'ring-gray-300 border-gray-400 text-gray-400 bg-white'
               )}
               onClick={() => {
-                if (game.isPaused) {
+                if (game.isPaused && game.winnerPlayerId == null) {
                   resumeGame()
                 } else {
                   pauseGame()
                 }
               }}
             >
-              {game.isPaused ? (
+              {game.isPaused && game.winnerPlayerId == null ? (
                 <Icon.Play className="translate-x-0.5" />
               ) : (
                 <Icon.Pause />
               )}
             </button>
           </div>
+
           <ViewCompleteTurnButton state={state} />
+
+          <button
+            type="button"
+            className={cx(
+              'flex justify-center items-center h-14 w-14 relative rounded-full border-2 text-2xl transition-colors duration-300',
+              'outline-none focus-visible:ring-4',
+              'ring-gray-300 border-gray-400 text-gray-400 bg-white'
+            )}
+            onClick={() => {
+              if (isTurnReadonly) {
+                return
+              }
+
+              const whiteDie = state.whiteDie.getState()
+              const redDie = state.redDie.getState()
+              const eventDie = state.eventDie.getState()
+
+              if (game.winnerPlayerId != null) {
+                toast.error('Game is already completed')
+              } else if (
+                whiteDie == null ||
+                redDie == null ||
+                eventDie == null
+              ) {
+                toast.error('Please select all dice')
+              } else {
+                completeGame({
+                  whiteDie,
+                  redDie,
+                  eventDie
+                })
+              }
+            }}
+          >
+            {game.winnerPlayerId == null ? <Icon.Flag /> : <Icon.Flag />}
+          </button>
         </div>
       </form>
     </div>

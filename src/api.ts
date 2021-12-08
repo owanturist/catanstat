@@ -30,6 +30,7 @@ export interface Game {
   currentTurnDurationSince: Date
   startTime: Date
   endTime: null | Date
+  winnerPlayerId: null | number
   players: ReadonlyArray<Player>
   turns: ReadonlyArray<Turn>
 }
@@ -46,6 +47,7 @@ const decodeGame = (game: DB.Game): Game => {
     currentTurnDurationSince: game.current_turn_duration_since,
     startTime: game.start_time,
     endTime: game.end_time,
+    winnerPlayerId: game.winner_player_id,
     players,
     turns: game.turns.map(turn => decodeTurn(turn, playersMap))
   }
@@ -108,7 +110,7 @@ export interface Dice {
   eventDie: DieEvent
 }
 
-export const useCompleteGameTurn = (
+export const useCompleteTurn = (
   gameId: number,
   {
     onError,
@@ -119,7 +121,7 @@ export const useCompleteGameTurn = (
   }
 ): {
   isLoading: boolean
-  completeGameTurn(dice: Dice): void
+  completeTurn(dice: Dice): void
 } => {
   const queryClient = useQueryClient()
   const { mutate, isLoading } = useMutation<number, Error, Dice>(
@@ -142,7 +144,45 @@ export const useCompleteGameTurn = (
 
   return {
     isLoading,
-    completeGameTurn: mutate
+    completeTurn: mutate
+  }
+}
+
+export const useCompleteGame = (
+  gameId: number,
+  {
+    onError,
+    onSuccess
+  }: {
+    onError(error: Error): void
+    onSuccess(): void
+  }
+): {
+  isLoading: boolean
+  completeGame(dice: Dice): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<number, Error, Dice>(
+    ({ whiteDie, redDie, eventDie }) => {
+      return DB.complete_game(gameId, {
+        white_die: whiteDie,
+        red_die: redDie,
+        event_die: eventDie
+      })
+    },
+    {
+      onError,
+      async onSuccess() {
+        await queryClient.invalidateQueries(gameQueryKey(gameId))
+
+        onSuccess()
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    completeGame: mutate
   }
 }
 
