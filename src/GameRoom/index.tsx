@@ -3,8 +3,9 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { InnerStore, useGetInnerState, useInnerState } from 'react-inner-store'
 import { toast } from 'react-hot-toast'
-import { formatDistanceStrict, subMilliseconds } from 'date-fns'
+import { differenceInMilliseconds } from 'date-fns'
 
+import { formatDurationMs, useEvery } from '../utils'
 import {
   useCompleteGameTurn,
   useQueryGame,
@@ -60,8 +61,8 @@ const WHITE_DICE = NUMBER_DICE.map(({ value, icon }) => ({
 const RED_DICE = NUMBER_DICE.map(({ value, icon }) => ({
   value,
   icon: React.cloneElement(icon, {
-    className: cx('text-red-600'),
-    stroke: 'rgb(153, 27, 27)' // text-red-800
+    className: cx('text-red-500'),
+    stroke: 'rgb(185, 28, 28)' // text-red-700
   })
 }))
 
@@ -226,13 +227,28 @@ export const View: React.VFC<{
     }
   })
 
-  const [now, setNow] = React.useState(() => new Date())
+  const duration = useEvery(
+    now => {
+      if (game == null) {
+        return formatDurationMs(0)
+      }
 
-  React.useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 300)
+      if (game.isPaused) {
+        return formatDurationMs(game.currentTurnDurationMs)
+      }
 
-    return () => clearInterval(interval)
-  }, [])
+      const diffMs = differenceInMilliseconds(
+        now,
+        game.currentTurnDurationSince
+      )
+
+      return formatDurationMs(game.currentTurnDurationMs + diffMs)
+    },
+    {
+      interval: 60,
+      skip: game?.isPaused ?? true
+    }
+  )
 
   if (isLoading) {
     return null
@@ -284,17 +300,7 @@ export const View: React.VFC<{
                 style={{ color: player.color.hex }}
               />
 
-              {currentPlayer?.id === player.id && (
-                <span>
-                  {formatDistanceStrict(
-                    subMilliseconds(
-                      game.currentTurnDurationSince,
-                      game.currentTurnDurationMs
-                    ),
-                    game.isPaused ? game.currentTurnDurationSince : now
-                  )}
-                </span>
-              )}
+              {currentPlayer?.id === player.id && <span>{duration}</span>}
             </div>
           ))}
         </div>
