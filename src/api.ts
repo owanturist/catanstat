@@ -57,12 +57,14 @@ export interface Player {
   id: number
   name: string
   color: Color
+  nextPlayerId: number
 }
 
 const decodePlayer = (player: DB.Player): Player => ({
   id: player.id,
   name: player.name,
-  color: Color.fromId(player.color)
+  color: Color.fromId(player.color),
+  nextPlayerId: player.next_player_id
 })
 
 export interface Turn {

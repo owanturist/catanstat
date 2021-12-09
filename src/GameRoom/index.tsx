@@ -41,8 +41,8 @@ export abstract class State {
 const ViewCompleteTurnButton: React.VFC<{
   state: State
 }> = React.memo(({ state }) => {
-  const whiteDie = useGetInnerState(state.whiteDie)
-  const redDie = useGetInnerState(state.redDie)
+  const whiteDie = useGetInnerState(state.whiteDie) ?? 0
+  const redDie = useGetInnerState(state.redDie) ?? 0
   const eventDie = useGetInnerState(state.eventDie)
 
   return (
@@ -60,7 +60,7 @@ const ViewCompleteTurnButton: React.VFC<{
         }
       )}
     >
-      {(whiteDie ?? 0) + (redDie ?? 0)}
+      {whiteDie + redDie}
     </button>
   )
 })
@@ -139,6 +139,7 @@ export const View: React.VFC<{
   )
 
   if (isLoading) {
+    // @TODO loading skeleton
     return null
   }
 
@@ -146,7 +147,14 @@ export const View: React.VFC<{
     return <div>Something went wrong while loading the game</div>
   }
 
-  const currentPlayer = game.turns[0]?.player ?? game.players[0]
+  // it is either
+  // 1. winner
+  // 2. next player of latest (previous) turn
+  // 3. the first game player
+  const currentPlayerId =
+    game.winnerPlayerId ??
+    game.turns[0]?.player.nextPlayerId ??
+    game.players[0]?.id
 
   return (
     <div className="flex justify-center p-3 h-full overflow-hidden">
@@ -182,7 +190,7 @@ export const View: React.VFC<{
               key={player.id}
               className={cx(
                 'flex-1 flex flex-col items-center p-3 border border-transparent transition-colors',
-                currentPlayer?.id === player.id && 'border-gray-300'
+                currentPlayerId === player.id && 'border-gray-300'
               )}
             >
               <Icon.User
@@ -190,7 +198,7 @@ export const View: React.VFC<{
                 style={{ color: player.color.hex }}
               />
 
-              {currentPlayer?.id === player.id && <span>{duration}</span>}
+              {currentPlayerId === player.id && <span>{duration}</span>}
             </div>
           ))}
         </div>

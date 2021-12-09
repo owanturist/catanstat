@@ -22,6 +22,7 @@ export abstract class Player {
   abstract id: number
   abstract name: string
   abstract color: ColorId
+  abstract next_player_id: number
 }
 
 export abstract class Dice {
@@ -65,7 +66,7 @@ abstract class GameEntity {
   public static async get_current_player_id(game_id: number): Promise<number> {
     const prev_turn = await TurnEntity.get_last_turn_in_game(game_id)
 
-    // no last turn - first player is next
+    // no last turn - first player is current
     if (prev_turn == null) {
       const first_player = await PlayerEntity.get_first_player_in_game(game_id)
 
@@ -80,13 +81,8 @@ abstract class GameEntity {
 
 abstract class PlayerEntity extends Player {
   abstract game_id: number
-  abstract next_player_id: number
 
-  public static toPublic({
-    game_id,
-    next_player_id,
-    ...player
-  }: PlayerEntity): Player {
+  public static toPublic({ game_id, ...player }: PlayerEntity): Player {
     return player
   }
 
