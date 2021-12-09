@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { InnerStore, useGetInnerState, useInnerState } from 'react-inner-store'
+import { InnerStore, useGetInnerState } from 'react-inner-store'
 import { toast } from 'react-hot-toast'
 import { differenceInMilliseconds } from 'date-fns'
 
@@ -16,154 +16,26 @@ import {
 import * as Icon from '../Icon'
 import { DieEvent, DieNumber } from '../domain'
 
+import * as DieRow from './DieRow'
+
 export abstract class State {
-  abstract readonly whiteDie: InnerStore<null | DieNumber>
-  abstract readonly redDie: InnerStore<null | DieNumber>
-  abstract readonly eventDie: InnerStore<null | DieEvent>
+  abstract readonly whiteDie: InnerStore<DieRow.State<DieNumber>>
+  abstract readonly redDie: InnerStore<DieRow.State<DieNumber>>
+  abstract readonly eventDie: InnerStore<DieRow.State<DieEvent>>
 
   public static init(): State {
     return {
-      whiteDie: InnerStore.of<null | DieNumber>(null),
-      redDie: InnerStore.of<null | DieNumber>(null),
-      eventDie: InnerStore.of<null | DieEvent>(null)
+      whiteDie: InnerStore.of(DieRow.init()),
+      redDie: InnerStore.of(DieRow.init()),
+      eventDie: InnerStore.of(DieRow.init())
     }
   }
 
   public static reset({ whiteDie, redDie, eventDie }: State): void {
-    whiteDie.setState(null)
-    redDie.setState(null)
-    eventDie.setState(null)
+    whiteDie.setState(DieRow.init)
+    redDie.setState(DieRow.init)
+    eventDie.setState(DieRow.init)
   }
-}
-
-type Dice<TDie> = ReadonlyArray<{
-  placeholder?: boolean
-  value: TDie
-  icon: React.ReactElement
-}>
-
-const NUMBER_DICE: Dice<DieNumber> = [
-  { value: 1, icon: <Icon.DieOne /> },
-  { value: 2, icon: <Icon.DieTwo /> },
-  { value: 3, icon: <Icon.DieThree /> },
-  { value: 4, icon: <Icon.DieFour /> },
-  { value: 5, icon: <Icon.DieFive /> },
-  { value: 6, icon: <Icon.DieSix /> }
-]
-
-const WHITE_DICE = NUMBER_DICE.map(({ value, icon }) => ({
-  value,
-  icon: React.cloneElement(icon, {
-    className: cx('text-gray-100'),
-    stroke: 'rgb(156, 163, 175)' // text-gray-400
-  })
-}))
-
-const RED_DICE = NUMBER_DICE.map(({ value, icon }) => ({
-  value,
-  icon: React.cloneElement(icon, {
-    className: cx('text-red-500'),
-    stroke: 'rgb(185, 28, 28)' // text-red-700
-  })
-}))
-
-const EVENT_DICE: Dice<DieEvent> = [
-  {
-    placeholder: true,
-    value: 'black',
-    icon: <Icon.DieClear className="text-gray-100" />
-  },
-  {
-    value: 'yellow',
-    icon: (
-      <Icon.DieClear
-        className="text-yellow-400"
-        stroke="rgb(245, 158, 11)" // text-yellow-500
-      />
-    )
-  },
-  {
-    value: 'blue',
-    icon: (
-      <Icon.DieClear
-        className="text-blue-500"
-        stroke="rgb(37, 99, 235)" // text-blue-600
-      />
-    )
-  },
-  {
-    value: 'green',
-    icon: (
-      <Icon.DieClear
-        className="text-green-500"
-        stroke="rgb(5, 150, 105)" // text-green-600
-      />
-    )
-  },
-  {
-    value: 'black',
-    icon: (
-      <Icon.DieClear
-        className="text-gray-600"
-        stroke="rgb(31, 41, 55)" // text-gray-800
-      />
-    )
-  },
-  {
-    placeholder: true,
-    value: 'black',
-    icon: <Icon.DieClear className="text-gray-100" />
-  }
-]
-
-const ViewDie = <TDie extends DieNumber | DieEvent>({
-  isReadonly,
-  name,
-  dice,
-  store
-}: {
-  isReadonly: boolean
-  name: string
-  dice: Dice<TDie>
-  store: InnerStore<null | TDie>
-}): ReturnType<React.VFC> => {
-  const [state, setState] = useInnerState(store)
-
-  return (
-    <ol
-      className="flex gap-2 justify-between text-5xl"
-      role="radiogroup"
-      aria-labelledby={name}
-    >
-      {dice.map(({ placeholder, value, icon }, index) => (
-        <li key={index}>
-          {placeholder ? (
-            icon
-          ) : (
-            <label className="block cursor-pointer p-px">
-              <input
-                className="sr-only peer"
-                type="radio"
-                name={name}
-                readOnly={isReadonly}
-                value={value}
-                checked={state === value}
-                onChange={() => setState(value)}
-              />
-
-              {React.cloneElement(icon, {
-                className: cx(
-                  icon.props.className,
-                  state != null && 'opacity-25',
-                  'transition-opacity peer-checked:opacity-100 peer-focus-visible:ring rounded-lg'
-                )
-              })}
-            </label>
-          )}
-        </li>
-      ))}
-    </ol>
-  )
 }
 
 const ViewCompleteTurnButton: React.VFC<{
@@ -277,9 +149,9 @@ export const View: React.VFC<{
   const currentPlayer = game.turns[0]?.player ?? game.players[0]
 
   return (
-    <div className="p-3 h-full overflow-hidden">
+    <div className="flex justify-center p-3 h-full overflow-hidden">
       <form
-        className="space-y-2"
+        className="space-y-2 w-full sm:max-w-md"
         onSubmit={event => {
           event.preventDefault()
 
@@ -323,22 +195,19 @@ export const View: React.VFC<{
           ))}
         </div>
 
-        <ViewDie
+        <DieRow.ViewWhite
           name="white-dice"
           isReadonly={isTurnReadonly}
-          dice={WHITE_DICE}
           store={state.whiteDie}
         />
-        <ViewDie
+        <DieRow.ViewRed
           name="red-dice"
           isReadonly={isTurnReadonly}
-          dice={RED_DICE}
           store={state.redDie}
         />
-        <ViewDie
+        <DieRow.ViewEvent
           name="event-dice"
           isReadonly={isTurnReadonly}
-          dice={EVENT_DICE}
           store={state.eventDie}
         />
 
@@ -384,7 +253,7 @@ export const View: React.VFC<{
           <button
             type="button"
             className={cx(
-              'flex justify-center items-center h-14 w-14 relative rounded-full border-2 text-2xl transition-colors duration-300',
+              'flex justify-center items-center h-14 w-14 rounded-full border-2 text-2xl transition-colors duration-300',
               'outline-none focus-visible:ring-4',
               'ring-gray-300 border-gray-400 text-gray-400 bg-white'
             )}

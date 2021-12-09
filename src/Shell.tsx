@@ -1,5 +1,5 @@
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, Link } from 'react-router-dom'
 
 export const Shell = React.memo(() => {
   return (
@@ -7,7 +7,9 @@ export const Shell = React.memo(() => {
       <header className="bg-gray-100 flex justify-center">
         <div className="p-3 w-full sm:max-w-md sm:px-0">
           <h1 className="font-semibold text-xl tracking-wider text-gray-600 sm:text-2xl">
-            CATAN statistics
+            <Link to="/" className="outline-none focus-visible:underline">
+              CATAN statistics
+            </Link>
           </h1>
         </div>
       </header>
