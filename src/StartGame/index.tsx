@@ -165,7 +165,7 @@ export const View: React.VFC<{
         <form
           className={cx(
             'flex flex-col flex-1 max-h-full p-3 w-full bg-white space-y-3',
-            'sm:flex-grow-0 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
+            'sm:grow-0 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
           )}
           onSubmit={event => {
             event.preventDefault()
