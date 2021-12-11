@@ -65,6 +65,66 @@ const ViewCompleteTurnButton: React.VFC<{
   )
 })
 
+const ViewPauseGameButton: React.VFC<{
+  gameId: number
+  isGamePaused: boolean
+}> = React.memo(({ gameId, isGamePaused }) => {
+  const { pauseGame } = usePauseGame(gameId, {
+    onError() {
+      toast.error('Failed to pause game')
+    },
+    onSuccess() {
+      toast.success('Game paused')
+    }
+  })
+  const { resumeGame } = useResumeGame(gameId, {
+    onError() {
+      toast.error('Failed to resume game')
+    },
+    onSuccess() {
+      toast.success('Game resumed')
+    }
+  })
+
+  return (
+    <div className="relative">
+      <span
+        className={cx(
+          'absolute h-14 w-14 p-2 box-content rounded-full border-gray-300 transition-colors duration-500',
+          'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2',
+          isGamePaused
+            ? 'border-opacity-80 border-[9900px]'
+            : 'border-opacity-0'
+        )}
+      />
+
+      <button
+        type="button"
+        className={cx(
+          'flex justify-center items-center h-14 w-14 relative rounded-full border-2 text-2xl transition-colors duration-300',
+          'outline-none focus-visible:ring-4',
+          isGamePaused
+            ? 'ring-green-200 border-green-400 bg-green-400 text-white'
+            : 'ring-gray-300 border-gray-400 text-gray-400 bg-white'
+        )}
+        onClick={() => {
+          if (isGamePaused) {
+            resumeGame()
+          } else {
+            pauseGame()
+          }
+        }}
+      >
+        {isGamePaused ? (
+          <Icon.Play className="translate-x-0.5" />
+        ) : (
+          <Icon.Pause />
+        )}
+      </button>
+    </div>
+  )
+})
+
 export const View: React.VFC<{
   store: InnerStore<State>
 }> = React.memo(({ store }) => {
@@ -97,23 +157,6 @@ export const View: React.VFC<{
   )
 
   const isTurnReadonly = isTurnCompleting || isGameCompleting
-
-  const { pauseGame } = usePauseGame(gameId, {
-    onError() {
-      toast.error('Failed to pause game')
-    },
-    onSuccess() {
-      toast.success('Game paused')
-    }
-  })
-  const { resumeGame } = useResumeGame(gameId, {
-    onError() {
-      toast.error('Failed to resume game')
-    },
-    onSuccess() {
-      toast.success('Game resumed')
-    }
-  })
 
   const duration = useEvery(
     now => {
@@ -220,41 +263,7 @@ export const View: React.VFC<{
         />
 
         <div className="flex justify-center items-center gap-4">
-          <div className="relative">
-            <span
-              className={cx(
-                'absolute h-14 w-14 p-2 box-content rounded-full border-gray-300 transition-colors duration-500',
-                'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2',
-                game.isPaused && game.winnerPlayerId == null
-                  ? 'border-opacity-80 border-[9900px]'
-                  : 'border-opacity-0'
-              )}
-            />
-
-            <button
-              type="button"
-              className={cx(
-                'flex justify-center items-center h-14 w-14 relative rounded-full border-2 text-2xl transition-colors duration-300',
-                'outline-none focus-visible:ring-4',
-                game.isPaused && game.winnerPlayerId == null
-                  ? 'ring-green-200 border-green-400 bg-green-400 text-white'
-                  : 'ring-gray-300 border-gray-400 text-gray-400 bg-white'
-              )}
-              onClick={() => {
-                if (game.isPaused && game.winnerPlayerId == null) {
-                  resumeGame()
-                } else {
-                  pauseGame()
-                }
-              }}
-            >
-              {game.isPaused && game.winnerPlayerId == null ? (
-                <Icon.Play className="translate-x-0.5" />
-              ) : (
-                <Icon.Pause />
-              )}
-            </button>
-          </div>
+          <ViewPauseGameButton gameId={game.id} isGamePaused={game.isPaused} />
 
           <ViewCompleteTurnButton state={state} />
 
