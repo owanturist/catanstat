@@ -53,7 +53,7 @@ const ViewCompleteTurnButton: React.VFC<{
         'focus-visible:ring-4',
         {
           'bg-gray-400 ring-gray-300': eventDie == null,
-          'bg-yellow-400 ring-yellow-200': eventDie === 'yellow',
+          'bg-yellow-400 ring-yellow-300': eventDie === 'yellow',
           'bg-blue-500 ring-blue-300': eventDie === 'blue',
           'bg-green-500 ring-green-300': eventDie === 'green',
           'bg-gray-600 ring-gray-400': eventDie === 'black'

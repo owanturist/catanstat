@@ -44,7 +44,8 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
           className: cx(
             icon.props.className,
             isAnyDieSelected && 'opacity-25',
-            '!h-auto transition-opacity peer-checked:opacity-100 peer-focus-visible:ring rounded-lg'
+            '!h-auto transition-opacity rounded-lg',
+            'peer-checked:opacity-100 peer-focus-visible:ring-4'
           )
         })}
       </label>
@@ -98,7 +99,7 @@ export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = React.memo(
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
-            className: cx('text-gray-100'),
+            className: cx('text-gray-100 peer-focus-visible:ring-gray-300'),
             stroke: 'rgb(156, 163, 175)' // text-gray-400
           })}
         />
@@ -118,7 +119,7 @@ export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
-            className: cx('text-red-500'),
+            className: cx('text-red-500 peer-focus-visible:ring-red-300'),
             stroke: 'rgb(185, 28, 28)' // text-red-700
           })}
         />
@@ -128,10 +129,26 @@ export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
 )
 
 const EVENT_DICE: ReadonlyArray<[DieEvent, string, string]> = [
-  ['yellow', cx('text-yellow-400'), /* text-yellow-500 */ 'rgb(245, 158, 11)'],
-  ['blue', cx('text-blue-500'), /* text-blue-600 */ 'rgb(37, 99, 235)'],
-  ['green', cx('text-green-500'), /* text-green-600 */ 'rgb(5, 150, 105)'],
-  ['black', cx('text-gray-600'), /* text-gray-800 */ 'rgb(31, 41, 55)']
+  [
+    'yellow',
+    cx('text-yellow-400 peer-focus-visible:ring-yellow-300'),
+    'rgb(245, 158, 11)' // text-yellow-500
+  ],
+  [
+    'blue',
+    cx('text-blue-500 peer-focus-visible:ring-blue-300'),
+    'rgb(37, 99, 235)' // text-blue-600
+  ],
+  [
+    'green',
+    cx('text-green-500 peer-focus-visible:ring-green-300'),
+    'rgb(5, 150, 105)' // text-green-600
+  ],
+  [
+    'black',
+    cx('text-gray-600 peer-focus-visible:ring-gray-400'),
+    'rgb(31, 41, 55)' // text-gray-800
+  ]
 ]
 
 export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
