@@ -29,7 +29,7 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
     )
 
     return (
-      <label className="block cursor-pointer p-px">
+      <label className="bloc cursor-pointer">
         <input
           className="sr-only peer"
           type="radio"
@@ -44,7 +44,7 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
           className: cx(
             icon.props.className,
             isAnyDieSelected && 'opacity-25',
-            'transition-opacity peer-checked:opacity-100 peer-focus-visible:ring rounded-lg'
+            '!h-auto transition-opacity peer-checked:opacity-100 peer-focus-visible:ring rounded-lg'
           )
         })}
       </label>
@@ -58,7 +58,14 @@ const ViewDieRow: React.FC<{ name: string }> = ({ name, children }) => (
     role="radiogroup"
     aria-labelledby={name}
   >
-    {children}
+    {React.Children.map(children, (child, index) => (
+      <li
+        key={React.isValidElement(child) ? child.key : index}
+        className="flex-1 p-px"
+      >
+        {child}
+      </li>
+    ))}
   </ol>
 )
 
@@ -131,7 +138,10 @@ export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
   ({ name, isReadonly, store }) => (
     <ViewDieRow name={name}>
       {/* placeholder left */}
-      <Icon.DieClear className="text-gray-100" />
+      <Icon.DieClear
+        stroke="rgb(243, 244, 246)"
+        className="!h-auto text-gray-100"
+      />
 
       {EVENT_DICE.map(([value, className, stroke]) => (
         <ViewDie
@@ -145,7 +155,10 @@ export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
       ))}
 
       {/* placeholder right */}
-      <Icon.DieClear className="text-gray-100" />
+      <Icon.DieClear
+        stroke="rgb(243, 244, 246)"
+        className="!h-auto text-gray-100"
+      />
     </ViewDieRow>
   )
 )

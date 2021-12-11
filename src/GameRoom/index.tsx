@@ -72,17 +72,11 @@ const ViewPauseGameButton: React.VFC<{
   const { pauseGame } = usePauseGame(gameId, {
     onError() {
       toast.error('Failed to pause game')
-    },
-    onSuccess() {
-      toast.success('Game paused')
     }
   })
   const { resumeGame } = useResumeGame(gameId, {
     onError() {
       toast.error('Failed to resume game')
-    },
-    onSuccess() {
-      toast.success('Game resumed')
     }
   })
 
@@ -200,9 +194,12 @@ export const View: React.VFC<{
     game.players[0]?.id
 
   return (
-    <div className="flex justify-center p-3 h-full overflow-hidden">
+    <div className={cx('flex justify-center p-3 h-full overflow-hidden')}>
       <form
-        className="space-y-2 w-full sm:max-w-md"
+        className={cx(
+          'space-y-2 w-full sm:max-w-md',
+          'sm:p-3 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
+        )}
         onSubmit={event => {
           event.preventDefault()
 

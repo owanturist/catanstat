@@ -118,8 +118,8 @@ export const useCompleteTurn = (
     onError,
     onSuccess
   }: {
-    onError(error: Error): void
-    onSuccess(): void
+    onError?(error: Error): void
+    onSuccess?(): void
   }
 ): {
   isLoading: boolean
@@ -139,7 +139,7 @@ export const useCompleteTurn = (
       async onSuccess() {
         await queryClient.invalidateQueries(gameQueryKey(gameId))
 
-        onSuccess()
+        onSuccess?.()
       }
     }
   )
@@ -156,8 +156,8 @@ export const useCompleteGame = (
     onError,
     onSuccess
   }: {
-    onError(error: Error): void
-    onSuccess(): void
+    onError?(error: Error): void
+    onSuccess?(): void
   }
 ): {
   isLoading: boolean
@@ -177,7 +177,7 @@ export const useCompleteGame = (
       async onSuccess() {
         await queryClient.invalidateQueries(gameQueryKey(gameId))
 
-        onSuccess()
+        onSuccess?.()
       }
     }
   )
@@ -194,8 +194,8 @@ export const usePauseGame = (
     onError,
     onSuccess
   }: {
-    onError(error: Error): void
-    onSuccess(): void
+    onError?(error: Error): void
+    onSuccess?(): void
   }
 ): {
   isLoading: boolean
@@ -209,7 +209,7 @@ export const usePauseGame = (
       async onSuccess() {
         await queryClient.invalidateQueries(gameQueryKey(gameId))
 
-        onSuccess()
+        onSuccess?.()
       }
     }
   )
@@ -226,8 +226,8 @@ export const useResumeGame = (
     onError,
     onSuccess
   }: {
-    onError(error: Error): void
-    onSuccess(): void
+    onError?(error: Error): void
+    onSuccess?(): void
   }
 ): {
   isLoading: boolean
@@ -241,7 +241,7 @@ export const useResumeGame = (
       async onSuccess() {
         await queryClient.invalidateQueries(gameQueryKey(gameId))
 
-        onSuccess()
+        onSuccess?.()
       }
     }
   )
