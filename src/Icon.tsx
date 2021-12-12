@@ -83,6 +83,19 @@ export const Flag: React.VFC<IconProps> = ({ className, ...props }) => (
   </svg>
 )
 
+export const Undo: React.VFC<IconProps> = ({ className, ...props }) => (
+  <svg
+    className={cx(iconClassName, className)}
+    viewBox="0 0 512 512"
+    {...props}
+  >
+    <path
+      fill="currentColor"
+      d="M255.54 8A247.16 247.16 0 0 0 84.68 76.69l-35.7-35.72C33.84 25.85 8 36.56 8 57.94V192a24 24 0 0 0 24 24h134.06c21.38 0 32.09-25.85 16.97-40.97l-41.75-41.75A166.78 166.78 0 0 1 254.51 88c92.4-.8 170.28 73.97 169.48 169.44C423.24 348 349.82 424 256 424c-41.13 0-80-14.68-110.63-41.56A11.98 11.98 0 0 0 129 383l-39.66 39.66a12.02 12.02 0 0 0 .48 17.43A247.09 247.09 0 0 0 256 504c136.97 0 248-111.03 248-248C504 119.2 392.35 7.75 255.54 8z"
+    />
+  </svg>
+)
+
 const DEFAULT_DIE_STROKE_WIDTH = 12
 
 export const DieClear: React.VFC<IconProps> = ({

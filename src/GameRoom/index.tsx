@@ -1,7 +1,12 @@
 import cx from 'classnames'
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { InnerStore, useGetInnerState } from 'react-inner-store'
+import {
+  InnerStore,
+  useGetInnerState,
+  useInnerState,
+  useSetInnerState
+} from 'react-inner-store'
 import { toast } from 'react-hot-toast'
 import { differenceInMilliseconds } from 'date-fns'
 
@@ -46,6 +51,18 @@ export abstract class State {
     redDie.setState(dice?.redDie ?? DieRow.init)
     eventDie.setState(dice?.eventDie ?? DieRow.init)
   }
+
+  public static toDice(state: State): null | Dice {
+    const whiteDie = state.whiteDie.getState()
+    const redDie = state.redDie.getState()
+    const eventDie = state.eventDie.getState()
+
+    if (whiteDie == null || redDie == null || eventDie == null) {
+      return null
+    }
+
+    return { whiteDie, redDie, eventDie }
+  }
 }
 
 const ViewPlayerTile: React.VFC<{
@@ -54,7 +71,6 @@ const ViewPlayerTile: React.VFC<{
 }> = React.memo(({ isCurrentPlayer, player }) => {
   return (
     <div
-      key={player.id}
       className={cx(
         'flex-1 flex justify-center h-6 transition-[font-size] duration-300',
         isCurrentPlayer ? 'text-3xl' : 'text-5xl'
@@ -65,7 +81,7 @@ const ViewPlayerTile: React.VFC<{
   )
 })
 
-const ViewCurrentPlayerMarker: React.VFC<{
+const ViewCurrentPlayerCaret: React.VFC<{
   isGamePaused: boolean
   currentTurnDurationMs: number
   currentTurnDurationSince: Date
@@ -133,7 +149,7 @@ const ViewGamePlayers: React.VFC<{
 
   return (
     <div className="flex relative pt-2 pb-8">
-      <ViewCurrentPlayerMarker
+      <ViewCurrentPlayerCaret
         isGamePaused={game.isPaused}
         currentTurnDurationMs={game.currentTurnDurationMs}
         currentTurnDurationSince={game.currentTurnDurationSince}
@@ -153,15 +169,27 @@ const ViewGamePlayers: React.VFC<{
 })
 
 const ViewCompleteTurnButton: React.VFC<{
+  gameId: number
   state: State
-}> = React.memo(({ state }) => {
+}> = React.memo(({ gameId, state }) => {
+  const setIsMutating = useSetInnerState(state.isMutating)
   const whiteDie = useGetInnerState(state.whiteDie) ?? 0
   const redDie = useGetInnerState(state.redDie) ?? 0
   const eventDie = useGetInnerState(state.eventDie)
 
+  const { completeTurn } = useCompleteTurn(gameId, {
+    onError() {
+      setIsMutating(false)
+      toast.error('Failed to complete turn')
+    },
+    onSuccess() {
+      State.reset(state)
+    }
+  })
+
   return (
     <button
-      type="submit"
+      type="button"
       className={cx(
         'block w-20 h-20 border-2 rounded-full transition text-white text-5xl outline-none leading-none',
         'focus-visible:ring-4',
@@ -174,6 +202,18 @@ const ViewCompleteTurnButton: React.VFC<{
           'bg-gray-600 ring-gray-400 border-gray-800': eventDie === 'black'
         }
       )}
+      onClick={() => {
+        if (!state.isMutating.getState()) {
+          const dice = State.toDice(state)
+
+          if (dice == null) {
+            toast.error('Please select all dice')
+          } else {
+            setIsMutating(true)
+            completeTurn(dice)
+          }
+        }
+      }}
     >
       <div
         className={cx(
@@ -188,55 +228,179 @@ const ViewCompleteTurnButton: React.VFC<{
   )
 })
 
+const ViewSecondaryButton: React.FC<{
+  as?: string
+  className?: string
+  onClick?: VoidFunction
+}> = ({ as: tagName = 'button', className, onClick, children }) => {
+  return React.createElement(
+    tagName,
+    {
+      className: cx(
+        'flex justify-center items-center h-14 w-14 rounded-full border-2 text-2xl',
+        'transition-colors duration-300',
+        'outline-none focus-visible:ring-4',
+        'ring-gray-300 border-gray-400 text-gray-400 bg-white',
+        className
+      ),
+      onClick,
+      // eslint-disable-next-line no-undefined
+      type: tagName === 'button' ? 'button' : undefined
+    },
+    children
+  )
+}
+
 const ViewPauseGameButton: React.VFC<{
   gameId: number
   isGamePaused: boolean
-}> = React.memo(({ gameId, isGamePaused }) => {
+  isMutating: InnerStore<boolean>
+}> = React.memo(({ gameId, isGamePaused, isMutating }) => {
+  const [isMutatingBool, setIsMutating] = useInnerState(isMutating)
+
   const { pauseGame } = usePauseGame(gameId, {
     onError() {
+      setIsMutating(false)
       toast.error('Failed to pause game')
+    },
+    onSuccess() {
+      setIsMutating(false)
     }
   })
   const { resumeGame } = useResumeGame(gameId, {
     onError() {
+      setIsMutating(false)
       toast.error('Failed to resume game')
+    },
+    onSuccess() {
+      setIsMutating(false)
     }
   })
 
   return (
-    <div className="relative">
+    <div className="block relative z-10">
       <span
         className={cx(
           'absolute h-14 w-14 box-content rounded-full bg-gray-50/80 transition-[padding] ease-in-out duration-500',
-          'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2',
+          'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 transform-gpu',
           isGamePaused ? ' p-[2000px]' : 'p-0'
         )}
       />
 
-      <button
-        type="button"
-        className={cx(
-          'flex justify-center items-center h-14 w-14 relative rounded-full border-2 text-2xl transition-colors duration-300',
-          'outline-none focus-visible:ring-4',
-          isGamePaused
-            ? 'ring-green-200 border-green-400 bg-green-400 text-white'
-            : 'ring-gray-300 border-gray-400 text-gray-400 bg-white'
-        )}
-        onClick={() => {
-          if (isGamePaused) {
-            resumeGame()
-          } else {
-            pauseGame()
-          }
-        }}
-      >
-        {isGamePaused ? (
-          <Icon.Play className="translate-x-0.5" />
-        ) : (
-          <Icon.Pause />
-        )}
-      </button>
+      <label>
+        <input
+          className="sr-only peer"
+          type="checkbox"
+          name="is-game-paused"
+          checked={isGamePaused}
+          readOnly={isMutatingBool}
+          onChange={event => {
+            if (event.target.checked) {
+              pauseGame()
+            } else {
+              resumeGame()
+            }
+          }}
+        />
+
+        <ViewSecondaryButton
+          as="span"
+          className={cx(
+            'relative overflow-hidden cursor-pointer',
+            'peer-focus-visible:ring-4',
+            'peer-checked:ring-green-200 peer-checked:border-green-500 peer-checked:bg-green-400 peer-checked:text-white'
+          )}
+        >
+          <span>
+            <span
+              className={cx(
+                'flex items-center w-[200%] h-full',
+                'transition-transform ease-out duration-300',
+                isGamePaused && '-translate-x-1/2'
+              )}
+            >
+              <span className="flex justify-center flex-1">
+                <Icon.Pause />
+              </span>
+              <span className="flex justify-center flex-1">
+                <Icon.Play className="translate-x-0.5" />
+              </span>
+            </span>
+          </span>
+        </ViewSecondaryButton>
+      </label>
     </div>
+  )
+})
+
+const ViewCompleteGameButton: React.VFC<{
+  gameId: number
+  state: State
+}> = React.memo(({ gameId, state }) => {
+  const setIsMutating = useSetInnerState(state.isMutating)
+  const { completeGame } = useCompleteGame(gameId, {
+    onError() {
+      setIsMutating(false)
+      toast.error('Failed to complete game')
+    },
+    onSuccess() {
+      State.reset(state)
+      toast.success('Game completed!')
+    }
+  })
+
+  return (
+    <ViewSecondaryButton
+      onClick={() => {
+        if (!state.isMutating.getState()) {
+          const dice = State.toDice(state)
+
+          if (dice == null) {
+            toast.error('Please select all dice')
+          } else {
+            setIsMutating(true)
+            completeGame(dice)
+          }
+        }
+      }}
+    >
+      <Icon.Flag />
+    </ViewSecondaryButton>
+  )
+})
+
+const ViewAbortTurnButton: React.VFC<{
+  gameId: number
+  hasTurns: boolean
+  state: State
+}> = React.memo(({ gameId, hasTurns, state }) => {
+  const setIsMutating = useSetInnerState(state.isMutating)
+  const { abortLastTurn } = useAbortLastTurn(gameId, {
+    onError() {
+      setIsMutating(false)
+      toast.error('Failed to abort last turn')
+    },
+    onSuccess(dice) {
+      State.reset(state, dice)
+      toast.success('Aborted last turn!')
+    }
+  })
+
+  return (
+    <ViewSecondaryButton
+      onClick={() => {
+        if (!state.isMutating.getState()) {
+          if (hasTurns) {
+            setIsMutating(true)
+            abortLastTurn()
+          } else {
+            toast.error('No turns to abort')
+          }
+        }
+      }}
+    >
+      <Icon.Undo />
+    </ViewSecondaryButton>
   )
 })
 
@@ -251,136 +415,54 @@ const ViewOngoingGame: React.VFC<{
   store: InnerStore<State>
 }> = React.memo(({ game, store }) => {
   const state = useGetInnerState(store)
-
-  const { isLoading: isTurnCompleting, completeTurn } = useCompleteTurn(
-    game.id,
-    {
-      onError() {
-        toast.error('Failed to complete turn')
-      },
-      onSuccess() {
-        State.reset(state)
-      }
-    }
-  )
-  const { isLoading: isGameCompleting, completeGame } = useCompleteGame(
-    game.id,
-    {
-      onError() {
-        toast.error('Failed to complete game')
-      },
-      onSuccess() {
-        State.reset(state)
-        toast.success('Game completed!')
-      }
-    }
-  )
-
-  const { isLoading: isLastTurnAborting, abortLastTurn } = useAbortLastTurn(
-    game.id,
-    {
-      onError() {
-        toast.error('Failed to abort last turn')
-      },
-      onSuccess(dice) {
-        State.reset(state, dice)
-        toast.success('Aborted last turn!')
-      }
-    }
-  )
-
-  const isMutating = isTurnCompleting || isGameCompleting || isLastTurnAborting
+  const isMutating = useGetInnerState(state.isMutating)
 
   return (
     <div className={cx('flex justify-center p-3 h-full overflow-hidden')}>
       <form
         className={cx(
-          'space-y-2 w-full sm:max-w-md',
+          'space-y-3 w-full sm:max-w-md',
           'sm:p-3 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
         )}
-        onSubmit={event => {
-          event.preventDefault()
-
-          if (isMutating) {
-            return
-          }
-
-          const whiteDie = state.whiteDie.getState()
-          const redDie = state.redDie.getState()
-          const eventDie = state.eventDie.getState()
-
-          if (whiteDie == null || redDie == null || eventDie == null) {
-            toast.error('Please select all dice')
-          } else {
-            completeTurn({ whiteDie, redDie, eventDie })
-          }
-        }}
       >
         <ViewGamePlayers game={game} />
 
-        <DieRow.ViewWhite
-          name="white-dice"
-          isDisabled={isMutating}
-          store={state.whiteDie}
-        />
-        <DieRow.ViewRed
-          name="red-dice"
-          isDisabled={isMutating}
-          store={state.redDie}
-        />
-        <DieRow.ViewEvent
-          name="event-dice"
-          isDisabled={isMutating}
-          store={state.eventDie}
-        />
+        <div className="space-y-2">
+          <DieRow.ViewWhite
+            name="white-dice"
+            isDisabled={isMutating}
+            store={state.whiteDie}
+          />
+          <DieRow.ViewRed
+            name="red-dice"
+            isDisabled={isMutating}
+            store={state.redDie}
+          />
+          <DieRow.ViewEvent
+            name="event-dice"
+            isDisabled={isMutating}
+            store={state.eventDie}
+          />
+        </div>
 
         <div className="flex justify-center items-center gap-4">
-          <ViewPauseGameButton gameId={game.id} isGamePaused={game.isPaused} />
+          <span className="w-14">{/* placeholder */}</span>
 
-          <ViewCompleteTurnButton state={state} />
+          <ViewPauseGameButton
+            gameId={game.id}
+            isGamePaused={game.isPaused}
+            isMutating={state.isMutating}
+          />
 
-          <button
-            type="button"
-            onClick={() => {
-              if (isMutating) {
-                return
-              }
+          <ViewCompleteTurnButton gameId={game.id} state={state} />
 
-              if (game.turns.length === 0) {
-                toast.error('No turns to abort')
-              } else {
-                abortLastTurn()
-              }
-            }}
-          >
-            AB
-          </button>
+          <ViewAbortTurnButton
+            gameId={game.id}
+            hasTurns={game.turns.length > 0}
+            state={state}
+          />
 
-          <button
-            type="button"
-            className={cx(
-              'flex justify-center items-center h-14 w-14 rounded-full border-2 text-2xl transition-colors duration-300',
-              'outline-none focus-visible:ring-4',
-              'ring-gray-300 border-gray-400 text-gray-400 bg-white'
-            )}
-            onClick={() => {
-              if (isMutating) {
-                return
-              }
-
-              const whiteDie = state.whiteDie.getState()
-              const redDie = state.redDie.getState()
-              const eventDie = state.eventDie.getState()
-
-              if (whiteDie == null || redDie == null || eventDie == null) {
-                toast.error('Please select all dice')
-              } else {
-                completeGame({ whiteDie, redDie, eventDie })
-              }
-            }}
-          >
-            <Icon.Flag />
-          </button>
+          <ViewCompleteGameButton gameId={game.id} state={state} />
         </div>
       </form>
     </div>
