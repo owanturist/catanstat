@@ -13,7 +13,6 @@ export abstract class Game {
   abstract current_turn_duration_since: Date
   abstract start_time: Date
   abstract end_time: null | Date
-  abstract winner_player_id: null | number
   abstract players: ReadonlyArray<Player>
   abstract turns: ReadonlyArray<Turn>
 }
@@ -51,7 +50,6 @@ abstract class GameEntity {
   abstract current_turn_duration_since: Date
   abstract start_time: Date
   abstract end_time: null | Date
-  abstract winner_player_id: null | number
 
   public static async get_by_id(game_id: number): Promise<GameEntity> {
     const game = await db.games.get(game_id)
@@ -183,7 +181,7 @@ const complete_turn = async (
 ): Promise<number> => {
   const game = await GameEntity.get_by_id(game_id)
 
-  if (game.winner_player_id != null) {
+  if (game.end_time != null) {
     return Promise.reject(new Error('Game is over'))
   }
 
@@ -207,12 +205,11 @@ const complete_turn = async (
     ),
 
     db.games.update(game_id, {
-      is_paused: is_complete_game,
+      is_paused: false,
       total_duration_ms: game.total_duration_ms + total_turn_duration_ms,
       current_turn_duration_ms: 0,
       current_turn_duration_since: now,
-      end_time: is_complete_game ? now : null,
-      winner_player_id: is_complete_game ? current_player_id : null
+      end_time: is_complete_game ? now : null
     })
   ])
 
@@ -226,10 +223,39 @@ export const complete_game = (game_id: number, dice: Dice): Promise<number> => {
 export const next_turn: (game_id: number, dice: Dice) => Promise<number> =
   complete_turn
 
+export const abort_last_turn = async (game_id: number): Promise<Dice> => {
+  const game = await GameEntity.get_by_id(game_id)
+  const last_turn = await TurnEntity.get_last_turn_in_game(game_id)
+
+  if (last_turn == null) {
+    return Promise.reject(new Error('No turns found'))
+  }
+
+  await db.turns.delete(last_turn.id)
+
+  await db.games.update(game_id, {
+    // unpause if paused
+    is_paused: false,
+    // subtract the duration of the aborted turn
+    total_duration_ms: game.total_duration_ms - last_turn.duration_ms,
+    // restore the current turn duration from last turn
+    current_turn_duration_ms: last_turn.duration_ms,
+    current_turn_duration_since: new Date(),
+    // reset completed game fields if any
+    end_time: null
+  })
+
+  return {
+    white_die: last_turn.white_die,
+    red_die: last_turn.red_die,
+    event_die: last_turn.event_die
+  }
+}
+
 export const pause_game = async (game_id: number): Promise<number> => {
   const game = await GameEntity.get_by_id(game_id)
 
-  if (game.winner_player_id != null) {
+  if (game.end_time != null) {
     return Promise.reject(new Error('Game is over'))
   }
 
@@ -251,7 +277,7 @@ export const pause_game = async (game_id: number): Promise<number> => {
 export const resume_game = async (game_id: number): Promise<number> => {
   const game = await GameEntity.get_by_id(game_id)
 
-  if (game.winner_player_id != null) {
+  if (game.end_time != null) {
     return Promise.reject(new Error('Game is over'))
   }
 
@@ -302,8 +328,7 @@ export const start_game = async (
       current_turn_duration_ms: 0,
       current_turn_duration_since: now,
       start_time: now,
-      end_time: null,
-      winner_player_id: null
+      end_time: null
     })
   )
 

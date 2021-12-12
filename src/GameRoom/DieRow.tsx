@@ -13,11 +13,11 @@ export const init = <TDie extends DieNumber | DieEvent>(): State<TDie> => null
 const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
   icon: React.ReactElement
   name: string
-  isReadonly: boolean
+  isDisabled: boolean
   value: TDie
   store: InnerStore<State<TDie>>
 }) => ReturnType<React.VFC> = React.memo(
-  ({ icon, name, isReadonly, value, store }) => {
+  ({ icon, name, isDisabled, value, store }) => {
     const setState = useSetInnerState(store)
     const [isChecked, isAnyDieSelected] = useInnerWatch(
       React.useCallback(() => {
@@ -34,7 +34,7 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
           className="sr-only peer"
           type="radio"
           name={name}
-          readOnly={isReadonly}
+          disabled={isDisabled}
           value={value}
           checked={isChecked}
           onChange={() => setState(value)}
@@ -72,7 +72,7 @@ const ViewDieRow: React.FC<{ name: string }> = ({ name, children }) => (
 
 export interface DieRowProps<TDie extends DieNumber | DieEvent> {
   name: string
-  isReadonly: boolean
+  isDisabled: boolean
   store: InnerStore<State<TDie>>
 }
 
@@ -89,13 +89,13 @@ const NUMBER_DICE: ReadonlyArray<{
 ]
 
 export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = React.memo(
-  ({ name, isReadonly, store }) => (
+  ({ name, isDisabled, store }) => (
     <ViewDieRow name={name}>
       {NUMBER_DICE.map(({ value, icon }) => (
         <ViewDie
           key={value}
           name={name}
-          isReadonly={isReadonly}
+          isDisabled={isDisabled}
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
@@ -109,13 +109,13 @@ export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = React.memo(
 )
 
 export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
-  ({ name, isReadonly, store }) => (
+  ({ name, isDisabled: isReadonly, store }) => (
     <ViewDieRow name={name}>
       {NUMBER_DICE.map(({ value, icon }) => (
         <ViewDie
           key={value}
           name={name}
-          isReadonly={isReadonly}
+          isDisabled={isReadonly}
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
@@ -152,7 +152,7 @@ const EVENT_DICE: ReadonlyArray<[DieEvent, string, string]> = [
 ]
 
 export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
-  ({ name, isReadonly, store }) => (
+  ({ name, isDisabled: isReadonly, store }) => (
     <ViewDieRow name={name}>
       {/* placeholder left */}
       <Icon.DieClear
@@ -164,7 +164,7 @@ export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
         <ViewDie
           key={value}
           name={name}
-          isReadonly={isReadonly}
+          isDisabled={isReadonly}
           store={store}
           value={value}
           icon={<Icon.DieClear className={className} stroke={stroke} />}

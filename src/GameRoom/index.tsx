@@ -9,11 +9,13 @@ import { pct, formatDurationMs, useEvery } from '../utils'
 import {
   Game,
   Player,
+  Dice,
   useCompleteTurn,
   useQueryGame,
   usePauseGame,
   useResumeGame,
-  useCompleteGame
+  useCompleteGame,
+  useAbortLastTurn
 } from '../api'
 import * as Icon from '../Icon'
 import { DieEvent, DieNumber } from '../domain'
@@ -21,22 +23,28 @@ import { DieEvent, DieNumber } from '../domain'
 import * as DieRow from './DieRow'
 
 export abstract class State {
+  abstract readonly isMutating: InnerStore<boolean>
   abstract readonly whiteDie: InnerStore<DieRow.State<DieNumber>>
   abstract readonly redDie: InnerStore<DieRow.State<DieNumber>>
   abstract readonly eventDie: InnerStore<DieRow.State<DieEvent>>
 
   public static init(): State {
     return {
+      isMutating: InnerStore.of<boolean>(false),
       whiteDie: InnerStore.of(DieRow.init()),
       redDie: InnerStore.of(DieRow.init()),
       eventDie: InnerStore.of(DieRow.init())
     }
   }
 
-  public static reset({ whiteDie, redDie, eventDie }: State): void {
-    whiteDie.setState(DieRow.init)
-    redDie.setState(DieRow.init)
-    eventDie.setState(DieRow.init)
+  public static reset(
+    { isMutating, whiteDie, redDie, eventDie }: State,
+    dice?: Dice
+  ): void {
+    isMutating.setState(false)
+    whiteDie.setState(dice?.whiteDie ?? DieRow.init)
+    redDie.setState(dice?.redDie ?? DieRow.init)
+    eventDie.setState(dice?.eventDie ?? DieRow.init)
   }
 }
 
@@ -268,7 +276,20 @@ const ViewOngoingGame: React.VFC<{
     }
   )
 
-  const isMutating = isTurnCompleting || isGameCompleting
+  const { isLoading: isLastTurnAborting, abortLastTurn } = useAbortLastTurn(
+    game.id,
+    {
+      onError() {
+        toast.error('Failed to abort last turn')
+      },
+      onSuccess(dice) {
+        State.reset(state, dice)
+        toast.success('Aborted last turn!')
+      }
+    }
+  )
+
+  const isMutating = isTurnCompleting || isGameCompleting || isLastTurnAborting
 
   return (
     <div className={cx('flex justify-center p-3 h-full overflow-hidden')}>
@@ -288,16 +309,10 @@ const ViewOngoingGame: React.VFC<{
           const redDie = state.redDie.getState()
           const eventDie = state.eventDie.getState()
 
-          if (game.winnerPlayerId != null) {
-            toast.error('Game is already over')
-          } else if (whiteDie == null || redDie == null || eventDie == null) {
+          if (whiteDie == null || redDie == null || eventDie == null) {
             toast.error('Please select all dice')
           } else {
-            completeTurn({
-              whiteDie,
-              redDie,
-              eventDie
-            })
+            completeTurn({ whiteDie, redDie, eventDie })
           }
         }}
       >
@@ -305,17 +320,17 @@ const ViewOngoingGame: React.VFC<{
 
         <DieRow.ViewWhite
           name="white-dice"
-          isReadonly={isMutating}
+          isDisabled={isMutating}
           store={state.whiteDie}
         />
         <DieRow.ViewRed
           name="red-dice"
-          isReadonly={isMutating}
+          isDisabled={isMutating}
           store={state.redDie}
         />
         <DieRow.ViewEvent
           name="event-dice"
-          isReadonly={isMutating}
+          isDisabled={isMutating}
           store={state.eventDie}
         />
 
@@ -323,6 +338,23 @@ const ViewOngoingGame: React.VFC<{
           <ViewPauseGameButton gameId={game.id} isGamePaused={game.isPaused} />
 
           <ViewCompleteTurnButton state={state} />
+
+          <button
+            type="button"
+            onClick={() => {
+              if (isMutating) {
+                return
+              }
+
+              if (game.turns.length === 0) {
+                toast.error('No turns to abort')
+              } else {
+                abortLastTurn()
+              }
+            }}
+          >
+            AB
+          </button>
 
           <button
             type="button"
@@ -340,24 +372,14 @@ const ViewOngoingGame: React.VFC<{
               const redDie = state.redDie.getState()
               const eventDie = state.eventDie.getState()
 
-              if (game.winnerPlayerId != null) {
-                toast.error('Game is already completed')
-              } else if (
-                whiteDie == null ||
-                redDie == null ||
-                eventDie == null
-              ) {
+              if (whiteDie == null || redDie == null || eventDie == null) {
                 toast.error('Please select all dice')
               } else {
-                completeGame({
-                  whiteDie,
-                  redDie,
-                  eventDie
-                })
+                completeGame({ whiteDie, redDie, eventDie })
               }
             }}
           >
-            {game.winnerPlayerId == null ? <Icon.Flag /> : <Icon.Flag />}
+            <Icon.Flag />
           </button>
         </div>
       </form>
@@ -381,7 +403,7 @@ export const View: React.VFC<{
     return <div>Something went wrong while loading the game</div>
   }
 
-  if (game.winnerPlayerId != null) {
+  if (game.endTime != null) {
     return <ViewCompletedGame game={game} />
   }
 

@@ -30,7 +30,6 @@ export interface Game {
   currentTurnDurationSince: Date
   startTime: Date
   endTime: null | Date
-  winnerPlayerId: null | number
   players: ReadonlyArray<Player>
   turns: ReadonlyArray<Turn>
 }
@@ -47,7 +46,6 @@ const decodeGame = (game: DB.Game): Game => {
     currentTurnDurationSince: game.current_turn_duration_since,
     startTime: game.start_time,
     endTime: game.end_time,
-    winnerPlayerId: game.winner_player_id,
     players,
     turns: game.turns.map(turn => decodeTurn(turn, playersMap))
   }
@@ -112,15 +110,17 @@ export interface Dice {
   eventDie: DieEvent
 }
 
+export interface ApiHookOptions<
+  TArgs extends Array<unknown> = [],
+  TError = Error
+> {
+  onError?(error: TError): void
+  onSuccess?(...args: TArgs): void
+}
+
 export const useCompleteTurn = (
   gameId: number,
-  {
-    onError,
-    onSuccess
-  }: {
-    onError?(error: Error): void
-    onSuccess?(): void
-  }
+  { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
   completeTurn(dice: Dice): void
@@ -150,15 +150,39 @@ export const useCompleteTurn = (
   }
 }
 
+export const useAbortLastTurn = (
+  gameId: number,
+  { onError, onSuccess }: ApiHookOptions<[Dice]>
+): {
+  isLoading: boolean
+  abortLastTurn(): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<DB.Dice, Error>(
+    () => DB.abort_last_turn(gameId),
+    {
+      onError,
+      async onSuccess(dice) {
+        await queryClient.invalidateQueries(gameQueryKey(gameId))
+
+        onSuccess?.({
+          whiteDie: dice.white_die,
+          redDie: dice.red_die,
+          eventDie: dice.event_die
+        })
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    abortLastTurn: mutate
+  }
+}
+
 export const useCompleteGame = (
   gameId: number,
-  {
-    onError,
-    onSuccess
-  }: {
-    onError?(error: Error): void
-    onSuccess?(): void
-  }
+  { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
   completeGame(dice: Dice): void
@@ -190,13 +214,7 @@ export const useCompleteGame = (
 
 export const usePauseGame = (
   gameId: number,
-  {
-    onError,
-    onSuccess
-  }: {
-    onError?(error: Error): void
-    onSuccess?(): void
-  }
+  { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
   pauseGame(): void
@@ -222,13 +240,7 @@ export const usePauseGame = (
 
 export const useResumeGame = (
   gameId: number,
-  {
-    onError,
-    onSuccess
-  }: {
-    onError?(error: Error): void
-    onSuccess?(): void
-  }
+  { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
   resumeGame(): void
