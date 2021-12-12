@@ -49,7 +49,7 @@ const ViewPlayerTile: React.VFC<{
       key={player.id}
       className={cx(
         'flex-1 flex justify-center h-6 transition-[font-size] duration-300',
-        isCurrentPlayer ? 'text-2xl' : 'text-5xl'
+        isCurrentPlayer ? 'text-3xl' : 'text-5xl'
       )}
     >
       <Icon.User style={{ color: player.color.hex }} />
@@ -124,7 +124,7 @@ const ViewGamePlayers: React.VFC<{
   }, [game.players, prevTurn])
 
   return (
-    <div className="flex relative pt-2 pb-7">
+    <div className="flex relative pt-2 pb-8">
       <ViewCurrentPlayerMarker
         isGamePaused={game.isPaused}
         currentTurnDurationMs={game.currentTurnDurationMs}
@@ -167,7 +167,15 @@ const ViewCompleteTurnButton: React.VFC<{
         }
       )}
     >
-      {whiteDie + redDie}
+      <div
+        className={cx(
+          whiteDie > 0 && redDie > 0
+            ? 'transition-[transform,opacity] scale-100 opacity-100'
+            : 'scale-50 opacity-0'
+        )}
+      >
+        {whiteDie + redDie}
+      </div>
     </button>
   )
 })
@@ -191,11 +199,9 @@ const ViewPauseGameButton: React.VFC<{
     <div className="relative">
       <span
         className={cx(
-          'absolute h-14 w-14 p-2 box-content rounded-full border-gray-300 transition-colors duration-500',
+          'absolute h-14 w-14 box-content rounded-full bg-gray-50/80 transition-[padding] ease-in-out duration-500',
           'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2',
-          isGamePaused
-            ? 'border-opacity-80 border-[9900px]'
-            : 'border-opacity-0'
+          isGamePaused ? ' p-[2000px]' : 'p-0'
         )}
       />
 
