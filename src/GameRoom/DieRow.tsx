@@ -29,7 +29,7 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
     )
 
     return (
-      <label className="bloc cursor-pointer">
+      <label className="cursor-pointer">
         <input
           className="sr-only peer"
           type="radio"
@@ -131,22 +131,22 @@ export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
 const EVENT_DICE: ReadonlyArray<[DieEvent, string, string]> = [
   [
     'yellow',
-    cx('text-yellow-400 peer-focus-visible:ring-yellow-300'),
+    cx('text-yellow-400 ring-yellow-300'),
     'rgb(245, 158, 11)' // text-yellow-500
   ],
   [
     'blue',
-    cx('text-blue-500 peer-focus-visible:ring-blue-300'),
+    cx('text-blue-500 ring-blue-300'),
     'rgb(37, 99, 235)' // text-blue-600
   ],
   [
     'green',
-    cx('text-green-500 peer-focus-visible:ring-green-300'),
+    cx('text-green-500 ring-green-300'),
     'rgb(5, 150, 105)' // text-green-600
   ],
   [
     'black',
-    cx('text-gray-600 peer-focus-visible:ring-gray-400'),
+    cx('text-gray-600 ring-gray-400'),
     'rgb(31, 41, 55)' // text-gray-800
   ]
 ]

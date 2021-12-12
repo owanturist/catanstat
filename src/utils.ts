@@ -1,19 +1,24 @@
 import { MutableRefObject, useRef, useState, useEffect } from 'react'
 
+const padDuration = (duration: number): string => {
+  return duration.toString().padStart(2, '0')
+}
+
 export const formatDurationMs = (ms: number): string => {
   const seconds = Math.floor(ms / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
 
+  const parts = [
+    padDuration(minutes - hours * 60),
+    padDuration(seconds - minutes * 60)
+  ]
+
   if (hours > 0) {
-    return `${hours}h ${minutes - hours * 60}m`
+    parts.unshift(hours.toString())
   }
 
-  if (minutes > 0) {
-    return `${minutes}m ${seconds - minutes * 60}s`
-  }
-
-  return `${seconds}s`
+  return parts.join(':')
 }
 
 export const useDynamicRef = <T>(value: T): MutableRefObject<T> => {

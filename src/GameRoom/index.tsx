@@ -7,6 +7,8 @@ import { differenceInMilliseconds } from 'date-fns'
 
 import { formatDurationMs, useEvery } from '../utils'
 import {
+  Game,
+  Player,
   useCompleteTurn,
   useQueryGame,
   usePauseGame,
@@ -38,6 +40,74 @@ export abstract class State {
   }
 }
 
+const ViewPlayerTile: React.VFC<{
+  player: Player
+  currentPlayerTurnDuration: null | string
+}> = React.memo(({ currentPlayerTurnDuration, player }) => {
+  return (
+    <div
+      key={player.id}
+      className={cx(
+        'flex-1 flex flex-col items-center border transition-colors',
+        currentPlayerTurnDuration != null
+          ? 'border-gray-300'
+          : 'border-transparent'
+      )}
+    >
+      <Icon.User className="text-2xl" style={{ color: player.color.hex }} />
+
+      {currentPlayerTurnDuration != null && (
+        <span className="font-mono text-xs bg-gray-400 text-gray-50 px-1 rounded">
+          {currentPlayerTurnDuration}
+        </span>
+      )}
+    </div>
+  )
+})
+
+const ViewGamePlayers: React.VFC<{
+  game: Game
+}> = React.memo(({ game }) => {
+  const currentTurnDuration = useEvery(
+    now => {
+      if (game.isPaused) {
+        return formatDurationMs(game.currentTurnDurationMs)
+      }
+
+      const diffMs = differenceInMilliseconds(
+        now,
+        game.currentTurnDurationSince
+      )
+
+      return formatDurationMs(game.currentTurnDurationMs + diffMs)
+    },
+    {
+      interval: 60,
+      skip: game.isPaused
+    }
+  )
+
+  // it is either
+  // 1. next player of latest (previous) turn
+  // 2. the game's first player
+  const currentPlayerId =
+    game.turns[0]?.player.nextPlayerId ?? game.players[0]?.id
+
+  return (
+    <div className="flex">
+      {game.players.map(player => (
+        <ViewPlayerTile
+          key={player.id}
+          player={player}
+          currentPlayerTurnDuration={
+            currentPlayerId === player.id ? currentTurnDuration : null
+          }
+        />
+      ))}
+    </div>
+  )
+})
+
 const ViewCompleteTurnButton: React.VFC<{
   state: State
 }> = React.memo(({ state }) => {
@@ -49,14 +119,15 @@ const ViewCompleteTurnButton: React.VFC<{
     <button
       type="submit"
       className={cx(
-        'block w-20 h-20 rounded-full transition text-white text-5xl outline-none leading-none',
+        'block w-20 h-20 border-2 rounded-full transition text-white text-5xl outline-none leading-none',
         'focus-visible:ring-4',
         {
-          'bg-gray-400 ring-gray-300': eventDie == null,
-          'bg-yellow-400 ring-yellow-300': eventDie === 'yellow',
-          'bg-blue-500 ring-blue-300': eventDie === 'blue',
-          'bg-green-500 ring-green-300': eventDie === 'green',
-          'bg-gray-600 ring-gray-400': eventDie === 'black'
+          'bg-gray-400 ring-gray-300 border-gray-500': eventDie == null,
+          'bg-yellow-400 ring-yellow-300 border-yellow-500':
+            eventDie === 'yellow',
+          'bg-blue-500 ring-blue-300 border-blue-600': eventDie === 'blue',
+          'bg-green-500 ring-green-300 border-green-600': eventDie === 'green',
+          'bg-gray-600 ring-gray-400 border-gray-800': eventDie === 'black'
         }
       )}
     >
@@ -119,15 +190,20 @@ const ViewPauseGameButton: React.VFC<{
   )
 })
 
-export const View: React.VFC<{
+const ViewCompletedGame: React.VFC<{
+  game: Game
+}> = React.memo(({ game }) => {
+  return null
+})
+
+const ViewOngoingGame: React.VFC<{
+  game: Game
   store: InnerStore<State>
-}> = React.memo(({ store }) => {
+}> = React.memo(({ game, store }) => {
   const state = useGetInnerState(store)
-  const params = useParams<'gameId'>()
-  const gameId = Number(params.gameId)
-  const { isLoading, error, game } = useQueryGame(gameId)
+
   const { isLoading: isTurnCompleting, completeTurn } = useCompleteTurn(
-    gameId,
+    game.id,
     {
       onError() {
         toast.error('Failed to complete turn')
@@ -138,7 +214,7 @@ export const View: React.VFC<{
     }
   )
   const { isLoading: isGameCompleting, completeGame } = useCompleteGame(
-    gameId,
+    game.id,
     {
       onError() {
         toast.error('Failed to complete game')
@@ -150,48 +226,7 @@ export const View: React.VFC<{
     }
   )
 
-  const isTurnReadonly = isTurnCompleting || isGameCompleting
-
-  const duration = useEvery(
-    now => {
-      if (game == null) {
-        return formatDurationMs(0)
-      }
-
-      if (game.isPaused) {
-        return formatDurationMs(game.currentTurnDurationMs)
-      }
-
-      const diffMs = differenceInMilliseconds(
-        now,
-        game.currentTurnDurationSince
-      )
-
-      return formatDurationMs(game.currentTurnDurationMs + diffMs)
-    },
-    {
-      interval: 60,
-      skip: game?.isPaused ?? true
-    }
-  )
-
-  if (isLoading) {
-    // @TODO loading skeleton
-    return null
-  }
-
-  if (error != null || game == null) {
-    return <div>Something went wrong while loading the game</div>
-  }
-
-  // it is either
-  // 1. winner
-  // 2. next player of latest (previous) turn
-  // 3. the first game player
-  const currentPlayerId =
-    game.winnerPlayerId ??
-    game.turns[0]?.player.nextPlayerId ??
-    game.players[0]?.id
+  const isMutating = isTurnCompleting || isGameCompleting
 
   return (
     <div className={cx('flex justify-center p-3 h-full overflow-hidden')}>
@@ -203,7 +238,7 @@ export const View: React.VFC<{
         onSubmit={event => {
           event.preventDefault()
 
-          if (isTurnReadonly) {
+          if (isMutating) {
             return
           }
 
@@ -224,38 +259,21 @@ export const View: React.VFC<{
           }
         }}
       >
-        <div className="flex">
-          {game.players.map(player => (
-            <div
-              key={player.id}
-              className={cx(
-                'flex-1 flex flex-col items-center p-3 border border-transparent transition-colors',
-                currentPlayerId === player.id && 'border-gray-300'
-              )}
-            >
-              <Icon.User
-                className="text-2xl"
-                style={{ color: player.color.hex }}
-              />
-
-              {currentPlayerId === player.id && <span>{duration}</span>}
-            </div>
-          ))}
-        </div>
+        <ViewGamePlayers game={game} />
 
         <DieRow.ViewWhite
           name="white-dice"
-          isReadonly={isTurnReadonly}
+          isReadonly={isMutating}
           store={state.whiteDie}
         />
         <DieRow.ViewRed
           name="red-dice"
-          isReadonly={isTurnReadonly}
+          isReadonly={isMutating}
           store={state.redDie}
         />
         <DieRow.ViewEvent
           name="event-dice"
-          isReadonly={isTurnReadonly}
+          isReadonly={isMutating}
           store={state.eventDie}
         />
 
@@ -272,7 +290,7 @@ export const View: React.VFC<{
               'ring-gray-300 border-gray-400 text-gray-400 bg-white'
             )}
             onClick={() => {
-              if (isTurnReadonly) {
+              if (isMutating) {
                 return
               }
 
@@ -303,4 +321,27 @@ export const View: React.VFC<{
       </form>
     </div>
   )
+})
+
+export const View: React.VFC<{
+  store: InnerStore<State>
+}> = React.memo(({ store }) => {
+  const params = useParams<'gameId'>()
+  const gameId = Number(params.gameId)
+  const { isLoading, error, game } = useQueryGame(gameId)
+
+  if (isLoading) {
+    // @TODO loading skeleton
+    return null
+  }
+
+  if (error != null || game == null) {
+    return <div>Something went wrong while loading the game</div>
+  }
+
+  if (game.winnerPlayerId != null) {
+    return <ViewCompletedGame game={game} />
+  }
+
+  return <ViewOngoingGame game={game} store={store} />
 })
