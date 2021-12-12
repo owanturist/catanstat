@@ -21,6 +21,10 @@ export const formatDurationMs = (ms: number): string => {
   return parts.join(':')
 }
 
+export const pct = (num: number, precision = 2): string => {
+  return `${num.toFixed(precision)}%`
+}
+
 export const useDynamicRef = <T>(value: T): MutableRefObject<T> => {
   const valueRef = useRef<T>(value)
 

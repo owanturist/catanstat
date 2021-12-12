@@ -5,7 +5,7 @@ import { InnerStore, useGetInnerState } from 'react-inner-store'
 import { toast } from 'react-hot-toast'
 import { differenceInMilliseconds } from 'date-fns'
 
-import { formatDurationMs, useEvery } from '../utils'
+import { pct, formatDurationMs, useEvery } from '../utils'
 import {
   Game,
   Player,
@@ -41,67 +41,103 @@ export abstract class State {
 }
 
 const ViewPlayerTile: React.VFC<{
+  isCurrentPlayer: boolean
   player: Player
-  currentPlayerTurnDuration: null | string
-}> = React.memo(({ currentPlayerTurnDuration, player }) => {
+}> = React.memo(({ isCurrentPlayer, player }) => {
   return (
     <div
       key={player.id}
       className={cx(
-        'flex-1 flex flex-col items-center border transition-colors',
-        currentPlayerTurnDuration != null
-          ? 'border-gray-300'
-          : 'border-transparent'
+        'flex-1 flex justify-center h-6 transition-[font-size] duration-300',
+        isCurrentPlayer ? 'text-2xl' : 'text-5xl'
       )}
     >
-      <Icon.User className="text-2xl" style={{ color: player.color.hex }} />
-
-      {currentPlayerTurnDuration != null && (
-        <span className="font-mono text-xs bg-gray-400 text-gray-50 px-1 rounded">
-          {currentPlayerTurnDuration}
-        </span>
-      )}
+      <Icon.User style={{ color: player.color.hex }} />
     </div>
   )
 })
 
+const ViewCurrentPlayerMarker: React.VFC<{
+  isGamePaused: boolean
+  currentTurnDurationMs: number
+  currentTurnDurationSince: Date
+  playersCount: number
+  currentPlayerIndex: number
+}> = React.memo(
+  ({
+    isGamePaused,
+    currentTurnDurationMs,
+    currentTurnDurationSince,
+    playersCount,
+    currentPlayerIndex
+  }) => {
+    const fraction = 100 / playersCount
+    const currentTurnDuration = useEvery(
+      now => {
+        if (isGamePaused) {
+          return formatDurationMs(currentTurnDurationMs)
+        }
+
+        const diffMs = differenceInMilliseconds(now, currentTurnDurationSince)
+
+        return formatDurationMs(currentTurnDurationMs + diffMs)
+      },
+      {
+        interval: 60,
+        skip: isGamePaused
+      }
+    )
+
+    return (
+      <div
+        className="absolute inset-0 transition-transform ease-out duration-300"
+        style={{
+          transform: `translateX(${pct(fraction * currentPlayerIndex)})`
+        }}
+      >
+        <div
+          className="flex flex-col h-full justify-end ring-inset ring-2 ring-gray-200 rounded overflow-hidden"
+          style={{
+            width: pct(fraction)
+          }}
+        >
+          <span className="p-0.5 font-mono text-xs text-center text-gray-500 bg-gray-200">
+            {currentTurnDuration}
+          </span>
+        </div>
+      </div>
+    )
+  }
+)
+
 const ViewGamePlayers: React.VFC<{
   game: Game
 }> = React.memo(({ game }) => {
-  const currentTurnDuration = useEvery(
-    now => {
-      if (game.isPaused) {
-        return formatDurationMs(game.currentTurnDurationMs)
-      }
-
-      const diffMs = differenceInMilliseconds(
-        now,
-        game.currentTurnDurationSince
-      )
-
-      return formatDurationMs(game.currentTurnDurationMs + diffMs)
-    },
-    {
-      interval: 60,
-      skip: game.isPaused
-    }
-  )
-
-  // it is either
-  // 1. next player of latest (previous) turn
-  // 2. the game's first player
-  const currentPlayerId =
-    game.turns[0]?.player.nextPlayerId ?? game.players[0]?.id
+  const prevTurn = game.turns[0]
+  const currentPlayerIndex = React.useMemo(() => {
+    return Math.max(
+      0,
+      game.players.findIndex(player => {
+        return player.id === prevTurn?.player.nextPlayerId
+      })
+    )
+  }, [game.players, prevTurn])
 
   return (
-    <div className="flex">
-      {game.players.map(player => (
+    <div className="flex relative pt-2 pb-7">
+      <ViewCurrentPlayerMarker
+        isGamePaused={game.isPaused}
+        currentTurnDurationMs={game.currentTurnDurationMs}
+        currentTurnDurationSince={game.currentTurnDurationSince}
+        playersCount={game.players.length}
+        currentPlayerIndex={currentPlayerIndex}
+      />
+
+      {game.players.map((player, index) => (
         <ViewPlayerTile
           key={player.id}
+          isCurrentPlayer={index === currentPlayerIndex}
           player={player}
-          currentPlayerTurnDuration={
-            currentPlayerId === player.id ? currentTurnDuration : null
-          }
         />
       ))}
     </div>
@@ -192,7 +228,7 @@ const ViewPauseGameButton: React.VFC<{
 
 const ViewCompletedGame: React.VFC<{
   game: Game
-}> = React.memo(({ game }) => {
+}> = React.memo(() => {
   return null
 })
 
