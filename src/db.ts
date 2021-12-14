@@ -45,7 +45,6 @@ const cast_id = <T>(payload: T): T & { id: number } => {
 abstract class GameEntity {
   abstract id: number
   abstract is_paused: boolean
-  abstract total_duration_ms: number
   abstract current_turn_duration_ms: number
   abstract current_turn_duration_since: Date
   abstract start_time: Date
@@ -206,7 +205,6 @@ const complete_turn = async (
 
     db.games.update(game_id, {
       is_paused: false,
-      total_duration_ms: game.total_duration_ms + total_turn_duration_ms,
       current_turn_duration_ms: 0,
       current_turn_duration_since: now,
       end_time: is_complete_game ? now : null
@@ -224,7 +222,6 @@ export const next_turn: (game_id: number, dice: Dice) => Promise<number> =
   complete_turn
 
 export const abort_last_turn = async (game_id: number): Promise<Dice> => {
-  const game = await GameEntity.get_by_id(game_id)
   const last_turn = await TurnEntity.get_last_turn_in_game(game_id)
 
   if (last_turn == null) {
@@ -236,8 +233,6 @@ export const abort_last_turn = async (game_id: number): Promise<Dice> => {
   await db.games.update(game_id, {
     // unpause if paused
     is_paused: false,
-    // subtract the duration of the aborted turn
-    total_duration_ms: game.total_duration_ms - last_turn.duration_ms,
     // restore the current turn duration from last turn
     current_turn_duration_ms: last_turn.duration_ms,
     current_turn_duration_since: new Date(),
@@ -301,7 +296,10 @@ export const get_game = async (game_id: number): Promise<Game> => {
   return {
     ...game,
     players: players.map(PlayerEntity.toPublic),
-    turns: turns.map(TurnEntity.toPublic).reverse()
+    turns: turns.map(TurnEntity.toPublic).reverse(),
+    total_duration_ms: turns
+      .map(turn => turn.duration_ms)
+      .reduce((acc, ms) => acc + ms, 0)
   }
 }
 
@@ -324,7 +322,6 @@ export const start_game = async (
     cast_id({
       // fake player id will be overridden when players are created
       is_paused: false,
-      total_duration_ms: 0,
       current_turn_duration_ms: 0,
       current_turn_duration_since: now,
       start_time: now,
