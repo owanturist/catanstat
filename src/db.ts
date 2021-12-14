@@ -1,7 +1,7 @@
 import Dexie from 'dexie'
 import { differenceInMilliseconds } from 'date-fns'
 
-import { ColorId, DieNumber, DieEvent } from './domain'
+import { ColorID, DieNumber, DieEvent } from './domain'
 
 // P U B L I C   E N T I T I E S
 
@@ -20,7 +20,7 @@ export abstract class Game {
 export abstract class Player {
   abstract id: number
   abstract name: string
-  abstract color: ColorId
+  abstract color: ColorID
   abstract next_player_id: number
 }
 
@@ -305,7 +305,7 @@ export const get_game = async (game_id: number): Promise<Game> => {
 
 export interface PlayerPayload {
   name: string
-  color: ColorId
+  color: ColorID
 }
 
 export const start_game = async (

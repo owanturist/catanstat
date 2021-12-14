@@ -70,3 +70,16 @@ export const useEvery = <T>(
 
   return value
 }
+
+export type ID<
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  TNamespace extends string
+> = TNamespace
+
+export const castID = <TNamespace extends string>(
+  id: string | number
+): ID<TNamespace> => {
+  return String(id) as ID<TNamespace>
+}

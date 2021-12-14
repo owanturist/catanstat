@@ -1,11 +1,15 @@
 import { QueryKey, useQuery, useMutation, useQueryClient } from 'react-query'
 
 import { Color, DieEvent, DieNumber } from './domain'
+import { ID, castID } from './utils'
 import * as DB from './db'
 
-export const useStartGame = (options: {
+export const useStartGame = ({
+  onError,
+  onSuccess
+}: {
   onError(error: Error): void
-  onSuccess(gameId: number): void
+  onSuccess(gameId: GameID): void
 }): {
   isLoading: boolean
   startGame(players: ReadonlyArray<DB.PlayerPayload>): void
@@ -14,7 +18,12 @@ export const useStartGame = (options: {
     number,
     Error,
     ReadonlyArray<DB.PlayerPayload>
-  >(DB.start_game, options)
+  >(DB.start_game, {
+    onError,
+    onSuccess(gameId) {
+      onSuccess(castID(gameId))
+    }
+  })
 
   return {
     isLoading,
@@ -22,8 +31,10 @@ export const useStartGame = (options: {
   }
 }
 
+export type GameID = ID<'@GAME@'>
+
 export interface Game {
-  id: number
+  id: GameID
   isPaused: boolean
   totalDurationMs: number
   currentTurnDurationMs: number
@@ -39,7 +50,7 @@ const decodeGame = (game: DB.Game): Game => {
   const playersMap = new Map(players.map(player => [player.id, player]))
 
   return {
-    id: game.id,
+    id: castID(game.id),
     isPaused: game.is_paused,
     totalDurationMs: game.total_duration_ms,
     currentTurnDurationMs: game.current_turn_duration_ms,
@@ -51,22 +62,25 @@ const decodeGame = (game: DB.Game): Game => {
   }
 }
 
+export type PlayerID = ID<'@PLAYER@'>
 export interface Player {
-  id: number
+  id: PlayerID
   name: string
   color: Color
-  nextPlayerId: number
+  nextPlayerId: PlayerID
 }
 
 const decodePlayer = (player: DB.Player): Player => ({
-  id: player.id,
+  id: castID(player.id),
   name: player.name,
-  color: Color.fromId(player.color),
-  nextPlayerId: player.next_player_id
+  color: Color.fromID(player.color),
+  nextPlayerId: castID(player.next_player_id)
 })
 
+export type TurnID = ID<'@TURN@'>
+
 export interface Turn {
-  id: number
+  id: TurnID
   player: Player
   durationMs: number
   whiteDie: number
@@ -74,19 +88,19 @@ export interface Turn {
   eventDie: string
 }
 
-const decodeTurn = (turn: DB.Turn, players: Map<number, Player>): Turn => ({
-  id: turn.id,
-  player: players.get(turn.player_id)!,
+const decodeTurn = (turn: DB.Turn, players: Map<PlayerID, Player>): Turn => ({
+  id: castID(turn.id),
+  player: players.get(castID(turn.player_id))!,
   durationMs: turn.duration_ms,
   whiteDie: turn.white_die,
   redDie: turn.red_die,
   eventDie: turn.event_die
 })
 
-const gameQueryKey = (gameId: number): QueryKey => ['games', gameId]
+const gameQueryKey = (gameId: GameID): QueryKey => ['games', gameId]
 
 export const useQueryGame = (
-  gameId: number
+  gameId: GameID
 ): {
   isLoading: boolean
   game: null | Game
@@ -94,7 +108,7 @@ export const useQueryGame = (
 } => {
   const { data, isLoading, error } = useQuery<DB.Game, Error>({
     queryKey: gameQueryKey(gameId),
-    queryFn: () => DB.get_game(gameId)
+    queryFn: () => DB.get_game(Number(gameId))
   })
 
   return {
@@ -119,7 +133,7 @@ export interface ApiHookOptions<
 }
 
 export const useCompleteTurn = (
-  gameId: number,
+  gameId: GameID,
   { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
@@ -128,7 +142,7 @@ export const useCompleteTurn = (
   const queryClient = useQueryClient()
   const { mutate, isLoading } = useMutation<number, Error, Dice>(
     ({ whiteDie, redDie, eventDie }) => {
-      return DB.next_turn(gameId, {
+      return DB.next_turn(Number(gameId), {
         white_die: whiteDie,
         red_die: redDie,
         event_die: eventDie
@@ -151,7 +165,7 @@ export const useCompleteTurn = (
 }
 
 export const useAbortLastTurn = (
-  gameId: number,
+  gameId: GameID,
   { onError, onSuccess }: ApiHookOptions<[Dice]>
 ): {
   isLoading: boolean
@@ -159,7 +173,7 @@ export const useAbortLastTurn = (
 } => {
   const queryClient = useQueryClient()
   const { mutate, isLoading } = useMutation<DB.Dice, Error>(
-    () => DB.abort_last_turn(gameId),
+    () => DB.abort_last_turn(Number(gameId)),
     {
       onError,
       async onSuccess(dice) {
@@ -181,7 +195,7 @@ export const useAbortLastTurn = (
 }
 
 export const useCompleteGame = (
-  gameId: number,
+  gameId: GameID,
   { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
@@ -190,7 +204,7 @@ export const useCompleteGame = (
   const queryClient = useQueryClient()
   const { mutate, isLoading } = useMutation<number, Error, Dice>(
     ({ whiteDie, redDie, eventDie }) => {
-      return DB.complete_game(gameId, {
+      return DB.complete_game(Number(gameId), {
         white_die: whiteDie,
         red_die: redDie,
         event_die: eventDie
@@ -213,7 +227,7 @@ export const useCompleteGame = (
 }
 
 export const usePauseGame = (
-  gameId: number,
+  gameId: GameID,
   { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
@@ -221,7 +235,7 @@ export const usePauseGame = (
 } => {
   const queryClient = useQueryClient()
   const { mutate, isLoading } = useMutation<number, Error>(
-    () => DB.pause_game(gameId),
+    () => DB.pause_game(Number(gameId)),
     {
       onError,
       async onSuccess() {
@@ -239,7 +253,7 @@ export const usePauseGame = (
 }
 
 export const useResumeGame = (
-  gameId: number,
+  gameId: GameID,
   { onError, onSuccess }: ApiHookOptions
 ): {
   isLoading: boolean
@@ -247,7 +261,7 @@ export const useResumeGame = (
 } => {
   const queryClient = useQueryClient()
   const { mutate, isLoading } = useMutation<number, Error>(
-    () => DB.resume_game(gameId),
+    () => DB.resume_game(Number(gameId)),
     {
       onError,
       async onSuccess() {

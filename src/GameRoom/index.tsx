@@ -17,10 +17,12 @@ import {
   usePauseGame,
   useResumeGame,
   useCompleteGame,
-  useAbortLastTurn
+  useAbortLastTurn,
+  GameID
 } from '../api'
 import * as Icon from '../Icon'
 import { DieEvent, DieNumber } from '../domain'
+import { castID } from '../utils'
 
 import * as DieRow from './DieRow'
 import { PlayersRow } from './PlayersRow'
@@ -64,7 +66,7 @@ export abstract class State {
 }
 
 const ViewCompleteTurnButton: React.VFC<{
-  gameId: number
+  gameId: GameID
   state: State
 }> = React.memo(({ gameId, state }) => {
   const setIsMutating = useSetInnerState(state.isMutating)
@@ -147,7 +149,7 @@ const ViewSecondaryButton: React.FC<{
 }
 
 const ViewPauseGameButton: React.VFC<{
-  gameId: number
+  gameId: GameID
   isGamePaused: boolean
   isMutating: InnerStore<boolean>
 }> = React.memo(({ gameId, isGamePaused, isMutating }) => {
@@ -230,7 +232,7 @@ const ViewPauseGameButton: React.VFC<{
 })
 
 const ViewCompleteGameButton: React.VFC<{
-  gameId: number
+  gameId: GameID
   state: State
 }> = React.memo(({ gameId, state }) => {
   const setIsMutating = useSetInnerState(state.isMutating)
@@ -266,7 +268,7 @@ const ViewCompleteGameButton: React.VFC<{
 })
 
 const ViewAbortTurnButton: React.VFC<{
-  gameId: number
+  gameId: GameID
   hasTurns: boolean
   state: State
 }> = React.memo(({ gameId, hasTurns, state }) => {
@@ -369,7 +371,7 @@ export const View: React.VFC<{
   store: InnerStore<State>
 }> = React.memo(({ store }) => {
   const params = useParams<'gameId'>()
-  const gameId = Number(params.gameId)
+  const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
