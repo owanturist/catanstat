@@ -44,7 +44,7 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
           className: cx(
             icon.props.className,
             isAnyDieSelected && 'opacity-25',
-            '!h-auto transition-opacity rounded-lg',
+            '!h-auto transition-opacity rounded-lg stroke-[12]',
             'peer-checked:opacity-100 peer-focus-visible:ring-4'
           )
         })}
@@ -99,8 +99,7 @@ export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = React.memo(
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
-            className: cx('text-gray-100 peer-focus-visible:ring-gray-300'),
-            stroke: 'rgb(156, 163, 175)' // text-gray-400
+            className: cx('text-gray-100 stroke-gray-400 ring-gray-300')
           })}
         />
       ))}
@@ -119,8 +118,7 @@ export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
-            className: cx('text-red-500 peer-focus-visible:ring-red-300'),
-            stroke: 'rgb(185, 28, 28)' // text-red-700
+            className: cx('text-red-500 stroke-red-700 ring-red-300')
           })}
         />
       ))}
@@ -128,54 +126,32 @@ export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
   )
 )
 
-const EVENT_DICE: ReadonlyArray<[DieEvent, string, string]> = [
-  [
-    'yellow',
-    cx('text-yellow-400 ring-yellow-300'),
-    'rgb(245, 158, 11)' // text-yellow-500
-  ],
-  [
-    'blue',
-    cx('text-blue-500 ring-blue-300'),
-    'rgb(37, 99, 235)' // text-blue-600
-  ],
-  [
-    'green',
-    cx('text-green-500 ring-green-300'),
-    'rgb(5, 150, 105)' // text-green-600
-  ],
-  [
-    'black',
-    cx('text-gray-600 ring-gray-400'),
-    'rgb(31, 41, 55)' // text-gray-800
-  ]
+const EVENT_DICE: ReadonlyArray<[DieEvent, string]> = [
+  ['yellow', cx('text-yellow-400 ring-yellow-300 stroke-yellow-500')],
+  ['blue', cx('text-blue-500 ring-blue-300 stroke-blue-600')],
+  ['green', cx('text-green-500 ring-green-300 stroke-green-600')],
+  ['black', cx('text-gray-600 ring-gray-400 stroke-gray-800')]
 ]
 
 export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
   ({ name, isDisabled: isReadonly, store }) => (
     <ViewDieRow name={name}>
       {/* placeholder left */}
-      <Icon.DieClear
-        stroke="rgb(243, 244, 246)"
-        className="!h-auto text-gray-100"
-      />
+      <Icon.DieClear className="!h-auto text-gray-100" />
 
-      {EVENT_DICE.map(([value, className, stroke]) => (
+      {EVENT_DICE.map(([value, className]) => (
         <ViewDie
           key={value}
           name={name}
           isDisabled={isReadonly}
           store={store}
           value={value}
-          icon={<Icon.DieClear className={className} stroke={stroke} />}
+          icon={<Icon.DieClear className={className} />}
         />
       ))}
 
       {/* placeholder right */}
-      <Icon.DieClear
-        stroke="rgb(243, 244, 246)"
-        className="!h-auto text-gray-100"
-      />
+      <Icon.DieClear className="!h-auto text-gray-100" />
     </ViewDieRow>
   )
 )
