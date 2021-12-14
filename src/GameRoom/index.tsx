@@ -281,9 +281,10 @@ const ViewPauseGameButton: React.VFC<{
     <div className="block relative z-10">
       <span
         className={cx(
-          'absolute h-14 w-14 box-content rounded-full bg-gray-50/80 transition-[padding] ease-in-out duration-500',
+          'absolute rounded-full bg-gray-50/80',
+          'transition-[width,height] ease-in-out duration-500',
           'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 transform-gpu',
-          isGamePaused ? ' p-[2000px]' : 'p-0'
+          isGamePaused ? 'w-[144vmax] h-[144vmax]' : 'h-0 w-0'
         )}
       />
 
