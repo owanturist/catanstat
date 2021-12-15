@@ -3,11 +3,12 @@ import React from 'react'
 import { differenceInMilliseconds } from 'date-fns'
 
 import { pct, formatDurationMs, useEvery } from '../utils'
-import { Game, Player } from '../api'
+import { Game, Player, PlayerID } from '../api'
 import * as Icon from '../Icon'
 
 const ViewPlayerTile: React.VFC<{
-  isCurrentPlayer: boolean
+  isCurrentPlayer?: boolean
+  isWinner?: boolean
   player: Player
 }> = React.memo(({ isCurrentPlayer, player }) => (
   <div
@@ -73,7 +74,11 @@ const ViewCurrentPlayerCaret: React.VFC<{
   }
 )
 
-export const PlayersRow: React.VFC<{
+const ViewContainer: React.FC = ({ children }) => (
+  <div className="flex relative pt-2 pb-8">{children}</div>
+)
+
+export const OngoingGame: React.VFC<{
   game: Game
 }> = React.memo(({ game }) => {
   const prevTurn = game.turns[0]
@@ -87,7 +92,7 @@ export const PlayersRow: React.VFC<{
   }, [game.players, prevTurn])
 
   return (
-    <div className="flex relative pt-2 pb-8">
+    <ViewContainer>
       <ViewCurrentPlayerCaret
         isGamePaused={game.isPaused}
         currentTurnDurationMs={game.currentTurnDurationMs}
@@ -103,6 +108,21 @@ export const PlayersRow: React.VFC<{
           player={player}
         />
       ))}
-    </div>
+    </ViewContainer>
   )
 })
+
+export const CompletedGame: React.VFC<{
+  winnerId: PlayerID
+  players: ReadonlyArray<Player>
+}> = React.memo(({ winnerId, players }) => (
+  <ViewContainer>
+    {players.map(player => (
+      <ViewPlayerTile
+        key={player.id}
+        isWinner={player.id === String(winnerId)}
+        player={player}
+      />
+    ))}
+  </ViewContainer>
+))

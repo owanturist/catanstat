@@ -63,6 +63,7 @@ const decodeGame = (game: DB.Game): Game => {
 }
 
 export type PlayerID = ID<'@PLAYER@'>
+
 export interface Player {
   id: PlayerID
   name: string
