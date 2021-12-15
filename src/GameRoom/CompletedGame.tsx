@@ -1,16 +1,19 @@
 import React from 'react'
 
-import { PlayerID, Player } from '../api'
+import { Player, GameStatusCompleted } from '../api'
 
 import * as PlayersRow from './PlayersRow'
 
 export const CompletedGame: React.VFC<{
-  winnerId: PlayerID
+  status: GameStatusCompleted
   players: ReadonlyArray<Player>
-}> = React.memo(({ winnerId, players }) => {
+}> = React.memo(({ status, players }) => {
   return (
     <>
-      <PlayersRow.CompletedGame winnerId={winnerId} players={players} />
+      <PlayersRow.CompletedGame
+        winnerId={status.winnerPlayerId}
+        players={players}
+      />
     </>
   )
 })

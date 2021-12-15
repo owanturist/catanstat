@@ -9,13 +9,14 @@ import {
 import { toast } from 'react-hot-toast'
 
 import {
-  Game,
+  GameID,
+  GameStatusOngoing,
+  Player,
   useCompleteTurn,
   usePauseGame,
   useResumeGame,
   useCompleteGame,
-  useAbortLastTurn,
-  GameID
+  useAbortLastTurn
 } from '../api'
 import * as Icon from '../Icon'
 
@@ -261,15 +262,18 @@ const ViewAbortTurnButton: React.VFC<{
 })
 
 export const OngoingGame: React.VFC<{
-  game: Game
+  gameId: GameID
+  status: GameStatusOngoing
+  players: ReadonlyArray<Player>
+  hasTurns: boolean
   store: InnerStore<State>
-}> = React.memo(({ game, store }) => {
+}> = React.memo(({ gameId, status, players, hasTurns, store }) => {
   const state = useGetInnerState(store)
   const isMutating = useGetInnerState(state.isMutating)
 
   return (
     <>
-      <PlayersRow.OngoingGame game={game} />
+      <PlayersRow.OngoingGame status={status} players={players} />
 
       <div className="space-y-2">
         <DieRow.ViewWhite
@@ -293,20 +297,20 @@ export const OngoingGame: React.VFC<{
         <span className="w-14">{/* placeholder */}</span>
 
         <ViewPauseGameButton
-          gameId={game.id}
-          isGamePaused={game.isPaused}
+          gameId={gameId}
+          isGamePaused={status.isPaused}
           isMutating={state.isMutating}
         />
 
-        <ViewCompleteTurnButton gameId={game.id} state={state} />
+        <ViewCompleteTurnButton gameId={gameId} state={state} />
 
         <ViewAbortTurnButton
-          gameId={game.id}
-          hasTurns={game.turns.length > 0}
+          gameId={gameId}
+          hasTurns={hasTurns}
           state={state}
         />
 
-        <ViewCompleteGameButton gameId={game.id} state={state} />
+        <ViewCompleteGameButton gameId={gameId} state={state} />
       </div>
     </>
   )

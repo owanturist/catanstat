@@ -33,14 +33,52 @@ export const useStartGame = ({
 
 export type GameID = ID<'@GAME@'>
 
-export interface Game {
-  id: GameID
+export type GameStatusOngoing = {
+  type: 'ONGOING'
   isPaused: boolean
-  totalDurationMs: number
+  currentPlayerId: PlayerID
   currentTurnDurationMs: number
   currentTurnDurationSince: Date
+}
+export type GameStatusCompleted = {
+  type: 'COMPLETED'
+  winnerPlayerId: PlayerID
+  endTime: Date
+}
+
+export type GameStatus = GameStatusOngoing | GameStatusCompleted
+
+const decodeGameStatus = (
+  game: DB.Game,
+  turns: ReadonlyArray<Turn>
+): GameStatus => {
+  const lastTurn = turns[0]
+
+  if (game.end_time != null && lastTurn != null) {
+    return {
+      type: 'COMPLETED',
+      winnerPlayerId: castID(lastTurn.player.id),
+      endTime: game.end_time
+    }
+  }
+
+  return {
+    type: 'ONGOING',
+    isPaused: game.is_paused,
+    currentPlayerId:
+      lastTurn == null
+        ? castID(game.players[0]!.id)
+        : castID(lastTurn.player.nextPlayerId),
+    currentTurnDurationMs: game.current_turn_duration_ms,
+    currentTurnDurationSince: game.current_turn_duration_since
+  }
+}
+
+export interface Game {
+  id: GameID
+  status: GameStatus
+  totalDurationMs: number
   startTime: Date
-  endTime: null | Date
   players: ReadonlyArray<Player>
   turns: ReadonlyArray<Turn>
 }
@@ -48,17 +86,15 @@ export interface Game {
 const decodeGame = (game: DB.Game): Game => {
   const players = game.players.map(decodePlayer)
   const playersMap = new Map(players.map(player => [player.id, player]))
+  const turns = game.turns.map(turn => decodeTurn(turn, playersMap))
 
   return {
     id: castID(game.id),
-    isPaused: game.is_paused,
+    status: decodeGameStatus(game, turns),
     totalDurationMs: game.total_duration_ms,
-    currentTurnDurationMs: game.current_turn_duration_ms,
-    currentTurnDurationSince: game.current_turn_duration_since,
     startTime: game.start_time,
-    endTime: game.end_time,
     players,
-    turns: game.turns.map(turn => decodeTurn(turn, playersMap))
+    turns
   }
 }
 

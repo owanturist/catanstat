@@ -12,6 +12,19 @@ import { OngoingGame } from './OngoingGame'
 
 export { State } from './domain'
 
+const ViewContainer: React.FC = ({ children }) => (
+  <div className={cx('flex justify-center p-3 h-full overflow-hidden')}>
+    <div
+      className={cx(
+        'space-y-3 w-full sm:max-w-md',
+        'sm:p-3 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
+      )}
+    >
+      {children}
+    </div>
+  </div>
+)
+
 export const View: React.VFC<{
   store: InnerStore<State>
 }> = React.memo(({ store }) => {
@@ -28,22 +41,23 @@ export const View: React.VFC<{
     return <div>Something went wrong while loading the game</div>
   }
 
-  const lastTurn = game.turns[0]
+  if (game.status.type === 'COMPLETED') {
+    return (
+      <ViewContainer>
+        <CompletedGame status={game.status} players={game.players} />
+      </ViewContainer>
+    )
+  }
 
   return (
-    <div className={cx('flex justify-center p-3 h-full overflow-hidden')}>
-      <div
-        className={cx(
-          'space-y-3 w-full sm:max-w-md',
-          'sm:p-3 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
-        )}
-      >
-        {game.endTime != null && lastTurn != null ? (
-          <CompletedGame winnerId={lastTurn.player.id} players={game.players} />
-        ) : (
-          <OngoingGame game={game} store={store} />
-        )}
-      </div>
-    </div>
+    <ViewContainer>
+      <OngoingGame
+        gameId={game.id}
+        status={game.status}
+        players={game.players}
+        hasTurns={game.turns.length > 0}
+        store={store}
+      />
+    </ViewContainer>
   )
 })

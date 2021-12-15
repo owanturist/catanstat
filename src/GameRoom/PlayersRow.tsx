@@ -3,7 +3,7 @@ import React from 'react'
 import { differenceInMilliseconds } from 'date-fns'
 
 import { pct, formatDurationMs, useEvery } from '../utils'
-import { Game, Player, PlayerID } from '../api'
+import { GameStatusOngoing, Player, PlayerID } from '../api'
 import * as Icon from '../Icon'
 
 const ViewPlayerTile: React.VFC<{
@@ -79,29 +79,25 @@ const ViewContainer: React.FC = ({ children }) => (
 )
 
 export const OngoingGame: React.VFC<{
-  game: Game
-}> = React.memo(({ game }) => {
-  const prevTurn = game.turns[0]
-  const currentPlayerIndex = React.useMemo(() => {
-    return Math.max(
-      0,
-      game.players.findIndex(player => {
-        return player.id === prevTurn?.player.nextPlayerId
-      })
-    )
-  }, [game.players, prevTurn])
+  status: GameStatusOngoing
+  players: ReadonlyArray<Player>
+}> = React.memo(({ status, players }) => {
+  const currentPlayerIndex = React.useMemo(
+    () => players.map(player => player.id).indexOf(status.currentPlayerId),
+    [players, status.currentPlayerId]
+  )
 
   return (
     <ViewContainer>
       <ViewCurrentPlayerCaret
-        isGamePaused={game.isPaused}
-        currentTurnDurationMs={game.currentTurnDurationMs}
-        currentTurnDurationSince={game.currentTurnDurationSince}
-        playersCount={game.players.length}
+        isGamePaused={status.isPaused}
+        currentTurnDurationMs={status.currentTurnDurationMs}
+        currentTurnDurationSince={status.currentTurnDurationSince}
+        playersCount={players.length}
         currentPlayerIndex={currentPlayerIndex}
       />
 
-      {game.players.map((player, index) => (
+      {players.map((player, index) => (
         <ViewPlayerTile
           key={player.id}
           isCurrentPlayer={index === currentPlayerIndex}
