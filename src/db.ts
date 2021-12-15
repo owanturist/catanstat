@@ -13,6 +13,7 @@ export abstract class Game {
   abstract current_turn_duration_since: Date
   abstract start_time: Date
   abstract end_time: null | Date
+  abstract board_picture: null | Blob
   abstract players: ReadonlyArray<Player>
   abstract turns: ReadonlyArray<Turn>
 }
@@ -38,7 +39,7 @@ export abstract class Turn extends Dice {
 
 // D B   D E F I N I T I O N
 
-const cast_id = <T>(payload: T): T & { id: number } => {
+const fake_id = <T>(payload: T): T & { id: number } => {
   return payload as T & { id: number }
 }
 
@@ -135,10 +136,25 @@ abstract class TurnEntity extends Turn {
   }
 }
 
+abstract class PictureEntity {
+  abstract id: number
+  abstract game_id: number
+  abstract picture: Blob
+
+  public static async get_by_game_id(
+    game_id: number
+  ): Promise<null | PictureEntity> {
+    const picture = await db.pictures.where('game_id').equals(game_id).first()
+
+    return picture ?? null
+  }
+}
+
 const db = new (class DB extends Dexie {
   public games!: Dexie.Table<GameEntity, number>
   public players!: Dexie.Table<PlayerEntity, number>
   public turns!: Dexie.Table<TurnEntity, number>
+  public pictures!: Dexie.Table<PictureEntity, number>
 
   public constructor() {
     super('Catan')
@@ -146,7 +162,8 @@ const db = new (class DB extends Dexie {
     this.version(1).stores({
       games: '++id',
       players: '++id, game_id, next_player_id',
-      turns: '++id, game_id, player_id'
+      turns: '++id, game_id, player_id',
+      pictures: '++id, game_id'
     })
   }
 })()
@@ -160,7 +177,7 @@ const create_players = async (
 ): Promise<void> => {
   const players_ids = await Promise.all(
     players.map(player => {
-      return db.players.add(cast_id({ ...player, game_id, next_player_id: -1 }))
+      return db.players.add(fake_id({ ...player, game_id, next_player_id: -1 }))
     })
   )
 
@@ -195,7 +212,7 @@ const complete_turn = async (
 
   const [next_turn_id] = await Promise.all([
     db.turns.add(
-      cast_id({
+      fake_id({
         ...dice,
         game_id,
         player_id: current_player_id,
@@ -287,14 +304,16 @@ export const resume_game = async (game_id: number): Promise<number> => {
 }
 
 export const get_game = async (game_id: number): Promise<Game> => {
-  const [game, players, turns] = await Promise.all([
+  const [game, board_picture, players, turns] = await Promise.all([
     GameEntity.get_by_id(game_id),
+    PictureEntity.get_by_game_id(game_id),
     db.players.where('game_id').equals(game_id).toArray(),
     db.turns.where('game_id').equals(game_id).toArray()
   ])
 
   return {
     ...game,
+    board_picture: board_picture?.picture ?? null,
     players: players.map(PlayerEntity.toPublic),
     turns: turns.map(TurnEntity.toPublic).reverse(),
     total_duration_ms: turns
@@ -319,7 +338,7 @@ export const start_game = async (
 
   const now = new Date()
   const game_id = await db.games.add(
-    cast_id({
+    fake_id({
       // fake player id will be overridden when players are created
       is_paused: false,
       current_turn_duration_ms: 0,
@@ -330,6 +349,32 @@ export const start_game = async (
   )
 
   await create_players(game_id, players)
+
+  return game_id
+}
+
+export const upload_board_picture = async (
+  game_id: number,
+  picture: Blob
+): Promise<number> => {
+  const picture_id = await db.pictures.add(fake_id({ game_id, picture }))
+
+  await db.games.update(game_id, { board_picture_id: picture_id })
+
+  return picture_id
+}
+
+export const delete_board_picture = async (
+  game_id: number
+): Promise<number> => {
+  const picture = await PictureEntity.get_by_game_id(game_id)
+
+  if (picture != null) {
+    await Promise.all([
+      db.pictures.delete(picture.id),
+      db.games.update(game_id, { board_picture_id: null })
+    ])
+  }
 
   return game_id
 }

@@ -33,14 +33,15 @@ export const useStartGame = ({
 
 export type GameID = ID<'@GAME@'>
 
-export type GameStatusOngoing = {
+export interface GameStatusOngoing {
   type: 'ONGOING'
   isPaused: boolean
   currentPlayerId: PlayerID
   currentTurnDurationMs: number
   currentTurnDurationSince: Date
 }
-export type GameStatusCompleted = {
+
+export interface GameStatusCompleted {
   type: 'COMPLETED'
   winnerPlayerId: PlayerID
   endTime: Date
