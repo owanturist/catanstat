@@ -13,7 +13,7 @@ export abstract class Game {
   abstract current_turn_duration_since: Date
   abstract start_time: Date
   abstract end_time: null | Date
-  abstract board_picture: null | Blob
+  abstract board_picture: null | File
   abstract players: ReadonlyArray<Player>
   abstract turns: ReadonlyArray<Turn>
 }
@@ -139,7 +139,7 @@ abstract class TurnEntity extends Turn {
 abstract class PictureEntity {
   abstract id: number
   abstract game_id: number
-  abstract picture: Blob
+  abstract picture: File
 
   public static async get_by_game_id(
     game_id: number
@@ -303,13 +303,17 @@ export const resume_game = async (game_id: number): Promise<number> => {
   return game_id
 }
 
-export const get_game = async (game_id: number): Promise<Game> => {
+export const get_game = async (game_id: number): Promise<null | Game> => {
   const [game, board_picture, players, turns] = await Promise.all([
-    GameEntity.get_by_id(game_id),
+    db.games.get(game_id),
     PictureEntity.get_by_game_id(game_id),
     db.players.where('game_id').equals(game_id).toArray(),
     db.turns.where('game_id').equals(game_id).toArray()
   ])
+
+  if (game == null) {
+    return null
+  }
 
   return {
     ...game,
@@ -355,7 +359,7 @@ export const start_game = async (
 
 export const upload_board_picture = async (
   game_id: number,
-  picture: Blob
+  picture: File
 ): Promise<number> => {
   const picture_id = await db.pictures.add(fake_id({ game_id, picture }))
 

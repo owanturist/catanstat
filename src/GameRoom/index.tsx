@@ -37,14 +37,22 @@ export const View: React.VFC<{
     return null
   }
 
-  if (error != null || game == null) {
+  if (error != null) {
     return <div>Something went wrong while loading the game</div>
+  }
+
+  if (game == null) {
+    return <div>Game not found</div>
   }
 
   if (game.status.type === 'COMPLETED') {
     return (
       <ViewContainer>
-        <CompletedGame status={game.status} players={game.players} />
+        <CompletedGame
+          gameId={gameId}
+          status={game.status}
+          players={game.players}
+        />
       </ViewContainer>
     )
   }

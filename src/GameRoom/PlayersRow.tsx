@@ -10,14 +10,25 @@ const ViewPlayerTile: React.VFC<{
   isCurrentPlayer?: boolean
   isWinner?: boolean
   player: Player
-}> = React.memo(({ isCurrentPlayer, player }) => (
+}> = React.memo(({ isCurrentPlayer, isWinner, player }) => (
   <div
     className={cx(
-      'flex-1 flex justify-center h-6 transition-[font-size] duration-300',
+      'relative flex-1 flex justify-center h-6 transition-[font-size] duration-300',
       isCurrentPlayer ? 'text-3xl' : 'text-5xl'
     )}
   >
-    <Icon.User style={{ color: player.color.hex }} />
+    <Icon.User
+      className={cx(isWinner === false && 'opacity-40')}
+      style={{ color: player.color.hex }}
+    />
+    {isWinner && (
+      <Icon.Trophy
+        className={cx(
+          'absolute bottom-0 ring-0 text-yellow-300 stroke-yellow-500 stroke-[20] text-3xl',
+          'translate-x-4 translate-y-5 rotate-[20deg]'
+        )}
+      />
+    )}
   </div>
 ))
 

@@ -45,6 +45,7 @@ export interface GameStatusCompleted {
   type: 'COMPLETED'
   winnerPlayerId: PlayerID
   endTime: Date
+  boardPicture: null | File
 }
 
 export type GameStatus = GameStatusOngoing | GameStatusCompleted
@@ -59,7 +60,8 @@ const decodeGameStatus = (
     return {
       type: 'COMPLETED',
       winnerPlayerId: castID(lastTurn.player.id),
-      endTime: game.end_time
+      endTime: game.end_time,
+      boardPicture: game.board_picture
     }
   }
 
@@ -144,7 +146,7 @@ export const useQueryGame = (
   game: null | Game
   error: null | Error
 } => {
-  const { data, isLoading, error } = useQuery<DB.Game, Error>({
+  const { data, isLoading, error } = useQuery<null | DB.Game, Error>({
     queryKey: gameQueryKey(gameId),
     queryFn: () => DB.get_game(Number(gameId))
   })
@@ -313,5 +315,57 @@ export const useResumeGame = (
   return {
     isLoading,
     resumeGame: mutate
+  }
+}
+
+export const useUploadBoardPicture = (
+  gameId: GameID,
+  { onError, onSuccess }: ApiHookOptions
+): {
+  isLoading: boolean
+  uploadBoardPicture(file: File): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<number, Error, File>(
+    file => DB.upload_board_picture(Number(gameId), file),
+    {
+      onError,
+      async onSuccess() {
+        await queryClient.invalidateQueries(gameQueryKey(gameId))
+
+        onSuccess?.()
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    uploadBoardPicture: mutate
+  }
+}
+
+export const useDeleteBoardPicture = (
+  gameId: GameID,
+  { onError, onSuccess }: ApiHookOptions
+): {
+  isLoading: boolean
+  deleteBoardPicture(): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<number, Error>(
+    () => DB.delete_board_picture(Number(gameId)),
+    {
+      onError,
+      async onSuccess() {
+        await queryClient.invalidateQueries(gameQueryKey(gameId))
+
+        onSuccess?.()
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    deleteBoardPicture: mutate
   }
 }
