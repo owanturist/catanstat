@@ -52,6 +52,7 @@ export const View: React.VFC<{
           gameId={gameId}
           status={game.status}
           players={game.players}
+          store={store}
         />
       </ViewContainer>
     )

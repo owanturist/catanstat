@@ -1,17 +1,45 @@
 import React from 'react'
 import cx from 'classnames'
 import { toast } from 'react-hot-toast'
+import { InnerStore, useGetInnerState } from 'react-inner-store'
 
 import {
-  Player,
-  GameStatusCompleted,
-  useUploadBoardPicture,
   GameID,
-  useDeleteBoardPicture
+  GameStatusCompleted,
+  Player,
+  useAbortLastTurn,
+  useDeleteBoardPicture,
+  useUploadBoardPicture
 } from '../api'
 import * as Icon from '../Icon'
 
 import * as PlayersRow from './PlayersRow'
+import { State } from './domain'
+
+const ViewContinueButton: React.FC<{
+  gameId: GameID
+  state: State
+}> = ({ gameId, state, children }) => {
+  const { abortLastTurn } = useAbortLastTurn(gameId, {
+    onError() {
+      toast.error('Failed to abort last turn')
+    },
+    onSuccess(dice) {
+      State.reset(state, dice)
+      toast.success('Aborted last turn!')
+    }
+  })
+
+  return (
+    <button
+      type="button"
+      className="text-blue-500 outline-none underline-offset-1 focus-visible:underline"
+      onClick={abortLastTurn}
+    >
+      {children}
+    </button>
+  )
+}
 
 const ViewBoardPicture: React.VFC<{
   gameId: GameID
@@ -95,13 +123,35 @@ export const CompletedGame: React.VFC<{
   gameId: GameID
   status: GameStatusCompleted
   players: ReadonlyArray<Player>
-}> = React.memo(({ gameId, status, players }) => {
+  store: InnerStore<State>
+}> = React.memo(({ gameId, status, players, store }) => {
+  const state = useGetInnerState(store)
+  const winnerPlayer = players.find(
+    player => player.id === String(status.winnerPlayerId)
+  )
+
   return (
     <>
       <PlayersRow.CompletedGame
         winnerId={status.winnerPlayerId}
         players={players}
       />
+
+      {winnerPlayer != null && (
+        <div className="text-center text-lg">
+          <p>
+            <strong>{winnerPlayer.name}</strong> is the winner 🎉
+          </p>
+
+          <p>
+            Is it a mistake?{' '}
+            <ViewContinueButton gameId={gameId} state={state}>
+              Continue the game
+            </ViewContinueButton>
+            .
+          </p>
+        </div>
+      )}
 
       {status.boardPicture ? (
         <ViewBoardPicture gameId={gameId} picture={status.boardPicture} />

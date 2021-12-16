@@ -1,6 +1,7 @@
-import cx from 'classnames'
 import React from 'react'
+import cx from 'classnames'
 import { differenceInMilliseconds } from 'date-fns'
+import Tooltip from '@tippyjs/react'
 
 import { pct, formatDurationMs, useEvery } from '../utils'
 import { GameStatusOngoing, Player, PlayerID } from '../api'
@@ -10,27 +11,33 @@ const ViewPlayerTile: React.VFC<{
   isCurrentPlayer?: boolean
   isWinner?: boolean
   player: Player
-}> = React.memo(({ isCurrentPlayer, isWinner, player }) => (
-  <div
-    className={cx(
-      'relative flex-1 flex justify-center h-6 transition-[font-size] duration-300',
-      isCurrentPlayer ? 'text-3xl' : 'text-5xl'
-    )}
-  >
-    <Icon.User
-      className={cx(isWinner === false && 'opacity-40')}
-      style={{ color: player.color.hex }}
-    />
-    {isWinner && (
-      <Icon.Trophy
-        className={cx(
-          'absolute bottom-0 ring-0 text-yellow-300 stroke-yellow-500 stroke-[20] text-3xl',
-          'translate-x-4 translate-y-5 rotate-[20deg]'
-        )}
-      />
-    )}
-  </div>
-))
+}> = React.memo(({ isCurrentPlayer, isWinner, player }) => {
+  return (
+    <div className="relative flex-1 flex justify-center">
+      <Tooltip placement="bottom" offset={[0, 0]} content={player.name}>
+        <div
+          className={cx(
+            'py-2 transition-[font-size] duration-300',
+            isWinner === false && 'opacity-40',
+            isCurrentPlayer ? 'text-3xl' : 'text-5xl'
+          )}
+          style={{ color: player.color.hex }}
+        >
+          <Icon.User />
+        </div>
+      </Tooltip>
+
+      {isWinner && (
+        <Icon.Trophy
+          className={cx(
+            'absolute bottom-0 ring-0 text-yellow-300 stroke-yellow-500 stroke-[20] text-3xl pointer-events-none',
+            'translate-x-4 -translate-y-2 rotate-[20deg]'
+          )}
+        />
+      )}
+    </div>
+  )
+})
 
 const ViewCurrentPlayerCaret: React.VFC<{
   isGamePaused: boolean
@@ -86,7 +93,7 @@ const ViewCurrentPlayerCaret: React.VFC<{
 )
 
 const ViewContainer: React.FC = ({ children }) => (
-  <div className="flex relative pt-2 pb-8">{children}</div>
+  <div className="flex relative">{children}</div>
 )
 
 export const OngoingGame: React.VFC<{
