@@ -13,10 +13,10 @@ import { OngoingGame } from './OngoingGame'
 export { State } from './domain'
 
 const ViewContainer: React.FC = ({ children }) => (
-  <div className={cx('flex justify-center p-3 h-full overflow-hidden')}>
+  <div className="flex justify-center p-3 h-full overflow-hidden">
     <div
       className={cx(
-        'space-y-3 w-full sm:max-w-md',
+        'space-y-3 w-full sm:max-w-md overflow-y-auto overflow-x-hidden',
         'sm:p-3 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
       )}
     >
