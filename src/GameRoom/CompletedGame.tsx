@@ -138,19 +138,12 @@ export const CompletedGame: React.VFC<{
       />
 
       {winnerPlayer != null && (
-        <div className="text-center text-lg">
-          <p>
-            <strong>{winnerPlayer.name}</strong> is the winner 🎉
-          </p>
-
-          <p>
-            Is it a mistake?{' '}
-            <ViewContinueButton gameId={gameId} state={state}>
-              Continue the game
-            </ViewContinueButton>
-            .
-          </p>
-        </div>
+        <p className="text-center text-md">
+          The game is still going?{' '}
+          <ViewContinueButton gameId={gameId} state={state}>
+            Click to continue!
+          </ViewContinueButton>
+        </p>
       )}
 
       {status.boardPicture ? (

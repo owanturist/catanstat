@@ -293,7 +293,7 @@ export const OngoingGame: React.VFC<{
         />
       </div>
 
-      <div className="flex justify-center items-center gap-4">
+      <div className="flex justify-center items-center gap-3 sm:gap-4">
         <span className="w-14">{/* placeholder */}</span>
 
         <ViewPauseGameButton
