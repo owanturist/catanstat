@@ -1,12 +1,19 @@
 import React from 'react'
+import cx from 'classnames'
 import { Outlet, Link } from 'react-router-dom'
 
 export const Shell = React.memo(() => {
   return (
     <div className="h-full flex flex-col">
       <header className="bg-gray-100 flex justify-center">
-        <div className="p-3 w-full sm:max-w-md sm:px-0">
-          <h1 className="font-semibold text-xl tracking-wider text-gray-600 sm:text-2xl">
+        <div className={cx('p-3 w-full', 'xs:max-w-md xs:px-0')}>
+          <h1
+            className={cx(
+              'font-semibold tracking-wider text-gray-600',
+              'xs:text-xl',
+              'sm:text-2xl'
+            )}
+          >
             <Link to="/" className="outline-none focus-visible:underline">
               CATAN statistics
             </Link>

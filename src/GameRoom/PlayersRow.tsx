@@ -19,7 +19,7 @@ const ViewPlayerTile: React.VFC<{
           className={cx(
             'py-2 transition-[font-size] duration-300',
             isWinner === false && 'opacity-40',
-            isCurrentPlayer ? 'text-3xl' : 'text-5xl'
+            isCurrentPlayer ? 'text-2xl 2xs:text-3xl' : 'text-4xl 2xs:text-5xl'
           )}
           style={{ color: player.color.hex }}
         >
@@ -30,8 +30,9 @@ const ViewPlayerTile: React.VFC<{
       {isWinner && (
         <Icon.Trophy
           className={cx(
-            'absolute bottom-0 ring-0 text-yellow-300 stroke-yellow-500 stroke-[20] text-3xl pointer-events-none',
-            'translate-x-4 -translate-y-2 rotate-[20deg]'
+            'absolute bottom-0 ring-0 text-yellow-300 stroke-yellow-500 stroke-[20] text-2xl pointer-events-none',
+            'translate-x-3 -translate-y-2 rotate-[20deg]',
+            '2xs:text-3xl 2xs:translate-x-4'
           )}
         />
       )}
@@ -83,7 +84,12 @@ const ViewCurrentPlayerCaret: React.VFC<{
             width: pct(fraction)
           }}
         >
-          <span className="p-0.5 font-mono text-xs text-center text-gray-500 bg-gray-200">
+          <span
+            className={cx(
+              'p-px font-mono text-2xs text-center text-gray-500 bg-gray-200',
+              '2xs:p-0.5 2xs:text-xs'
+            )}
+          >
             {currentTurnDuration}
           </span>
         </div>

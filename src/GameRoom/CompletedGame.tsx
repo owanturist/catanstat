@@ -138,13 +138,15 @@ export const CompletedGame: React.VFC<{
       />
 
       {winnerPlayer != null && (
-        <p className="text-center text-md">
+        <p className="text-center text-xs 2xs:text-base">
           The game is still going?{' '}
           <ViewContinueButton gameId={gameId} state={state}>
             Click to continue!
           </ViewContinueButton>
         </p>
       )}
+
+      <div className="mt-2" />
 
       {status.boardPicture ? (
         <ViewBoardPicture gameId={gameId} picture={status.boardPicture} />

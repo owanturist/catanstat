@@ -158,14 +158,15 @@ export const View: React.VFC<{
     >
       <div
         className={cx(
-          'h-full flex flex-col text-gray-700 justify-center items-center',
-          'sm:py-4'
+          'h-full flex flex-col items-center text-gray-700',
+          'sm:py-3 sm:justify-center'
         )}
       >
         <form
           className={cx(
-            'flex flex-col flex-1 max-h-full p-3 w-full bg-white space-y-3',
-            'sm:grow-0 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
+            'flex flex-col flex-1 max-h-full p-2 w-full bg-white',
+            'xs:p-3',
+            'sm:grow-0 sm:space-y-3 sm:max-w-md sm:rounded-md sm:shadow-lg sm:border sm:border-gray-50'
           )}
           onSubmit={event => {
             event.preventDefault()
@@ -192,7 +193,11 @@ export const View: React.VFC<{
             {provided => (
               <div
                 ref={provided.innerRef}
-                className="flex-1 -m-1 min-h-0 overflow-y-auto"
+                className={cx(
+                  'flex-1 overflow-y-auto',
+                  '-mr-3 pr-2', // position scrollbar to the containers' edge
+                  '-m-1' // compensate items' padding to be align with divider
+                )}
               >
                 {state.players.map((player, index) => (
                   <ViewPlayer

@@ -47,7 +47,8 @@ const ViewCompleteTurnButton: React.VFC<{
     <button
       type="button"
       className={cx(
-        'block w-20 h-20 border-2 rounded-full transition text-white text-5xl outline-none leading-none',
+        'block w-16 h-16 border-2 rounded-full transition text-white text-4xl outline-none leading-none',
+        '2xs:h-20 2xs:w-20 2xs:text-5xl',
         'focus-visible:ring-4',
         {
           'bg-gray-400 ring-gray-300 border-gray-500': eventDie == null,
@@ -93,10 +94,11 @@ const ViewSecondaryButton: React.FC<{
     tagName,
     {
       className: cx(
-        'flex justify-center items-center h-14 w-14 rounded-full border-2 text-2xl',
+        'flex justify-center items-center h-12 w-12 rounded-full border-2 text-xl',
         'transition-colors duration-300',
         'outline-none focus-visible:ring-4',
         'ring-gray-300 border-gray-400 text-gray-400 bg-white',
+        '2xs:h-14 2xs:w-14 2xs:text-2xl',
         className
       ),
       onClick,
@@ -140,7 +142,7 @@ const ViewPauseGameButton: React.VFC<{
           'absolute rounded-full bg-gray-50/80',
           'transition-[width,height] ease-in-out duration-500',
           'left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2 transform-gpu',
-          isGamePaused ? 'w-[144vmax] h-[144vmax]' : 'h-0 w-0'
+          isGamePaused ? 'w-[200vmax] h-[200vmax]' : 'h-0 w-0'
         )}
       />
 
@@ -275,7 +277,7 @@ export const OngoingGame: React.VFC<{
     <>
       <PlayersRow.OngoingGame status={status} players={players} />
 
-      <div className="space-y-2">
+      <div className={cx('mt-1 space-y-1', 'xs:mt-2 xs:space-y-2')}>
         <DieRow.ViewWhite
           name="white-dice"
           isDisabled={isMutating}
@@ -293,7 +295,13 @@ export const OngoingGame: React.VFC<{
         />
       </div>
 
-      <div className="flex justify-center items-center gap-3 sm:gap-4">
+      <div
+        className={cx(
+          'flex justify-center items-center gap-2 mt-2',
+          'xs:gap-3 xs:mt-3',
+          'sm:gap-4 sm:mt-4'
+        )}
+      >
         <span className="w-14">{/* placeholder */}</span>
 
         <ViewPauseGameButton
