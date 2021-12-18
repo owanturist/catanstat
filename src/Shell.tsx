@@ -2,20 +2,25 @@ import React from 'react'
 import cx from 'classnames'
 import { Outlet, Link } from 'react-router-dom'
 
-export const Shell = React.memo(() => {
+import * as Icon from './Icon'
+
+export const Shell: React.VFC = React.memo(() => {
   return (
     <div className="h-full flex flex-col">
       <header className="bg-gray-100 flex justify-center">
         <div className={cx('p-3 w-full', 'xs:max-w-md xs:px-0')}>
           <h1
             className={cx(
-              'font-semibold tracking-wider text-gray-600',
+              'flex font-semibold tracking-wider text-gray-600',
               'xs:text-xl',
               'sm:text-2xl'
             )}
           >
-            <Link to="/" className="outline-none focus-visible:underline">
-              CATAN statistics
+            <Link
+              to="/"
+              className="flex gap-2 items-center outline-none focus-visible:underline"
+            >
+              <Icon.Logo className="text-2xl xs:text-3xl sm:text-4xl" /> CATAN
             </Link>
           </h1>
         </div>
