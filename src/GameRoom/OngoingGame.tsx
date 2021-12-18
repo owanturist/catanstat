@@ -302,7 +302,7 @@ export const OngoingGame: React.VFC<{
           'sm:gap-4 sm:mt-4'
         )}
       >
-        <span className="w-14">{/* placeholder */}</span>
+        <span className="w-12 2xs:w-14">{/* placeholder */}</span>
 
         <ViewPauseGameButton
           gameId={gameId}

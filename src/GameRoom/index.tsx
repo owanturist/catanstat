@@ -1,13 +1,13 @@
 import cx from 'classnames'
 import React from 'react'
-import { useParams } from 'react-router-dom'
 import { InnerStore } from 'react-inner-store'
+import { useParams } from 'react-router-dom'
 
 import { GameID, useQueryGame } from '../api'
 import { castID } from '../utils'
 
-import { State } from './domain'
 import { CompletedGame } from './CompletedGame'
+import { State } from './domain'
 import { OngoingGame } from './OngoingGame'
 
 export { State } from './domain'

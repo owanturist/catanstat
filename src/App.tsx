@@ -33,44 +33,42 @@ const LazyComponent = <TProps,>({
   return React.createElement(component, propsRef.current)
 }
 
-export const App: React.VFC = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Routes>
-        <Route path="/" element={<Shell />}>
-          <Route index element={<div>TODO home screen</div>} />
+export const App: React.VFC = () => (
+  <QueryClientProvider client={queryClient}>
+    <Routes>
+      <Route element={<Shell />}>
+        <Route index element={<div>TODO home screen</div>} />
 
-          <Route
-            path="start"
-            element={
-              <LazyComponent
-                init={() => ({
-                  store: InnerStore.of(StartGame.State.init())
-                })}
-                component={StartGame.View}
-              />
-            }
-          />
-
-          <Route path="game">
-            <Route
-              path=":gameId"
-              element={
-                <LazyComponent
-                  init={() => ({
-                    store: InnerStore.of(GameRoom.State.init())
-                  })}
-                  component={GameRoom.View}
-                />
-              }
+        <Route
+          path="start"
+          element={
+            <LazyComponent
+              init={() => ({
+                store: InnerStore.of(StartGame.State.init())
+              })}
+              component={StartGame.View}
             />
-          </Route>
+          }
+        />
 
-          <Route path="*" element={<div>TODO 404</div>} />
-        </Route>
-      </Routes>
+        <Route path="*" element={<div>TODO 404</div>} />
+      </Route>
 
-      <Toaster position="top-right" />
-    </QueryClientProvider>
-  )
-}
+      <Route path="game" element={<Shell dropdown="hi" />}>
+        <Route
+          path=":gameId"
+          element={
+            <LazyComponent
+              init={() => ({
+                store: InnerStore.of(GameRoom.State.init())
+              })}
+              component={GameRoom.View}
+            />
+          }
+        />
+      </Route>
+    </Routes>
+
+    <Toaster position="top-right" />
+  </QueryClientProvider>
+)
