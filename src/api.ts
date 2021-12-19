@@ -36,7 +36,7 @@ export type GameID = ID<'@GAME@'>
 export interface GameStatusOngoing {
   type: 'ONGOING'
   isPaused: boolean
-  currentPlayerId: PlayerID
+  currentPlayer: Player
   currentTurnDurationMs: number
   currentTurnDurationSince: Date
 }
@@ -52,6 +52,7 @@ export type GameStatus = GameStatusOngoing | GameStatusCompleted
 
 const decodeGameStatus = (
   game: DB.Game,
+  players: ReadonlyArray<Player>,
   turns: ReadonlyArray<Turn>
 ): GameStatus => {
   const lastTurn = turns[0]
@@ -65,13 +66,17 @@ const decodeGameStatus = (
     }
   }
 
+  const currentPlayer =
+    lastTurn == null
+      ? players[0]
+      : players.find(
+          player => player.id === String(lastTurn.player.nextPlayerId)
+        )
+
   return {
     type: 'ONGOING',
     isPaused: game.is_paused,
-    currentPlayerId:
-      lastTurn == null
-        ? castID(game.players[0]!.id)
-        : castID(lastTurn.player.nextPlayerId),
+    currentPlayer: currentPlayer!,
     currentTurnDurationMs: game.current_turn_duration_ms,
     currentTurnDurationSince: game.current_turn_duration_since
   }
@@ -93,7 +98,7 @@ const decodeGame = (game: DB.Game): Game => {
 
   return {
     id: castID(game.id),
-    status: decodeGameStatus(game, turns),
+    status: decodeGameStatus(game, players, turns),
     totalDurationMs: game.total_duration_ms,
     startTime: game.start_time,
     players,
@@ -123,18 +128,18 @@ export interface Turn {
   id: TurnID
   player: Player
   durationMs: number
-  whiteDie: number
-  redDie: number
-  eventDie: string
+  dice: Dice
 }
 
 const decodeTurn = (turn: DB.Turn, players: Map<PlayerID, Player>): Turn => ({
   id: castID(turn.id),
   player: players.get(castID(turn.player_id))!,
   durationMs: turn.duration_ms,
-  whiteDie: turn.white_die,
-  redDie: turn.red_die,
-  eventDie: turn.event_die
+  dice: {
+    whiteDie: turn.white_die,
+    redDie: turn.red_die,
+    eventDie: turn.event_die
+  }
 })
 
 const gameQueryKey = (gameId: GameID): QueryKey => ['games', gameId]

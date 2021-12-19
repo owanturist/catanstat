@@ -7,6 +7,7 @@ import { InnerStore } from 'react-inner-store'
 import { Shell } from './Shell'
 import * as StartGame from './StartGame'
 import * as GameRoom from './GameRoom'
+import { GameHistory } from './GameHistory'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,7 +66,7 @@ export const App: React.VFC = () => (
           />
 
           <Route path="stat" element={<div>TODO game stat</div>} />
-          <Route path="history" element={<div>TODO game history</div>} />
+          <Route path="history" element={<GameHistory />} />
         </Route>
       </Route>
 

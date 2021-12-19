@@ -107,8 +107,8 @@ export const OngoingGame: React.VFC<{
   players: ReadonlyArray<Player>
 }> = React.memo(({ status, players }) => {
   const currentPlayerIndex = React.useMemo(
-    () => players.map(player => player.id).indexOf(status.currentPlayerId),
-    [players, status.currentPlayerId]
+    () => players.map(player => player.id).indexOf(status.currentPlayer.id),
+    [players, status.currentPlayer.id]
   )
 
   return (

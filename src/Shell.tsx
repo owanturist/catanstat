@@ -47,8 +47,9 @@ const ViewHeaderDropdown: React.VFC = React.memo(() => {
       <Menu.Button
         className={cx(
           'flex justify-center items-center w-6 h-6',
-          'text-xs text-gray-600 bg-gray-200 border-gray-300 border ring-gray-300/50 rounded outline-none transition-colors',
+          'text-xs text-gray-600 border border-gray-300/0 ring-gray-300/50 rounded outline-none transition-colors',
           'focus-visible:ring-2',
+          'hover:border-gray-300/100',
           '2xs:w-8 2xs:h-8 2xs:text-base',
           'xs:w-10 xs:h-10 xs:text-lg'
         )}
