@@ -132,7 +132,7 @@ export const Shell: React.VFC = React.memo(() => (
           </Link>
         </h1>
 
-        <div className="flex-1" />
+        <div className="flex-1 h-6 2xs:h-8 xs:h-10" />
 
         <div className="flex gap-1">
           <ViewBackToGameButton />
