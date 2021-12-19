@@ -15,10 +15,14 @@ const ViewContainer: React.FC = ({ children }) => (
 )
 
 const ViewDie: React.VFC<{
+  className?: string
   die?: React.ReactElement
-}> = ({ die = <DiePlaceholderIcon className="animate-pulse" /> }) => {
+}> = ({
+  className,
+  die = <DiePlaceholderIcon className="animate-bounce relative top-1" />
+}) => {
   return React.cloneElement(die, {
-    className: cx(die.props.className, 'stroke-[24]')
+    className: cx(die.props.className, className, 'stroke-[24]')
   })
 }
 
@@ -29,8 +33,14 @@ const ViewDice: React.VFC<{
     <ViewDie
       die={dice && <DieNumberIcon color="white" side={dice.whiteDie} />}
     />
-    <ViewDie die={dice && <DieNumberIcon color="red" side={dice.redDie} />} />
-    <ViewDie die={dice && <DieEventIcon side={dice.eventDie} />} />
+    <ViewDie
+      className="[animation-delay:0.25s]"
+      die={dice && <DieNumberIcon color="red" side={dice.redDie} />}
+    />
+    <ViewDie
+      className="[animation-delay:0.5s]"
+      die={dice && <DieEventIcon side={dice.eventDie} />}
+    />
   </div>
 ))
 
