@@ -9,19 +9,24 @@ import * as Icon from './Icon'
 
 const ViewDropdownItem: React.FC<{
   to: string
-  icon: React.ReactNode
+  icon: React.ReactElement
 }> = ({ to, icon, children }) => (
   <Menu.Item>
     {({ active }) => (
       <NavLink
         to={to}
-        className={cx(
-          'flex gap-2 items-center w-full px-2 py-2 rounded-md text-sm transition-colors',
-          active && 'bg-gray-100',
-          '2xs:text-base'
-        )}
+        className={navProps =>
+          cx(
+            'flex gap-2 items-center w-full px-2 py-2 rounded-md text-sm transition-colors',
+            active && 'bg-gray-100',
+            navProps.isActive && 'text-blue-500',
+            '2xs:text-base'
+          )
+        }
       >
-        {icon}
+        {React.cloneElement(icon, {
+          className: cx('w-4 2xs:w-5')
+        })}
         <span>{children}</span>
       </NavLink>
     )}
