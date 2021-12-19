@@ -51,22 +51,25 @@ export const App: React.VFC = () => (
           }
         />
 
-        <Route path="*" element={<div>TODO 404</div>} />
+        <Route path="game/:gameId">
+          <Route
+            index
+            element={
+              <LazyComponent
+                init={() => ({
+                  store: InnerStore.of(GameRoom.State.init())
+                })}
+                component={GameRoom.View}
+              />
+            }
+          />
+
+          <Route path="stat" element={<div>TODO game stat</div>} />
+          <Route path="history" element={<div>TODO game history</div>} />
+        </Route>
       </Route>
 
-      <Route path="game" element={<Shell dropdown="hi" />}>
-        <Route
-          path=":gameId"
-          element={
-            <LazyComponent
-              init={() => ({
-                store: InnerStore.of(GameRoom.State.init())
-              })}
-              component={GameRoom.View}
-            />
-          }
-        />
-      </Route>
+      <Route path="*" element={<div>TODO 404</div>} />
     </Routes>
 
     <Toaster position="top-right" />

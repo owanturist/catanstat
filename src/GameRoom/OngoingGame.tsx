@@ -51,12 +51,13 @@ const ViewCompleteTurnButton: React.VFC<{
         '2xs:h-20 2xs:w-20 2xs:text-5xl',
         'focus-visible:ring-4',
         {
-          'bg-gray-400 ring-gray-300 border-gray-500': eventDie == null,
-          'bg-yellow-400 ring-yellow-300 border-yellow-500':
+          'bg-gray-400 ring-gray-400/50 border-gray-500': eventDie == null,
+          'bg-yellow-400 ring-yellow-400/50 border-yellow-500':
             eventDie === 'yellow',
-          'bg-blue-500 ring-blue-300 border-blue-600': eventDie === 'blue',
-          'bg-green-500 ring-green-300 border-green-600': eventDie === 'green',
-          'bg-gray-600 ring-gray-400 border-gray-800': eventDie === 'black'
+          'bg-blue-500 ring-blue-500/50 border-blue-600': eventDie === 'blue',
+          'bg-green-500 ring-green-500/50 border-green-600':
+            eventDie === 'green',
+          'bg-gray-600 ring-gray-600/50 border-gray-800': eventDie === 'black'
         }
       )}
       onClick={() => {
@@ -97,7 +98,7 @@ const ViewSecondaryButton: React.FC<{
         'flex justify-center items-center h-12 w-12 rounded-full border-2 text-xl',
         'transition-colors duration-300',
         'outline-none focus-visible:ring-4',
-        'ring-gray-300 border-gray-400 text-gray-400 bg-white',
+        'ring-gray-400/50 border-gray-400 text-gray-400 bg-white',
         '2xs:h-14 2xs:w-14 2xs:text-2xl',
         className
       ),
@@ -167,7 +168,7 @@ const ViewPauseGameButton: React.VFC<{
           className={cx(
             'relative overflow-hidden cursor-pointer',
             'peer-focus-visible:ring-4',
-            'peer-checked:ring-green-200 peer-checked:border-green-500 peer-checked:bg-green-400 peer-checked:text-white'
+            'peer-checked:ring-green-400/50 peer-checked:border-green-500 peer-checked:bg-green-400 peer-checked:text-white'
           )}
         >
           <span>

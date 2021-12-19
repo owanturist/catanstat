@@ -30,7 +30,7 @@ const ViewPlayerTile: React.VFC<{
       {isWinner && (
         <Icon.Trophy
           className={cx(
-            'absolute bottom-0 ring-0 text-yellow-300 stroke-yellow-500 stroke-[20] text-2xl pointer-events-none',
+            'absolute bottom-0 ring-0 text-yellow-300 stroke-yellow-500 stroke-[20] text-2xl',
             'translate-x-3 -translate-y-2 rotate-[20deg]',
             '2xs:text-3xl 2xs:translate-x-4'
           )}

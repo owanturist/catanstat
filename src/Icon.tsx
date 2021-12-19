@@ -1,7 +1,9 @@
 import cx from 'classnames'
 import React from 'react'
 
-const iconClassName = cx('block overflow-visible h-[1em] leading-none')
+const iconClassName = cx(
+  'block overflow-visible h-[1em] leading-none pointer-events-none'
+)
 
 export type IconProps = Omit<
   React.SVGProps<SVGSVGElement>,
@@ -134,6 +136,32 @@ export const Ellipsis: React.VFC<IconProps> = props => (
     <path
       fill="currentColor"
       d="M96 184c39.8 0 72 32.2 72 72s-32.2 72-72 72-72-32.2-72-72 32.2-72 72-72zM24 80c0 39.8 32.2 72 72 72s72-32.2 72-72S135.8 8 96 8 24 40.2 24 80zm0 352c0 39.8 32.2 72 72 72s72-32.2 72-72-32.2-72-72-72-72 32.2-72 72z"
+    />
+  </svg>
+)
+
+export const ChartPie: React.VFC<IconProps> = props => (
+  <svg
+    {...props}
+    className={cx(iconClassName, props.className)}
+    viewBox="0 0 544 512"
+  >
+    <path
+      fill="currentColor"
+      d="M527.79 288H290.5l158.03 158.03c6.04 6.04 15.98 6.53 22.19.68a239.5 239.5 0 0 0 73.13-140.86c1.34-9.46-6.51-17.85-16.06-17.85zm-15.83-64.8C503.72 103.74 408.26 8.28 288.8.04 279.68-.59 272 7.1 272 16.24V240h223.77c9.14 0 16.82-7.68 16.19-16.8zM224 288V50.71c0-9.55-8.39-17.4-17.84-16.06C86.99 51.49-4.1 155.6.14 280.37 4.5 408.51 114.83 513.59 243.03 511.98a238.14 238.14 0 0 0 135.26-44.03c7.9-5.6 8.42-17.23 1.57-24.08L224 288z"
+    />
+  </svg>
+)
+
+export const Book: React.VFC<IconProps> = props => (
+  <svg
+    {...props}
+    className={cx(iconClassName, props.className)}
+    viewBox="0 0 448 512"
+  >
+    <path
+      fill="currentColor"
+      d="M448 360V24c0-13.3-10.7-24-24-24H96C43 0 0 43 0 96v320c0 53 43 96 96 96h328c13.3 0 24-10.7 24-24v-16c0-7.5-3.5-14.3-8.9-18.7-4.2-15.4-4.2-59.3 0-74.7 5.4-4.3 8.9-11.1 8.9-18.6zM128 134c0-3.3 2.7-6 6-6h212c3.3 0 6 2.7 6 6v20c0 3.3-2.7 6-6 6H134c-3.3 0-6-2.7-6-6v-20zm0 64c0-3.3 2.7-6 6-6h212c3.3 0 6 2.7 6 6v20c0 3.3-2.7 6-6 6H134c-3.3 0-6-2.7-6-6v-20zm253.4 250H96c-17.7 0-32-14.3-32-32 0-17.6 14.4-32 32-32h285.4c-1.9 17.1-1.9 46.9 0 64z"
     />
   </svg>
 )

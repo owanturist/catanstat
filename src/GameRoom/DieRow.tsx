@@ -99,7 +99,7 @@ export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = React.memo(
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
-            className: cx('text-gray-100 stroke-gray-400 ring-gray-300')
+            className: cx('text-gray-100 stroke-gray-400 ring-gray-400/50')
           })}
         />
       ))}
@@ -118,7 +118,7 @@ export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
           store={store}
           value={value}
           icon={React.cloneElement(icon, {
-            className: cx('text-red-500 stroke-red-700 ring-red-300')
+            className: cx('text-red-500 stroke-red-700 ring-red-500/50')
           })}
         />
       ))}
@@ -127,10 +127,10 @@ export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(
 )
 
 const EVENT_DICE: ReadonlyArray<[DieEvent, string]> = [
-  ['yellow', cx('text-yellow-400 ring-yellow-300 stroke-yellow-500')],
-  ['blue', cx('text-blue-500 ring-blue-300 stroke-blue-600')],
-  ['green', cx('text-green-500 ring-green-300 stroke-green-600')],
-  ['black', cx('text-gray-600 ring-gray-400 stroke-gray-800')]
+  ['yellow', cx('text-yellow-400 ring-yellow-400/50 stroke-yellow-500')],
+  ['blue', cx('text-blue-500 ring-blue-500/50 stroke-blue-600')],
+  ['green', cx('text-green-500 ring-green-500/50 stroke-green-600')],
+  ['black', cx('text-gray-600 ring-gray-600/50 stroke-gray-800')]
 ]
 
 export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
