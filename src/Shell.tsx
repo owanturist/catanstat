@@ -1,11 +1,35 @@
-import React from 'react'
-import cx from 'classnames'
-import { Outlet, Link, NavLink, useParams } from 'react-router-dom'
 import { Menu } from '@headlessui/react'
+import cx from 'classnames'
+import React from 'react'
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useMatch,
+  useNavigate,
+  useParams
+} from 'react-router-dom'
 
-import { castID } from './utils'
 import { GameID } from './api'
 import * as Icon from './Icon'
+import { castID } from './utils'
+
+const ViewTool: React.FC<{
+  onClick?: VoidFunction
+}> = props => (
+  <button
+    type="button"
+    className={cx(
+      'flex justify-center items-center w-6 h-6',
+      'text-xs text-gray-600 border border-gray-300/0 ring-gray-300/50 rounded outline-none transition-colors',
+      'focus-visible:ring-2',
+      'hover:border-gray-300/100',
+      '2xs:w-8 2xs:h-8 2xs:text-base',
+      'xs:w-10 xs:h-10 xs:text-lg'
+    )}
+    {...props}
+  />
+)
 
 const ViewDropdownItem: React.FC<{
   to: string
@@ -44,16 +68,7 @@ const ViewHeaderDropdown: React.VFC = React.memo(() => {
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button
-        className={cx(
-          'flex justify-center items-center w-6 h-6',
-          'text-xs text-gray-600 border border-gray-300/0 ring-gray-300/50 rounded outline-none transition-colors',
-          'focus-visible:ring-2',
-          'hover:border-gray-300/100',
-          '2xs:w-8 2xs:h-8 2xs:text-base',
-          'xs:w-10 xs:h-10 xs:text-lg'
-        )}
-      >
+      <Menu.Button as={ViewTool}>
         <Icon.Ellipsis />
       </Menu.Button>
 
@@ -72,6 +87,24 @@ const ViewHeaderDropdown: React.VFC = React.memo(() => {
         </ViewDropdownItem>
       </Menu.Items>
     </Menu>
+  )
+})
+
+const ViewBackToGameButton: React.VFC = React.memo(() => {
+  const navigate = useNavigate()
+  const params = useParams<'gameId'>()
+  const isGamePath = useMatch('/game/:gameId')
+
+  if (params.gameId == null || isGamePath != null) {
+    return null
+  }
+
+  const gameId = castID<GameID>(params.gameId)
+
+  return (
+    <ViewTool onClick={() => navigate(`/game/${gameId}`)}>
+      <Icon.ArrowLeft />
+    </ViewTool>
   )
 })
 
@@ -101,7 +134,10 @@ export const Shell: React.VFC = React.memo(() => (
 
         <div className="flex-1" />
 
-        <ViewHeaderDropdown />
+        <div className="flex gap-1">
+          <ViewBackToGameButton />
+          <ViewHeaderDropdown />
+        </div>
       </div>
     </header>
 
