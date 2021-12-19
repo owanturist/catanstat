@@ -1,6 +1,6 @@
 import { QueryKey, useQuery, useMutation, useQueryClient } from 'react-query'
 
-import { Color } from './domain'
+import { Color } from './Color'
 import { DieNumber, DieEvent } from './Die'
 import { ID, castID } from './utils'
 import * as DB from './db'

@@ -6,7 +6,7 @@ import cx from 'classnames'
 import { toast } from 'react-hot-toast'
 
 import * as Icon from '../Icon'
-import { Color } from '../domain'
+import { Color } from '../Color'
 import { useStartGame } from '../api'
 
 abstract class PlayerInfo {
