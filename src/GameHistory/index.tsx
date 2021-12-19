@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 import { differenceInMilliseconds } from 'date-fns'
 
-import { DieNumber, DieEvent } from '../domain'
+import { DieEventIcon, DieNumberIcon, DiePlaceholderIcon } from '../Die'
 import { Dice, Game, GameID, Player, useQueryGame } from '../api'
 import { castID, formatDurationMs, useEvery } from '../utils'
 import * as Icon from '../Icon'
@@ -19,59 +19,25 @@ const ViewContainer: React.FC = ({ children }) => (
   </div>
 )
 
-const DIE_NUMBER_ICONS: Record<DieNumber, React.ReactElement> = {
-  1: <Icon.DieOne />,
-  2: <Icon.DieTwo />,
-  3: <Icon.DieThree />,
-  4: <Icon.DieFour />,
-  5: <Icon.DieFive />,
-  6: <Icon.DieSix />
+const ViewDie: React.VFC<{
+  die?: React.ReactElement
+}> = ({ die = <DiePlaceholderIcon /> }) => {
+  return React.cloneElement(die, {
+    className: cx(die.props.className, 'stroke-[24]')
+  })
 }
 
-const DIE_EVENT_COLORS: Record<DieEvent, string> = {
-  yellow: cx('text-yellow-400 stroke-yellow-500'),
-  blue: cx('text-blue-500 stroke-blue-600'),
-  green: cx('text-green-500 stroke-green-600'),
-  black: cx('text-gray-600 stroke-gray-800')
-}
-
-const DIE_PLACEHOLDER = (
-  <Icon.DieClear className="text-gray-100 stroke-gray-300 stroke-[24]" />
-)
-
-const ViewDiceTemplate: React.VFC<{
-  whiteDie?: React.ReactElement
-  redDie?: React.ReactElement
-  eventDie?: React.ReactElement
-}> = ({
-  whiteDie = DIE_PLACEHOLDER,
-  redDie = DIE_PLACEHOLDER,
-  eventDie = DIE_PLACEHOLDER
-}) => (
-  <span className="flex gap-1 text-xl">
-    {whiteDie}
-    {redDie}
-    {eventDie}
-  </span>
-)
-
-const ViewDice: React.VFC<Dice> = React.memo(
-  ({ whiteDie, redDie, eventDie }) => (
-    <ViewDiceTemplate
-      whiteDie={React.cloneElement(DIE_NUMBER_ICONS[whiteDie], {
-        className: cx('text-gray-100 stroke-gray-400 stroke-[24]')
-      })}
-      redDie={React.cloneElement(DIE_NUMBER_ICONS[redDie], {
-        className: cx('text-red-500 stroke-red-700 stroke-[24]')
-      })}
-      eventDie={
-        <Icon.DieClear
-          className={cx(DIE_EVENT_COLORS[eventDie], 'stroke-[24]')}
-        />
-      }
+const ViewDice: React.VFC<{
+  dice?: Dice
+}> = React.memo(({ dice }) => (
+  <div className="flex gap-1 text-xl">
+    <ViewDie
+      die={dice && <DieNumberIcon color="white" side={dice.whiteDie} />}
     />
-  )
-)
+    <ViewDie die={dice && <DieNumberIcon color="red" side={dice.redDie} />} />
+    <ViewDie die={dice && <DieEventIcon side={dice.eventDie} />} />
+  </div>
+))
 
 const ViewTableHeaderCell: React.FC<{
   className?: string
@@ -106,7 +72,7 @@ const ViewTableRow: React.VFC<{
       </span>
     </td>
     <td className="px-2 py-1">
-      {dice ? <ViewDice {...dice} /> : <ViewDiceTemplate />}
+      <ViewDice dice={dice} />
     </td>
     <td className="px-2 py-1 text-right">
       <span
