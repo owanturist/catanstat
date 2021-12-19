@@ -1,7 +1,7 @@
 import { QueryKey, useQuery, useMutation, useQueryClient } from 'react-query'
 
 import { Color } from './Color'
-import { DieNumber, DieEvent } from './Die'
+import { Dice } from './Die'
 import { ID, castID } from './utils'
 import * as DB from './db'
 
@@ -162,12 +162,6 @@ export const useQueryGame = (
     game: data ? decodeGame(data) : null,
     error
   }
-}
-
-export interface Dice {
-  whiteDie: DieNumber
-  redDie: DieNumber
-  eventDie: DieEvent
 }
 
 export interface ApiHookOptions<

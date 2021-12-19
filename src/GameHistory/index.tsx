@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 import { differenceInMilliseconds } from 'date-fns'
 
-import { DieEventIcon, DieNumberIcon, DiePlaceholderIcon } from '../Die'
-import { Dice, Game, GameID, Player, useQueryGame } from '../api'
+import { Dice, DieEventIcon, DieNumberIcon, DiePlaceholderIcon } from '../Die'
+import { Game, GameID, Player, useQueryGame } from '../api'
 import { castID, formatDurationMs, useEvery } from '../utils'
 import * as Icon from '../Icon'
 

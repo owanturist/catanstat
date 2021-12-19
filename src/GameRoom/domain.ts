@@ -1,7 +1,6 @@
 import { InnerStore } from 'react-inner-store'
 
-import { Dice } from '../api'
-import { DieEvent, DieNumber } from '../domain'
+import { Dice, DieEvent, DieNumber } from '../Die'
 
 import * as DieRow from './DieRow'
 

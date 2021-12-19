@@ -10,7 +10,8 @@
     "postdev": "rm -rf ./.tmp-dev",
     "prebuild": "npm run clean:cache && npm run clean:build",
     "build": "parcel build public/index.html --dist-dir build",
-    "postbuild": "npm run copy:index-200"
+    "postbuild": "npm run copy:index-200",
+    "ts": "tsc --noEmit"
   },
   "repository": {
     "type": "git",

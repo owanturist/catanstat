@@ -1,7 +1,8 @@
 import Dexie from 'dexie'
 import { differenceInMilliseconds } from 'date-fns'
 
-import { ColorID, DieNumber, DieEvent } from './domain'
+import { ColorID } from './Color'
+import { DieNumber, DieEvent } from './Die'
 
 // P U B L I C   E N T I T I E S
 

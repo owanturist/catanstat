@@ -3,6 +3,8 @@ import cx from 'classnames'
 
 import * as Icon from './Icon'
 
+// D I E  N U M B E R
+
 export type DieNumber = 1 | 2 | 3 | 4 | 5 | 6
 export type DieNumberColor = 'white' | 'red'
 
@@ -30,6 +32,8 @@ export const DieNumberIcon: React.VFC<{
   })
 })
 
+// D I E  E V E N T
+
 export type DieEvent = 'yellow' | 'blue' | 'green' | 'black'
 
 const DIE_EVENT_COLORS: Record<DieEvent, string> = {
@@ -46,8 +50,18 @@ export const DieEventIcon: React.VFC<{
   return <Icon.DieClear className={cx(DIE_EVENT_COLORS[side], className)} />
 })
 
+// D I E  P L A C E H O L D E R
+
 export const DiePlaceholderIcon: React.VFC<{
   className?: string
 }> = React.memo(({ className }) => (
   <Icon.DieClear className={cx('text-gray-100 stroke-gray-300', className)} />
 ))
+
+// D I C E
+
+export interface Dice {
+  whiteDie: DieNumber
+  redDie: DieNumber
+  eventDie: DieEvent
+}
