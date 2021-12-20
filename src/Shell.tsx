@@ -14,10 +14,15 @@ import { GameID } from './api'
 import * as Icon from './Icon'
 import { castID } from './utils'
 
-const ViewTool: React.FC<{
-  onClick?: VoidFunction
-}> = props => (
+const ViewTool = React.forwardRef<
+  HTMLButtonElement,
+  {
+    onClick?: VoidFunction
+    children?: React.ReactNode
+  }
+>((props, ref) => (
   <button
+    ref={ref}
     type="button"
     className={cx(
       'flex justify-center items-center w-6 h-6',
@@ -29,7 +34,7 @@ const ViewTool: React.FC<{
     )}
     {...props}
   />
-)
+))
 
 const ViewDropdownItem: React.FC<{
   to: string
