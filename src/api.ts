@@ -86,7 +86,6 @@ const decodeGameStatus = (
 export interface Game {
   id: GameID
   status: GameStatus
-  totalDurationMs: number
   startTime: Date
   players: ReadonlyArray<Player>
   turns: ReadonlyArray<Turn>
@@ -100,7 +99,6 @@ const decodeGame = (game: DB.Game): Game => {
   return {
     id: castID(game.id),
     status: decodeGameStatus(game, players, turns),
-    totalDurationMs: game.total_duration_ms,
     startTime: game.start_time,
     players,
     turns

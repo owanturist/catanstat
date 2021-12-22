@@ -9,7 +9,6 @@ import { DieNumber, DieEvent } from './Die'
 export abstract class Game {
   abstract id: number
   abstract is_paused: boolean
-  abstract total_duration_ms: number
   abstract current_turn_duration_ms: number
   abstract current_turn_duration_since: Date
   abstract start_time: Date
@@ -320,10 +319,7 @@ export const get_game = async (game_id: number): Promise<null | Game> => {
     ...game,
     board_picture: board_picture?.picture ?? null,
     players: players.map(PlayerEntity.toPublic),
-    turns: turns.map(TurnEntity.toPublic).reverse(),
-    total_duration_ms: turns
-      .map(turn => turn.duration_ms)
-      .reduce((acc, ms) => acc + ms, 0)
+    turns: turns.map(TurnEntity.toPublic).reverse()
   }
 }
 

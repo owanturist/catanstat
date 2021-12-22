@@ -25,6 +25,10 @@ export const pct = (num: number, precision = 2): string => {
   return `${num.toFixed(precision)}%`
 }
 
+export const sum = (arr: ReadonlyArray<number>): number => {
+  return arr.reduce((a, b) => a + b, 0)
+}
+
 export const useDynamicRef = <T>(value: T): MutableRefObject<T> => {
   const valueRef = useRef<T>(value)
 

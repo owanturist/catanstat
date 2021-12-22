@@ -1,23 +1,19 @@
 import React from 'react'
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  ChartData
-} from 'chart.js'
-import { Pie } from 'react-chartjs-2'
+import { Chart as ChartJS, ChartOptions, ArcElement, Color } from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
+import { Doughnut } from 'react-chartjs-2'
 import { useParams } from 'react-router-dom'
 import {
   millisecondsToSeconds,
   secondsToMilliseconds,
   differenceInMilliseconds
 } from 'date-fns'
+import cx from 'classnames'
 
-import { castID, useEvery } from '../utils'
+import { castID, sum, formatDurationMs, useEvery } from '../utils'
 import { Game, GameID, PlayerID, Turn, useQueryGame } from '../api'
 
-ChartJS.register(ArcElement, Tooltip, Legend)
+ChartJS.register(ArcElement, ChartDataLabels)
 
 const calcTotalPlayersDurationMs = (
   turns: ReadonlyArray<Turn>
@@ -32,10 +28,7 @@ const calcTotalPlayersDurationMs = (
 
   return acc
 }
-
-const useCalcTotalDuration = (
-  game: Game
-): ChartData<'pie', ReadonlyArray<number>, string> => {
+const useCalcDurationDataset = (game: Game): ReadonlyArray<number> => {
   const currentPlayerId =
     game.status.type === 'ONGOING' ? game.status.currentPlayer.id : null
 
@@ -72,35 +65,104 @@ const useCalcTotalDuration = (
     }
   )
 
-  return React.useMemo(
-    () => ({
-      labels: game.players.map(player => player.name),
-      datasets: [
-        {
-          label: 'Players duration',
-          backgroundColor: game.players.map(player => player.color.hex),
-          data: game.players.map(player => {
-            const baseDurationMs = playersDurationMs.get(player.id) ?? 0
+  return React.useMemo(() => {
+    return game.players.map(player => {
+      const baseDurationMs = playersDurationMs.get(player.id) ?? 0
 
-            return currentPlayerId === player.id
-              ? baseDurationMs + currentTurnDurationMs
-              : baseDurationMs
-          })
+      return currentPlayerId === player.id
+        ? baseDurationMs + currentTurnDurationMs
+        : baseDurationMs
+    })
+  }, [currentPlayerId, currentTurnDurationMs, game.players, playersDurationMs])
+}
+
+const TOTAL_DURATION_OPTIONS: ChartOptions<'doughnut'> = {
+  events: [],
+  plugins: {
+    datalabels: {
+      borderRadius: 4,
+      labels: {
+        name: {
+          align: 'top',
+          offset: 0,
+          color: 'rgba(31, 41, 55, 0.75)', // gray-800/75
+          backgroundColor(ctx) {
+            return ctx.dataset.backgroundColor as Color
+          },
+          font: {
+            size: 16,
+            weight: 500
+          },
+          formatter(_value, ctx) {
+            return ctx.chart.data.labels?.[ctx.dataIndex]
+          }
+        },
+        value: {
+          align: 'bottom',
+          backgroundColor: 'rgb(229, 231, 235)', // gray-200
+          color: 'rgb(107, 114, 128)', // gray-500
+          font: {
+            size: 12,
+            family: 'monospace'
+          },
+          formatter: formatDurationMs,
+          padding: {
+            top: 2,
+            left: 4,
+            right: 4,
+            bottom: 2
+          }
         }
-      ]
-    }),
-    [currentPlayerId, currentTurnDurationMs, game.players, playersDurationMs]
-  )
+      }
+    }
+  }
 }
 
 const ViewTotalDuration: React.VFC<{
   game: Game
 }> = React.memo(({ game }) => {
-  const data = useCalcTotalDuration(game)
+  const durationDataset = useCalcDurationDataset(game)
+  const data = React.useMemo(
+    () => ({
+      labels: game.players.map(player => player.name),
+      datasets: [
+        {
+          label: 'Players duration',
+          borderWidth: 0,
+          backgroundColor: game.players.map(player => player.color.hex),
+          data: durationDataset
+        }
+      ]
+    }),
+    [durationDataset, game.players]
+  )
+  const totalGameDurationMsg = React.useMemo(
+    () => sum(durationDataset),
+    [durationDataset]
+  )
 
   return (
-    <div>
-      <Pie data={data} />
+    <div className="relative">
+      <Doughnut data={data} options={TOTAL_DURATION_OPTIONS} />
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span
+          className={cx(
+            'uppercase font-semibold text-sm text-gray-700',
+            '2xs:text-base'
+          )}
+        >
+          Game duration
+        </span>
+        <span
+          className={cx(
+            'px-1 py-0.5 font-mono text-xs text-center text-gray-500 bg-gray-200 rounded',
+            '2xs:text-sm'
+          )}
+        >
+          {formatDurationMs(totalGameDurationMsg)}
+        </span>
+      </div>
     </div>
   )
 })
