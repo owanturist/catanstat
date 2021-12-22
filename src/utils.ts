@@ -29,6 +29,10 @@ export const sum = (arr: ReadonlyArray<number>): number => {
   return arr.reduce((a, b) => a + b, 0)
 }
 
+export const range = (start: number, end: number): Array<number> => {
+  return Array.from({ length: end - start }, (_, index) => index + start)
+}
+
 export const useDynamicRef = <T>(value: T): MutableRefObject<T> => {
   const valueRef = useRef<T>(value)
 

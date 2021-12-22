@@ -24,6 +24,7 @@ const calcTotalPlayersDurationMs = (
 
   return acc
 }
+
 const useCalcDurationDataset = (game: Game): ReadonlyArray<number> => {
   const currentPlayerId =
     game.status.type === 'ONGOING' ? game.status.currentPlayer.id : null

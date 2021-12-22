@@ -1,5 +1,11 @@
 import React from 'react'
-import { Chart as ChartJS, ArcElement } from 'chart.js'
+import {
+  Chart as ChartJS,
+  BarElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale
+} from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { useParams } from 'react-router-dom'
 
@@ -7,8 +13,15 @@ import { castID } from '../utils'
 import { GameID, useQueryGame } from '../api'
 
 import { TotalDurationChart } from './TotalDurationChart'
+import { TurnsDistributionChart } from './TurnsDistributionChart'
 
-ChartJS.register(ArcElement, ChartDataLabels)
+ChartJS.register(
+  ArcElement,
+  BarElement,
+  ChartDataLabels,
+  CategoryScale,
+  LinearScale
+)
 
 const ViewContainer: React.FC = ({ children }) => <div>{children}</div>
 
@@ -34,6 +47,7 @@ export const GameStat: React.VFC = React.memo(() => {
   return (
     <ViewContainer>
       <TotalDurationChart game={game} />
+      <TurnsDistributionChart turns={game.turns} />
     </ViewContainer>
   )
 })
