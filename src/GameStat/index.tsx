@@ -6,7 +6,9 @@ import {
   PointElement,
   LineElement,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  RadialLinearScale,
+  Tooltip
 } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { useParams } from 'react-router-dom'
@@ -16,6 +18,7 @@ import { GameID, useQueryGame } from '../api'
 
 import { TotalDurationChart } from './TotalDurationChart'
 import { TurnsDistributionChart } from './TurnsDistributionChart'
+import { NumberDiceDistribution } from './NumberDiceDistribution'
 
 ChartJS.register(
   ArcElement,
@@ -24,10 +27,14 @@ ChartJS.register(
   LineElement,
   ChartDataLabels,
   CategoryScale,
-  LinearScale
+  LinearScale,
+  RadialLinearScale,
+  Tooltip
 )
 
-const ViewContainer: React.FC = ({ children }) => <div>{children}</div>
+const ViewContainer: React.FC = ({ children }) => (
+  <div className="max-h-full overflow-y-auto">{children}</div>
+)
 
 export const GameStat: React.VFC = React.memo(() => {
   const params = useParams<'gameId'>()
@@ -52,6 +59,7 @@ export const GameStat: React.VFC = React.memo(() => {
     <ViewContainer>
       <TotalDurationChart game={game} />
       <TurnsDistributionChart turns={game.turns} />
+      <NumberDiceDistribution turns={game.turns} />
     </ViewContainer>
   )
 })

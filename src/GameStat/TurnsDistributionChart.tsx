@@ -38,6 +38,7 @@ const calcTurnsDistribution = (
 }
 
 const CHART_OPTIONS: ChartOptions = {
+  events: [],
   layout: {
     padding: {
       top: 20
@@ -52,6 +53,11 @@ const CHART_OPTIONS: ChartOptions = {
     y: {
       stacked: !true,
       beginAtZero: true
+    }
+  },
+  plugins: {
+    tooltip: {
+      enabled: false
     }
   }
 }
@@ -70,6 +76,8 @@ export const TurnsDistributionChart: React.VFC<{
         {
           type: 'line',
           label: 'Ideal lower distribution',
+          pointRadius: 0,
+          borderDash: [10, 5],
           borderWidth: 3,
           borderColor: 'rgb(96, 165, 250)', // blue-500
           backgroundColor: 'transparent',
@@ -80,8 +88,7 @@ export const TurnsDistributionChart: React.VFC<{
           }),
           datalabels: {
             formatter: () => null
-          },
-          pointRadius: 0
+          }
         },
         {
           type: 'bar',
