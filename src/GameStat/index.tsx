@@ -3,6 +3,8 @@ import {
   Chart as ChartJS,
   BarElement,
   ArcElement,
+  PointElement,
+  LineElement,
   CategoryScale,
   LinearScale
 } from 'chart.js'
@@ -18,6 +20,8 @@ import { TurnsDistributionChart } from './TurnsDistributionChart'
 ChartJS.register(
   ArcElement,
   BarElement,
+  PointElement,
+  LineElement,
   ChartDataLabels,
   CategoryScale,
   LinearScale

@@ -1,15 +1,9 @@
 import React from 'react'
-import { ChartOptions, Color } from 'chart.js'
-import { Bar } from 'react-chartjs-2'
-import {
-  millisecondsToSeconds,
-  secondsToMilliseconds,
-  differenceInMilliseconds
-} from 'date-fns'
-import cx from 'classnames'
+import { ChartData, ChartOptions } from 'chart.js'
+import { Chart } from 'react-chartjs-2'
 
-import { sum, formatDurationMs, useEvery, range } from '../utils'
-import { Game, PlayerID, Turn } from '../api'
+import { range } from '../utils'
+import { Turn } from '../api'
 
 const IDEAL_DISTRIBUTION = new Map(
   [
@@ -43,44 +37,21 @@ const calcTurnsDistribution = (
   return acc
 }
 
-const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
-  events: [],
-  plugins: {
-    datalabels: {
-      borderRadius: 4,
-      labels: {
-        name: {
-          align: 'top',
-          offset: 0,
-          color: 'rgba(31, 41, 55, 0.75)', // gray-800/75
-          backgroundColor(ctx) {
-            return ctx.dataset.backgroundColor as Color
-          },
-          font: {
-            size: 16,
-            weight: 500
-          },
-          formatter(_value, ctx) {
-            return ctx.chart.data.labels?.[ctx.dataIndex]
-          }
-        },
-        value: {
-          align: 'bottom',
-          backgroundColor: 'rgb(229, 231, 235)', // gray-200
-          color: 'rgb(107, 114, 128)', // gray-500
-          font: {
-            size: 12,
-            family: 'monospace'
-          },
-          formatter: formatDurationMs,
-          padding: {
-            top: 2,
-            left: 4,
-            right: 4,
-            bottom: 2
-          }
-        }
-      }
+const CHART_OPTIONS: ChartOptions = {
+  layout: {
+    padding: {
+      top: 20
+    }
+  },
+  responsive: true,
+  scales: {
+    x: {
+      stacked: true,
+      beginAtZero: false
+    },
+    y: {
+      stacked: !true,
+      beginAtZero: true
     }
   }
 }
@@ -88,7 +59,8 @@ const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
 export const TurnsDistributionChart: React.VFC<{
   turns: ReadonlyArray<Turn>
 }> = React.memo(({ turns }) => {
-  const data = React.useMemo(() => {
+  const data = React.useMemo<ChartData>(() => {
+    const turnsCount = turns.length
     const turnsDistribution = calcTurnsDistribution(turns)
     const combinations = range(2, 13)
 
@@ -96,32 +68,45 @@ export const TurnsDistributionChart: React.VFC<{
       labels: combinations,
       datasets: [
         {
-          label: 'Turns distribution',
+          type: 'line',
+          label: 'Ideal lower distribution',
+          borderWidth: 3,
+          borderColor: 'rgb(96, 165, 250)', // blue-500
+          backgroundColor: 'transparent',
+          data: combinations.map(combination => {
+            const ideal = IDEAL_DISTRIBUTION.get(combination) ?? 0
+
+            return turnsCount * ideal
+          }),
+          datalabels: {
+            formatter: () => null
+          },
+          pointRadius: 0
+        },
+        {
+          type: 'bar',
+          label: 'Real distribution',
           borderWidth: 0,
           data: combinations.map(
             combination => turnsDistribution.get(combination) ?? 0
-          )
+          ),
+          borderRadius: {
+            topLeft: 4,
+            topRight: 4
+          },
+          backgroundColor: 'rgb(236, 72, 153)', // pink-500
+          datalabels: {
+            anchor: 'end',
+            align: 'bottom',
+            color: '#fff',
+            font: {
+              weight: 500
+            }
+          }
         }
       ]
     }
   }, [turns])
 
-  return (
-    <Bar
-      data={data}
-      options={{
-        responsive: true,
-        scales: {
-          x: {
-            stacked: true,
-            beginAtZero: false
-          },
-          y: {
-            stacked: true,
-            beginAtZero: true
-          }
-        }
-      }}
-    />
-  )
+  return <Chart type="bar" data={data} options={CHART_OPTIONS} />
 })
