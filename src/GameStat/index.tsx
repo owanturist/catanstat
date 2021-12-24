@@ -8,7 +8,8 @@ import {
   CategoryScale,
   LinearScale,
   RadialLinearScale,
-  Tooltip
+  Tooltip,
+  Filler
 } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { useParams } from 'react-router-dom'
@@ -29,7 +30,8 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   RadialLinearScale,
-  Tooltip
+  Tooltip,
+  Filler
 )
 
 const ViewContainer: React.FC = ({ children }) => (

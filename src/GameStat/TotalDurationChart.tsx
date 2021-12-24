@@ -96,8 +96,12 @@ const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
         },
         value: {
           align: 'bottom',
-          backgroundColor: 'rgb(229, 231, 235)', // gray-200
-          color: 'rgb(107, 114, 128)', // gray-500
+          color: 'rgba(31, 41, 55, 0.75)', // gray-800/75
+          backgroundColor(ctx) {
+            return ctx.dataset.backgroundColor as Color
+          },
+          borderWidth: 1,
+          borderColor: 'rgba(31, 41, 55, 0.25)', // gray-800/75
           font: {
             size: 12,
             family: 'monospace'

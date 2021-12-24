@@ -23,7 +23,29 @@ const calcDieDistribution = (
 }
 
 const CHART_OPTIONS: ChartOptions<'radar'> = {
-  responsive: true
+  responsive: true,
+  interaction: {
+    intersect: false,
+    mode: 'index'
+  },
+  scales: {
+    r: {
+      beginAtZero: true,
+      ticks: {
+        display: false
+      },
+      pointLabels: {
+        font: {
+          size: 12
+        }
+      }
+    }
+  },
+  plugins: {
+    tooltip: {
+      // enabled: false
+    }
+  }
 }
 
 export const NumberDiceDistribution: React.VFC<{
@@ -43,29 +65,38 @@ export const NumberDiceDistribution: React.VFC<{
       datasets: [
         {
           label: 'White die',
-          // pointRadius: 3,
-          // borderWidth: 3,
+          pointRadius: 2,
+          borderWidth: 1,
           borderColor: 'rgb(96, 165, 250)', // blue-500
-          backgroundColor: 'rgb(96, 165, 250)', // blue-500/50
-          data: sides.map(side => whiteDistribution.get(side) ?? 0)
+          backgroundColor: 'rgba(96, 165, 250, 0.25)', // blue-500/25
+          pointBackgroundColor: 'rgb(96, 165, 250)', // blue-500
+          data: sides.map(side => whiteDistribution.get(side) ?? 0),
+          datalabels: {
+            display: false
+          }
         },
         {
           label: 'Red die',
-          // pointRadius: 3,
-          // borderWidth: 3,
+          pointRadius: 2,
+          borderWidth: 1,
           borderColor: 'rgb(239, 68, 68)', // red-500
-          backgroundColor: 'rgb(239, 68, 68)', // red-500/50
-          data: sides.map(side => redDistribution.get(side) ?? 0)
+          backgroundColor: 'rgba(239, 68, 68, 0.2)', // red-500/25
+          pointBackgroundColor: 'rgb(239, 68, 68)', // red-500
+          data: sides.map(side => redDistribution.get(side) ?? 0),
+          datalabels: {
+            display: false
+          }
         },
         {
           label: 'Ideal',
-          // pointRadius: 3,
-          // borderWidth: 3,
+          pointRadius: 0,
+          borderWidth: 1,
+          borderDash: [10, 5],
           borderColor: 'rgb(34, 197, 94)', // green-500
-          backgroundColor: 'rgb(34, 197, 94)', // red-500/50
+          backgroundColor: 'transparent',
           data: sides.map(() => turnsCount / 6),
           datalabels: {
-            formatter: (value: number) => value.toFixed(1)
+            display: false
           }
         }
       ]
