@@ -21,7 +21,8 @@ import { TotalDurationChart } from './TotalDurationChart'
 import { TurnsDistributionChart } from './TurnsDistributionChart'
 import {
   NumberDiceDistribution,
-  EventDieDistribution
+  EventDieDistribution,
+  NumberPerEventDiceDistribution
 } from './DiceDistributionChart'
 
 ChartJS.register(
@@ -66,6 +67,7 @@ export const GameStat: React.VFC = React.memo(() => {
       <TurnsDistributionChart turns={game.turns} />
       <NumberDiceDistribution turns={game.turns} />
       <EventDieDistribution turns={game.turns} />
+      <NumberPerEventDiceDistribution turns={game.turns} />
     </ViewContainer>
   )
 })
