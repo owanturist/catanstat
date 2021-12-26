@@ -35,7 +35,8 @@ const CHART_OPTIONS: ChartOptions<'radar'> = {
     r: {
       beginAtZero: true,
       ticks: {
-        display: false
+        stepSize: 1,
+        maxTicksLimit: 10
       },
       pointLabels: {
         font: {

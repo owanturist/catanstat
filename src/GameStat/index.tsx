@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   Chart as ChartJS,
+  Legend,
   BarElement,
   ArcElement,
   PointElement,
@@ -30,6 +31,7 @@ ChartJS.register(
   BarElement,
   PointElement,
   LineElement,
+  Legend,
   ChartDataLabels,
   CategoryScale,
   LinearScale,

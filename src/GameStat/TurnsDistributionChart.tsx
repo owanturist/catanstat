@@ -56,6 +56,9 @@ const CHART_OPTIONS: ChartOptions = {
     }
   },
   plugins: {
+    legend: {
+      display: false
+    },
     tooltip: {
       enabled: false
     }

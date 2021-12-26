@@ -76,6 +76,9 @@ const useCalcDurationDataset = (game: Game): ReadonlyArray<number> => {
 const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
   events: [],
   plugins: {
+    legend: {
+      display: false
+    },
     datalabels: {
       borderRadius: 4,
       labels: {
