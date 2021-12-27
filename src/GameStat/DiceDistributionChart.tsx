@@ -1,8 +1,8 @@
 import React from 'react'
-import { ChartData, ChartOptions } from 'chart.js'
+import { ChartData, ChartDataset, ChartOptions } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
+import cx from 'classnames'
 
-import { range } from '../utils'
 import { Turn } from '../api'
 import { DieEvent, DieNumber } from '../Die'
 
@@ -23,6 +23,13 @@ const calcDieDistribution = <TSide,>(
   }
 
   return acc
+}
+
+const joinSidesDistribution = <TSide,>(
+  sides: ReadonlyArray<TSide>,
+  distribution: Map<TSide, number>
+): Array<number> => {
+  return sides.map(side => distribution.get(side) ?? 0)
 }
 
 const CHART_OPTIONS: ChartOptions<'radar'> = {
@@ -47,6 +54,16 @@ const CHART_OPTIONS: ChartOptions<'radar'> = {
   }
 }
 
+const DATASET_DEFAULTS: Partial<ChartDataset<'radar'>> = {
+  pointRadius: 2,
+  borderWidth: 1,
+  datalabels: {
+    display: false
+  }
+}
+
+const DIE_NUMBER_SIDES: Array<DieNumber> = [1, 2, 3, 4, 5, 6]
+
 export const NumberDiceDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
 }> = React.memo(({ turns }) => {
@@ -57,47 +74,35 @@ export const NumberDiceDistribution: React.VFC<{
       turn => turn.dice.whiteDie
     )
     const redDistribution = calcDieDistribution(turns, turn => turn.dice.redDie)
-    const sides = range(1, 7) as Array<DieNumber>
 
     return {
-      labels: sides,
+      labels: DIE_NUMBER_SIDES,
       datasets: [
         {
+          ...DATASET_DEFAULTS,
           label: 'White die',
-          pointRadius: 2,
-          borderWidth: 1,
           borderColor: 'rgb(14, 165, 233)', // sky-500
           backgroundColor: 'rgba(14, 165, 233, 0.25)', // sky-500/25
           pointBackgroundColor: '#fff',
-          data: sides.map(side => whiteDistribution.get(side) ?? 0),
-          datalabels: {
-            display: false
-          }
+          data: joinSidesDistribution(DIE_NUMBER_SIDES, whiteDistribution)
         },
         {
+          ...DATASET_DEFAULTS,
           label: 'Red die',
-          pointRadius: 2,
-          borderWidth: 1,
           borderColor: 'rgb(239, 68, 68)', // red-500
-          backgroundColor: 'rgba(239, 68, 68, 0.2)', // red-500/25
+          backgroundColor: 'rgba(239, 68, 68, 0.25)', // red-500/25
           pointBackgroundColor: 'rgb(239, 68, 68)', // red-500
-          data: sides.map(side => redDistribution.get(side) ?? 0),
-          datalabels: {
-            display: false
-          }
+          data: joinSidesDistribution(DIE_NUMBER_SIDES, redDistribution)
         },
         {
+          ...DATASET_DEFAULTS,
           label: 'Ideal',
           pointRadius: 0,
-          borderWidth: 1,
           borderDash: [10, 5],
           borderColor: 'rgb(17, 24, 39)', // gray-500
           pointBackgroundColor: 'rgb(17, 24, 39)', // gray-500
           backgroundColor: 'transparent',
-          data: sides.map(() => turnsCount / 6),
-          datalabels: {
-            display: false
-          }
+          data: DIE_NUMBER_SIDES.map(() => turnsCount / 6)
         }
       ]
     }
@@ -105,6 +110,15 @@ export const NumberDiceDistribution: React.VFC<{
 
   return <Radar data={data} options={CHART_OPTIONS} />
 })
+
+const DIE_EVENT_SIDES: Array<DieEvent> = ['blue', 'green', 'black', 'yellow']
+
+const DIE_EVENT_COLORS: Record<DieEvent, string> = {
+  yellow: cx('rgb(234, 179, 8)'), // yellow-500
+  blue: cx('rgb(59, 130, 246)'), // blue-500
+  green: cx('rgb(34, 197, 94)'), // green-500
+  black: cx('rgb(107, 114, 128)') // gray-500
+}
 
 export const EventDieDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
@@ -115,70 +129,39 @@ export const EventDieDistribution: React.VFC<{
       turns,
       turn => turn.dice.eventDie
     )
-    const sides: Array<DieEvent> = ['blue', 'green', 'black', 'yellow']
 
     return {
-      labels: sides,
+      labels: DIE_EVENT_SIDES,
       datasets: [
         {
+          ...DATASET_DEFAULTS,
           label: 'Event die',
-          pointRadius: 2,
-          borderWidth: 1,
           borderColor: 'rgb(107, 114, 128)', // gray-500
           backgroundColor: 'rgba(107, 114, 128, 0.25)', // gray-500/25
           pointBackgroundColor(ctx) {
-            const side = sides[ctx.dataIndex]
+            const side = DIE_EVENT_SIDES[ctx.dataIndex] ?? 'black'
 
-            if (side === 'yellow') {
-              return 'rgb(234, 179, 8)' // yellow-500
-            }
-
-            if (side === 'blue') {
-              return 'rgb(59, 130, 246)' // blue-500
-            }
-
-            if (side === 'green') {
-              return 'rgb(34, 197, 94)' // green-500
-            }
-
-            return 'rgb(107, 114, 128)' // gray-500
+            return DIE_EVENT_COLORS[side]
           },
           pointBorderColor(ctx) {
-            const side = sides[ctx.dataIndex]
+            const side = DIE_EVENT_SIDES[ctx.dataIndex] ?? 'black'
 
-            if (side === 'yellow') {
-              return 'rgb(234, 179, 8)' // yellow-500
-            }
-
-            if (side === 'blue') {
-              return 'rgb(59, 130, 246)' // blue-500
-            }
-
-            if (side === 'green') {
-              return 'rgb(34, 197, 94)' // green-500
-            }
-
-            return 'rgb(107, 114, 128)' // gray-500
+            return DIE_EVENT_COLORS[side]
           },
-          data: sides.map(side => eventDistribution.get(side) ?? 0),
-          datalabels: {
-            display: false
-          }
+          data: joinSidesDistribution(DIE_EVENT_SIDES, eventDistribution)
         },
         {
+          ...DATASET_DEFAULTS,
           label: 'Ideal',
           pointRadius: 0,
-          borderWidth: 1,
           borderDash: [10, 5],
           borderColor: 'rgb(17, 24, 39)', // gray-500
           pointBackgroundColor: 'rgb(17, 24, 39)', // gray-500
           backgroundColor: 'transparent',
-          data: sides.map(side =>
-            side === 'black' ? turnsCount / 2 : turnsCount / 6
-          ),
-          datalabels: {
-            display: false
-          }
+          data: DIE_EVENT_SIDES.map(side => {
+            // black occupies 3 sides out of 6 on a cube
+            return side === 'black' ? turnsCount / 2 : turnsCount / 6
+          })
         }
       ]
     }
@@ -191,70 +174,53 @@ export const NumberPerEventDiceDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
 }> = React.memo(({ turns }) => {
   const data = React.useMemo<ChartData<'radar'>>(() => {
-    const blueDistribution = calcDieDistribution(turns, turn =>
-      turn.dice.eventDie === 'blue' ? turn.dice.redDie : null
-    )
-    const yellowDistribution = calcDieDistribution(turns, turn =>
-      turn.dice.eventDie === 'yellow' ? turn.dice.redDie : null
-    )
-    const greenDistribution = calcDieDistribution(turns, turn =>
-      turn.dice.eventDie === 'green' ? turn.dice.redDie : null
-    )
-    const blackDistribution = calcDieDistribution(turns, turn =>
-      turn.dice.eventDie === 'black' ? turn.dice.redDie : null
-    )
-    const sides = range(1, 7) as Array<DieNumber>
+    const blueDistribution = calcDieDistribution(turns, ({ dice }) => {
+      return dice.eventDie === 'blue' ? dice.redDie : null
+    })
+    const yellowDistribution = calcDieDistribution(turns, ({ dice }) => {
+      return dice.eventDie === 'yellow' ? dice.redDie : null
+    })
+    const greenDistribution = calcDieDistribution(turns, ({ dice }) => {
+      return dice.eventDie === 'green' ? dice.redDie : null
+    })
+    const blackDistribution = calcDieDistribution(turns, ({ dice }) => {
+      return dice.eventDie === 'black' ? dice.redDie : null
+    })
 
     return {
-      labels: sides,
+      labels: DIE_NUMBER_SIDES,
       datasets: [
         {
+          ...DATASET_DEFAULTS,
           label: 'Blue events',
-          pointRadius: 2,
-          borderWidth: 1,
           borderColor: 'rgb(59, 130, 246)', // blue-500
           backgroundColor: 'rgba(59, 130, 246, 0.25)', // blue-500/25
           pointBackgroundColor: 'rgb(59, 130, 246)', // blue-500
-          data: sides.map(side => blueDistribution.get(side) ?? 0),
-          datalabels: {
-            display: false
-          }
+          data: joinSidesDistribution(DIE_NUMBER_SIDES, blueDistribution)
         },
         {
+          ...DATASET_DEFAULTS,
           label: 'Yellow events',
-          pointRadius: 2,
-          borderWidth: 1,
           borderColor: 'rgb(234, 179, 8)', // yellow-500
           backgroundColor: 'rgba(234, 179, 8, 0.25)', // yellow-500/25
           pointBackgroundColor: 'rgb(234, 179, 8)', // yellow-500
-          data: sides.map(side => yellowDistribution.get(side) ?? 0),
-          datalabels: {
-            display: false
-          }
+          data: joinSidesDistribution(DIE_NUMBER_SIDES, yellowDistribution)
         },
         {
+          ...DATASET_DEFAULTS,
           label: 'Green events',
-          pointRadius: 2,
-          borderWidth: 1,
           borderColor: 'rgb(34, 197, 94)', // gray-500
           backgroundColor: 'rgba(34, 197, 94, 0.25)', // gray-500/25
           pointBackgroundColor: 'rgb(34, 197, 94)', // gray-500
-          data: sides.map(side => greenDistribution.get(side) ?? 0),
-          datalabels: {
-            display: false
-          }
+          data: joinSidesDistribution(DIE_NUMBER_SIDES, greenDistribution)
         },
         {
+          ...DATASET_DEFAULTS,
           label: 'Black events',
-          pointRadius: 2,
-          borderWidth: 1,
           borderColor: 'rgb(17, 24, 39)', // gray-500
           backgroundColor: 'rgba(17, 24, 39, 0.25)', // gray-500/25
           pointBackgroundColor: 'rgb(17, 24, 39)', // gray-500
-          data: sides.map(side => blackDistribution.get(side) ?? 0),
-          datalabels: {
-            display: false
-          }
+          data: joinSidesDistribution(DIE_NUMBER_SIDES, blackDistribution)
         }
       ]
     }
