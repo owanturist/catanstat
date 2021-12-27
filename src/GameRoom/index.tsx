@@ -23,8 +23,8 @@ const ViewContainer: React.FC = ({ children }) => (
       <div
         className={cx(
           'flex-1 shrink-0 max-w-md w-full p-2 bg-white border-gray-50 overflow-hidden',
-          'xs:p-3 xs:shadow-lg',
-          'sm:max-w-md sm:border sm:rounded-md sm:flex-initial'
+          'xs:p-3 xs:shadow-lg xs:border',
+          'sm:max-w-md sm:rounded-md sm:flex-initial'
         )}
       >
         {children}

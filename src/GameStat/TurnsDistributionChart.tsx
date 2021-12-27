@@ -39,6 +39,7 @@ const calcTurnsDistribution = (
 
 const CHART_OPTIONS: ChartOptions = {
   responsive: true,
+  aspectRatio: 4 / 3,
   interaction: {
     intersect: false,
     mode: 'index'
@@ -57,17 +58,23 @@ const CHART_OPTIONS: ChartOptions = {
     },
     tooltip: {
       callbacks: {
-        title: () => '',
+        title: ([firstItem]) => {
+          if (firstItem == null) {
+            return ''
+          }
+
+          return `Combination ${firstItem.label}`
+        },
         label: ctx => {
           const value = Number(ctx.dataset.data[ctx.dataIndex] ?? 0)
           const lowerBound = Math.floor(value)
           const upperBound = Math.ceil(value)
 
           if (lowerBound === upperBound) {
-            return `${ctx.dataset.label} ${ctx.label} times`
+            return `${ctx.dataset.label} ${value} times`
           }
 
-          return `${ctx.dataset.label} ${ctx.label}: ${lowerBound} - ${upperBound} times`
+          return `${ctx.dataset.label} ${lowerBound} - ${upperBound} times`
         }
       }
     }

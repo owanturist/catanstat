@@ -67,6 +67,7 @@ const useCalcTurnsDuration = (game: Game): Array<number> => {
 
 const CHART_OPTIONS: ChartOptions = {
   responsive: true,
+  aspectRatio: 4 / 3,
   interaction: {
     intersect: false,
     mode: 'index'
