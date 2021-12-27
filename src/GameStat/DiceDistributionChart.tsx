@@ -136,8 +136,8 @@ export const EventDieDistribution: React.VFC<{
         {
           ...DATASET_DEFAULTS,
           label: 'Event die',
-          borderColor: 'rgb(107, 114, 128)', // gray-500
-          backgroundColor: 'rgba(107, 114, 128, 0.25)', // gray-500/25
+          borderColor: 'rgb(236, 72, 153)', // pink-500
+          backgroundColor: 'rgba(236, 72, 153, 0.25)', // pink-500/25
           pointBackgroundColor(ctx) {
             const side = DIE_EVENT_SIDES[ctx.dataIndex] ?? 'black'
 

@@ -39,19 +39,12 @@ const calcTurnsDistribution = (
 
 const CHART_OPTIONS: ChartOptions = {
   events: [],
-  layout: {
-    padding: {
-      top: 20
-    }
-  },
   responsive: true,
   scales: {
     x: {
-      stacked: true,
       beginAtZero: false
     },
     y: {
-      stacked: !true,
       beginAtZero: true
     }
   },
@@ -101,8 +94,8 @@ export const TurnsDistributionChart: React.VFC<{
             combination => turnsDistribution.get(combination) ?? 0
           ),
           borderRadius: {
-            topLeft: 4,
-            topRight: 4
+            topLeft: 99,
+            topRight: 99
           },
           backgroundColor: 'rgb(236, 72, 153)', // pink-500
           datalabels: {
