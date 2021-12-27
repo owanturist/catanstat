@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChartOptions, Color } from 'chart.js'
+import { ChartData, ChartOptions, Color } from 'chart.js'
 import { Doughnut } from 'react-chartjs-2'
 import {
   millisecondsToSeconds,
@@ -25,7 +25,7 @@ const calcTotalPlayersDurationMs = (
   return acc
 }
 
-const useCalcDurationDataset = (game: Game): ReadonlyArray<number> => {
+const useCalcPlayersDuration = (game: Game): Array<number> => {
   const currentPlayerId =
     game.status.type === 'ONGOING' ? game.status.currentPlayer.id : null
 
@@ -125,8 +125,8 @@ const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
 export const TotalDurationChart: React.VFC<{
   game: Game
 }> = React.memo(({ game }) => {
-  const durationDataset = useCalcDurationDataset(game)
-  const data = React.useMemo(
+  const playersDuration = useCalcPlayersDuration(game)
+  const data = React.useMemo<ChartData<'doughnut'>>(
     () => ({
       labels: game.players.map(player => player.name),
       datasets: [
@@ -134,15 +134,15 @@ export const TotalDurationChart: React.VFC<{
           label: 'Players duration',
           borderWidth: 0,
           backgroundColor: game.players.map(player => player.color.hex),
-          data: durationDataset
+          data: playersDuration.filter(duration => duration > 0)
         }
       ]
     }),
-    [durationDataset, game.players]
+    [playersDuration, game.players]
   )
   const totalGameDurationMsg = React.useMemo(
-    () => sum(durationDataset),
-    [durationDataset]
+    () => sum(playersDuration),
+    [playersDuration]
   )
 
   return (

@@ -51,15 +51,28 @@ const CHART_OPTIONS: ChartOptions<'radar'> = {
         }
       }
     }
+  },
+  plugins: {
+    datalabels: {
+      display: false
+    },
+    tooltip: {
+      callbacks: {
+        title: () => '',
+        label: ctx => {
+          const value = ctx.dataset.data[ctx.dataIndex] ?? 0
+          const formattedValue = value % 1 > 0 ? `~${value.toFixed(2)}` : value
+
+          return `${ctx.dataset.label} ${ctx.label} side: ${formattedValue}`
+        }
+      }
+    }
   }
 }
 
 const DATASET_DEFAULTS: Partial<ChartDataset<'radar'>> = {
   pointRadius: 2,
-  borderWidth: 1,
-  datalabels: {
-    display: false
-  }
+  borderWidth: 1
 }
 
 const DIE_NUMBER_SIDES: Array<DieNumber> = [1, 2, 3, 4, 5, 6]

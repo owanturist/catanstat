@@ -18,6 +18,7 @@ import { useParams } from 'react-router-dom'
 import { castID } from '../utils'
 import { GameID, useQueryGame } from '../api'
 
+import { TurnsDurationChart } from './TurnsDurationChart'
 import { TotalDurationChart } from './TotalDurationChart'
 import { TurnsDistributionChart } from './TurnsDistributionChart'
 import {
@@ -66,6 +67,7 @@ export const GameStat: React.VFC = React.memo(() => {
   return (
     <ViewContainer>
       <TotalDurationChart game={game} />
+      <TurnsDurationChart game={game} />
       <TurnsDistributionChart turns={game.turns} />
       <NumberDiceDistribution turns={game.turns} />
       <EventDieDistribution turns={game.turns} />

@@ -76,14 +76,15 @@ export const TurnsDistributionChart: React.VFC<{
           borderDash: [10, 5],
           borderWidth: 3,
           borderColor: 'rgb(96, 165, 250)', // blue-500
-          backgroundColor: 'transparent',
-          data: combinations.map(combination => {
-            const ideal = IDEAL_DISTRIBUTION.get(combination) ?? 0
+          data: combinations
+            .map(combination => {
+              const ideal = IDEAL_DISTRIBUTION.get(combination) ?? 0
 
-            return turnsCount * ideal
-          }),
+              return turnsCount * ideal
+            })
+            .filter(count => count > 0),
           datalabels: {
-            formatter: () => null
+            display: false
           }
         },
         {
@@ -104,7 +105,8 @@ export const TurnsDistributionChart: React.VFC<{
             color: '#fff',
             font: {
               weight: 500
-            }
+            },
+            formatter: (value: number) => (value > 0 ? value : null)
           }
         }
       ]
