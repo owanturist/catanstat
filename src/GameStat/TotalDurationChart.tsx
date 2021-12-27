@@ -74,10 +74,20 @@ const useCalcPlayersDuration = (game: Game): Array<number> => {
 }
 
 const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
-  events: [],
   plugins: {
     legend: {
       display: false
+    },
+    tooltip: {
+      callbacks: {
+        label: ctx => {
+          const totalDurationMs = sum(ctx.dataset.data)
+          const playerDurationMs = ctx.dataset.data[ctx.dataIndex] ?? 0
+          const percent = (playerDurationMs / totalDurationMs) * 100
+
+          return `${percent.toFixed(2)}%`
+        }
+      }
     },
     datalabels: {
       borderRadius: 4,
@@ -149,7 +159,7 @@ export const TotalDurationChart: React.VFC<{
     <div className="relative">
       <Doughnut data={data} options={DOUGHNUT_OPTIONS} />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      <div className="absolute -z-10 inset-0 flex flex-col items-center justify-center">
         <span
           className={cx(
             'uppercase font-semibold text-sm text-gray-700',

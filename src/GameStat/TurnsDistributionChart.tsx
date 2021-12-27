@@ -38,8 +38,11 @@ const calcTurnsDistribution = (
 }
 
 const CHART_OPTIONS: ChartOptions = {
-  events: [],
   responsive: true,
+  interaction: {
+    intersect: false,
+    mode: 'index'
+  },
   scales: {
     x: {
       beginAtZero: false
@@ -53,7 +56,20 @@ const CHART_OPTIONS: ChartOptions = {
       display: false
     },
     tooltip: {
-      enabled: false
+      callbacks: {
+        title: () => '',
+        label: ctx => {
+          const value = Number(ctx.dataset.data[ctx.dataIndex] ?? 0)
+          const lowerBound = Math.floor(value)
+          const upperBound = Math.ceil(value)
+
+          if (lowerBound === upperBound) {
+            return `${ctx.dataset.label} ${ctx.label} times`
+          }
+
+          return `${ctx.dataset.label} ${ctx.label}: ${lowerBound} - ${upperBound} times`
+        }
+      }
     }
   }
 }
@@ -71,11 +87,13 @@ export const TurnsDistributionChart: React.VFC<{
       datasets: [
         {
           type: 'line',
-          label: 'Ideal lower distribution',
+          label: 'Ideal distribution',
           pointRadius: 0,
           borderDash: [10, 5],
           borderWidth: 3,
           borderColor: 'rgb(96, 165, 250)', // blue-500
+          pointBackgroundColor: 'rgb(96, 165, 250)', // blue-500
+          pointBorderWidth: 0,
           data: combinations
             .map(combination => {
               const ideal = IDEAL_DISTRIBUTION.get(combination) ?? 0
@@ -99,6 +117,7 @@ export const TurnsDistributionChart: React.VFC<{
             topRight: 99
           },
           backgroundColor: 'rgb(236, 72, 153)', // pink-500
+          pointBorderWidth: 0,
           datalabels: {
             anchor: 'end',
             align: 'bottom',

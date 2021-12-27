@@ -63,7 +63,7 @@ const CHART_OPTIONS: ChartOptions<'radar'> = {
           const value = ctx.dataset.data[ctx.dataIndex] ?? 0
           const formattedValue = value % 1 > 0 ? `~${value.toFixed(2)}` : value
 
-          return `${ctx.dataset.label} ${ctx.label} side: ${formattedValue}`
+          return `${ctx.dataset.label} ${ctx.label} side: ${formattedValue} times`
         }
       }
     }
