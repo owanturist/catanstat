@@ -41,68 +41,61 @@ const ViewPlayerTile: React.VFC<{
 })
 
 const ViewCurrentPlayerCaret: React.VFC<{
-  isGamePaused: boolean
-  currentTurnDurationMs: number
-  currentTurnDurationSince: Date
+  status: GameStatusOngoing
   playersCount: number
   currentPlayerIndex: number
-}> = React.memo(
-  ({
-    isGamePaused,
-    currentTurnDurationMs,
-    currentTurnDurationSince,
-    playersCount,
-    currentPlayerIndex
-  }) => {
-    const fraction = 100 / playersCount
-    const currentTurnDuration = useEvery(
-      now => {
-        if (isGamePaused) {
-          return formatDurationMs(currentTurnDurationMs)
-        }
-
-        const diffMs = differenceInMilliseconds(now, currentTurnDurationSince)
-
-        return formatDurationMs(currentTurnDurationMs + diffMs)
-      },
-      {
-        interval: 60,
-        skip: isGamePaused
+}> = React.memo(({ status, playersCount, currentPlayerIndex }) => {
+  const fraction = 100 / playersCount
+  const currentTurnDuration = useEvery(
+    now => {
+      if (status.isPaused) {
+        return formatDurationMs(status.currentTurnDurationMs)
       }
-    )
 
-    return (
+      const diffMs = differenceInMilliseconds(
+        now,
+        status.currentTurnDurationSince
+      )
+
+      return formatDurationMs(status.currentTurnDurationMs + diffMs)
+    },
+    {
+      interval: 60,
+      skip: status.isPaused
+    }
+  )
+
+  return (
+    <div
+      className="absolute inset-0 transition-transform ease-out duration-300"
+      style={{
+        transform: `translateX(${pct(fraction * currentPlayerIndex)})`
+      }}
+    >
       <div
-        className="absolute inset-0 transition-transform ease-out duration-300"
+        className="flex flex-col h-full justify-end ring-inset ring-2 ring-gray-200 rounded overflow-hidden"
         style={{
-          transform: `translateX(${pct(fraction * currentPlayerIndex)})`
+          width: pct(fraction)
         }}
       >
-        <div
-          className="flex flex-col h-full justify-end ring-inset ring-2 ring-gray-200 rounded overflow-hidden"
-          style={{
-            width: pct(fraction)
-          }}
+        <span
+          className={cx(
+            'p-px font-mono text-2xs text-center text-gray-500 bg-gray-200',
+            '2xs:p-0.5 2xs:text-xs'
+          )}
         >
-          <span
-            className={cx(
-              'p-px font-mono text-2xs text-center text-gray-500 bg-gray-200',
-              '2xs:p-0.5 2xs:text-xs'
-            )}
-          >
-            {currentTurnDuration}
-          </span>
-        </div>
+          {currentTurnDuration}
+        </span>
       </div>
-    )
-  }
-)
+    </div>
+  )
+})
 
 const ViewContainer: React.FC = ({ children }) => (
   <div className="flex relative">{children}</div>
 )
 
-export const OngoingGame: React.VFC<{
+export const OngoingGamePlayers: React.VFC<{
   status: GameStatusOngoing
   players: ReadonlyArray<Player>
 }> = React.memo(({ status, players }) => {
@@ -114,9 +107,7 @@ export const OngoingGame: React.VFC<{
   return (
     <ViewContainer>
       <ViewCurrentPlayerCaret
-        isGamePaused={status.isPaused}
-        currentTurnDurationMs={status.currentTurnDurationMs}
-        currentTurnDurationSince={status.currentTurnDurationSince}
+        status={status}
         playersCount={players.length}
         currentPlayerIndex={currentPlayerIndex}
       />
@@ -132,7 +123,7 @@ export const OngoingGame: React.VFC<{
   )
 })
 
-export const CompletedGame: React.VFC<{
+export const CompletedGamePlayers: React.VFC<{
   winnerId: PlayerID
   players: ReadonlyArray<Player>
 }> = React.memo(({ winnerId, players }) => (

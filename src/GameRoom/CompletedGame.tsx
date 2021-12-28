@@ -12,8 +12,8 @@ import {
   useUploadBoardPicture
 } from '../api'
 import * as Icon from '../Icon'
+import { CompletedGamePlayers } from '../GamePlayers'
 
-import * as PlayersRow from './PlayersRow'
 import { State } from './domain'
 
 const ViewContinueButton: React.FC<{
@@ -132,7 +132,7 @@ export const CompletedGame: React.VFC<{
 
   return (
     <>
-      <PlayersRow.CompletedGame
+      <CompletedGamePlayers
         winnerId={status.winnerPlayerId}
         players={players}
       />

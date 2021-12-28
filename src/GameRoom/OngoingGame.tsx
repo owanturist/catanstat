@@ -19,9 +19,9 @@ import {
   useAbortLastTurn
 } from '../api'
 import * as Icon from '../Icon'
+import { OngoingGamePlayers } from '../GamePlayers'
 
 import { State } from './domain'
-import * as PlayersRow from './PlayersRow'
 import * as DieRow from './DieRow'
 
 const ViewCompleteTurnButton: React.VFC<{
@@ -276,7 +276,7 @@ export const OngoingGame: React.VFC<{
 
   return (
     <>
-      <PlayersRow.OngoingGame status={status} players={players} />
+      <OngoingGamePlayers status={status} players={players} />
 
       <div className={cx('mt-1 space-y-1', 'xs:mt-2 xs:space-y-2')}>
         <DieRow.ViewWhite
