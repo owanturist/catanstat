@@ -7,6 +7,7 @@ import { InnerStore } from 'react-inner-store'
 import { Shell } from './Shell'
 import * as StartGame from './StartGame'
 import * as GameRoom from './GameRoom'
+import { GameList } from './GamesList'
 import { GameHistory } from './GameHistory'
 import { GameStat } from './GameStat'
 
@@ -39,7 +40,7 @@ export const App: React.VFC = () => (
   <QueryClientProvider client={queryClient}>
     <Routes>
       <Route element={<Shell />}>
-        <Route index element={<div>TODO home screen</div>} />
+        <Route index element={<GameList />} />
 
         <Route
           path="start"

@@ -323,6 +323,13 @@ export const get_game = async (game_id: number): Promise<null | Game> => {
   }
 }
 
+export const get_all_games = async (): Promise<ReadonlyArray<Game>> => {
+  const games = await db.games.toArray()
+  const entities = await Promise.all(games.map(game => get_game(game.id)))
+
+  return entities.filter(game => game != null).reverse() as ReadonlyArray<Game>
+}
+
 export interface PlayerPayload {
   name: string
   color: ColorID

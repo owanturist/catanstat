@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { QueryKey, useQuery, useMutation, useQueryClient } from 'react-query'
 
 import { Color } from './Color'
@@ -154,12 +155,23 @@ export const useQueryGame = (
     queryKey: gameQueryKey(gameId),
     queryFn: () => DB.get_game(Number(gameId))
   })
+  const game = useMemo(() => (data ? decodeGame(data) : null), [data])
 
-  return {
-    isLoading,
-    game: data ? decodeGame(data) : null,
-    error
-  }
+  return { isLoading, game, error }
+}
+
+export const useQueryAllGames = (): {
+  isLoading: boolean
+  games: ReadonlyArray<Game>
+  error: null | Error
+} => {
+  const { data, isLoading, error } = useQuery<ReadonlyArray<DB.Game>, Error>({
+    queryKey: ['games'],
+    queryFn: () => DB.get_all_games()
+  })
+  const games = useMemo(() => data?.map(decodeGame) ?? [], [data])
+
+  return { isLoading, games, error }
 }
 
 export interface ApiHookOptions<

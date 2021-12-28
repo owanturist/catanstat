@@ -150,7 +150,7 @@ export const TotalDurationChart: React.VFC<{
     }),
     [playersDuration, game.players]
   )
-  const totalGameDurationMsg = React.useMemo(
+  const totalGameDurationMs = React.useMemo(
     () => sum(playersDuration),
     [playersDuration]
   )
@@ -159,7 +159,7 @@ export const TotalDurationChart: React.VFC<{
     <div className="relative">
       <Doughnut data={data} options={DOUGHNUT_OPTIONS} />
 
-      <div className="absolute -z-10 inset-0 flex flex-col items-center justify-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         <span
           className={cx(
             'uppercase font-semibold text-sm text-gray-700',
@@ -174,7 +174,7 @@ export const TotalDurationChart: React.VFC<{
             '2xs:text-sm'
           )}
         >
-          {formatDurationMs(totalGameDurationMsg)}
+          {formatDurationMs(totalGameDurationMs)}
         </span>
       </div>
     </div>
