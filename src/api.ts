@@ -142,6 +142,7 @@ const decodeTurn = (turn: DB.Turn, players: Map<PlayerID, Player>): Turn => ({
   }
 })
 
+const allGamesQueryKey: QueryKey = ['games']
 const gameQueryKey = (gameId: GameID): QueryKey => ['games', gameId]
 
 export const useQueryGame = (
@@ -166,12 +167,41 @@ export const useQueryAllGames = (): {
   error: null | Error
 } => {
   const { data, isLoading, error } = useQuery<ReadonlyArray<DB.Game>, Error>({
-    queryKey: ['games'],
+    queryKey: allGamesQueryKey,
     queryFn: () => DB.get_all_games()
   })
   const games = useMemo(() => data?.map(decodeGame) ?? [], [data])
 
   return { isLoading, games, error }
+}
+
+export const useDeleteGame = ({
+  onError,
+  onSuccess
+}: {
+  onError?(error: Error): void
+  onSuccess?(): void
+}): {
+  isLoading: boolean
+  deleteGame(gameId: GameID): void
+} => {
+  const queryClient = useQueryClient()
+  const { mutate, isLoading } = useMutation<number, Error, GameID>(
+    (gameId: GameID) => DB.delete_game(Number(gameId)),
+    {
+      onError,
+      async onSuccess() {
+        await queryClient.invalidateQueries(allGamesQueryKey)
+
+        onSuccess?.()
+      }
+    }
+  )
+
+  return {
+    isLoading,
+    deleteGame: mutate
+  }
 }
 
 export interface ApiHookOptions<

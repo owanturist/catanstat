@@ -1,51 +1,128 @@
 import React from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import cx from 'classnames'
-import {
-  differenceInMilliseconds,
-  format,
-  millisecondsToSeconds,
-  secondsToMilliseconds
-} from 'date-fns'
+import { differenceInMilliseconds, format } from 'date-fns'
+import { toast } from 'react-hot-toast'
 
-import { castID, formatDurationMs, sum, useEvery } from '../utils'
+import { formatDurationMs, sum, useEvery } from '../utils'
 import {
   GameID,
   Game,
   useQueryAllGames,
-  useQueryGame,
+  useDeleteGame,
   GameStatus,
   Turn
 } from '../api'
 import { OngoingGamePlayers, CompletedGamePlayers } from '../GamePlayers'
 
+const DELETE_RESTORE_INTERVAL_SEC = 3
+
 const gameToolClassName = cx(
-  'flex-1 p-1 bg-gray-50 rounded border border-gray-100'
+  'flex-1 p-1 rounded border text-center text-2xs font-semibold uppercase outline-none transition',
+  'focus-within:ring-2',
+  '2xs:text-xs',
+  'xs:text-sm'
 )
+
+const ViewGameToolLink: React.FC<{
+  to: string
+}> = props => (
+  <Link
+    {...props}
+    className={cx(
+      gameToolClassName,
+      'text-gray-600 bg-gray-50 border-gray-100 ring-gray-100',
+      'hover:bg-gray-100 hover:border-gray-200'
+    )}
+  />
+)
+
+const ViewDeleteGameTool: React.FC<{
+  gameId: GameID
+}> = React.memo(({ gameId }) => {
+  const [restoreSince, setRestoreSince] = React.useState<null | Date>(null)
+  const countdown = useEvery(
+    now => {
+      if (restoreSince == null) {
+        return null
+      }
+
+      const diff = Math.max(
+        0,
+        DELETE_RESTORE_INTERVAL_SEC -
+          differenceInMilliseconds(now, restoreSince) / 1000
+      )
+
+      return Number(diff.toFixed(1))
+    },
+    {
+      interval: 60,
+      skip: restoreSince === null
+    }
+  )
+  const { isLoading, deleteGame } = useDeleteGame({
+    onError() {
+      toast.error('Failed to delete game')
+    }
+  })
+
+  React.useEffect(() => {
+    if (countdown === 0) {
+      deleteGame(gameId)
+      setRestoreSince(null)
+    }
+  }, [deleteGame, countdown, gameId])
+
+  if (countdown != null && countdown > 0) {
+    return (
+      <button
+        type="button"
+        className={cx(
+          gameToolClassName,
+          'whitespace-nowrap',
+          'text-blue-600 bg-blue-50 border-blue-100 ring-blue-100',
+          'hover:bg-blue-100 hover:border-blue-200'
+        )}
+        onClick={() => setRestoreSince(null)}
+      >
+        <span className="inline-block w-[3ch]">{countdown.toFixed(1)}</span>
+        restore
+      </button>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className={cx(
+        gameToolClassName,
+        'text-red-600 bg-red-50 border-red-100 ring-red-100',
+        'hover:bg-red-100 hover:border-red-200'
+      )}
+      onClick={() => {
+        if (!isLoading) {
+          setRestoreSince(new Date())
+        }
+      }}
+    >
+      delete
+    </button>
+  )
+})
 
 const ViewGameToolbar: React.VFC<{
   gameId: GameID
-}> = React.memo(({ gameId }) => {
-  return (
-    <div className="flex gap-1 flex-row text-gray-600 text-center text-xs font-semibold uppercase">
-      <Link to={`/game/${gameId}`} className={gameToolClassName}>
-        board
-      </Link>
+}> = React.memo(({ gameId }) => (
+  <div className="flex gap-1 flex-row">
+    <ViewGameToolLink to={`/game/${gameId}`}>board</ViewGameToolLink>
 
-      <Link to={`/game/${gameId}/history`} className={gameToolClassName}>
-        history
-      </Link>
+    <ViewGameToolLink to={`/game/${gameId}/history`}>history</ViewGameToolLink>
 
-      <Link to={`/game/${gameId}/stat`} className={gameToolClassName}>
-        statistic
-      </Link>
+    <ViewGameToolLink to={`/game/${gameId}/stat`}>statistic</ViewGameToolLink>
 
-      <Link to={`/game/${gameId}/stat`} className={gameToolClassName}>
-        delete
-      </Link>
-    </div>
-  )
-})
+    <ViewDeleteGameTool gameId={gameId} />
+  </div>
+))
 
 const ViewGameDuration: React.VFC<{
   status: GameStatus
@@ -98,7 +175,7 @@ const ViewGameDuration: React.VFC<{
       {status.type === 'ONGOING' && status.isPaused && (
         <span
           className={cx(
-            'px-1 py-0.5 uppercase text-xs text-center text-gray-500 bg-gray-50 ring-1 ring-gray-200 rounded',
+            'px-1 py-0.5 uppercase text-xs text-yellow-500 bg-yellow-50 ring-1 ring-yellow-300 tracking-wider rounded',
             '2xs:text-sm'
           )}
         >
@@ -127,9 +204,20 @@ const ViewGamePicture: React.VFC<{
 const ViewGame: React.VFC<{
   game: Game
 }> = React.memo(({ game }) => (
-  <div className={cx('py-3 space-y-2')}>
+  <div
+    className={cx(
+      'py-3 space-y-2',
+      '2xs:py-4 2xs:space-y-3',
+      'xs:py-5 xs:space-y-4'
+    )}
+  >
     <div className="flex items-center gap-2">
-      <time className="text-gray-500 text-xs font-light uppercase">
+      <time
+        className={cx(
+          'text-gray-500 text-xs font-light uppercase',
+          '2xs:text-sm'
+        )}
+      >
         {format(game.startTime, 'MMMM d HH:mm, yyyy')}
       </time>
 
@@ -154,12 +242,12 @@ const ViewGame: React.VFC<{
 ))
 
 const ViewContainer: React.FC<{
-  withDividers?: boolean
-}> = ({ withDividers, children }) => (
+  className?: string
+}> = ({ className, children }) => (
   <div className="h-full overflow-x-hidden overflow-y-auto text-gray-700 mx-auto">
     <div
       className={cx(
-        withDividers && 'divide-y divide-gray-200',
+        className,
         'px-2 mx-auto bg-white border-gray-50',
         'xs:max-w-md xs:px-3 xs:shadow-lg xs:border'
       )}
@@ -185,7 +273,7 @@ export const GameList = React.memo(() => {
   }
 
   return (
-    <ViewContainer withDividers>
+    <ViewContainer className="divide-y divide-gray-200">
       {games.map(game => (
         <ViewGame key={game.id} game={game} />
       ))}

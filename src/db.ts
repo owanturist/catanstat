@@ -190,6 +190,17 @@ const create_players = async (
   }
 }
 
+export const delete_game = async (game_id: number): Promise<number> => {
+  await Promise.all([
+    db.games.delete(game_id),
+    db.players.where('game_id').equals(game_id).delete(),
+    db.turns.where('game_id').equals(game_id).delete(),
+    db.pictures.where('game_id').equals(game_id).delete()
+  ])
+
+  return game_id
+}
+
 const complete_turn = async (
   game_id: number,
   dice: Dice,
@@ -375,14 +386,10 @@ export const upload_board_picture = async (
 export const delete_board_picture = async (
   game_id: number
 ): Promise<number> => {
-  const picture = await PictureEntity.get_by_game_id(game_id)
-
-  if (picture != null) {
-    await Promise.all([
-      db.pictures.delete(picture.id),
-      db.games.update(game_id, { board_picture_id: null })
-    ])
-  }
+  await Promise.all([
+    db.pictures.where('game_id').equals(game_id).delete(),
+    db.games.update(game_id, { board_picture_id: null })
+  ])
 
   return game_id
 }
