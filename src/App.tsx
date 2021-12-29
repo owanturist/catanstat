@@ -39,7 +39,7 @@ const LazyComponent = <TProps,>({
 export const App: React.VFC = () => (
   <QueryClientProvider client={queryClient}>
     <Routes>
-      <Route element={<Shell />}>
+      <Route path="*" element={<Shell />}>
         <Route index element={<GameList />} />
 
         <Route
@@ -70,9 +70,9 @@ export const App: React.VFC = () => (
           <Route path="stat" element={<GameStat />} />
           <Route path="history" element={<GameHistory />} />
         </Route>
-      </Route>
 
-      <Route path="*" element={<div>TODO 404</div>} />
+        <Route path="*" element={<div>TODO 404</div>} />
+      </Route>
     </Routes>
 
     <Toaster position="top-right" />

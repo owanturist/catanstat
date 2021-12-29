@@ -79,16 +79,6 @@ export const useEvery = <T>(
   return value
 }
 
-export const usePermanent = <T>(init: () => T): T => {
-  const valueRef = useRef<{ value: T }>()
-
-  if (valueRef.current == null) {
-    valueRef.current = { value: init() }
-  }
-
-  return valueRef.current.value
-}
-
 export type ID<TNamespace extends string> = TNamespace
 
 export const castID = <TNamespace extends string>(

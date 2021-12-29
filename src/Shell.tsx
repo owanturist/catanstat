@@ -2,13 +2,15 @@ import { Menu } from '@headlessui/react'
 import cx from 'classnames'
 import React from 'react'
 import {
+  Routes,
+  Route,
   Link,
   NavLink,
   Outlet,
-  useMatch,
   useNavigate,
   useParams
 } from 'react-router-dom'
+import Tooltip from '@tippyjs/react'
 
 import { GameID } from './api'
 import * as Icon from './Icon'
@@ -17,23 +19,26 @@ import { castID } from './utils'
 const ViewTool = React.forwardRef<
   HTMLButtonElement,
   {
+    tooltip?: React.ReactNode
     onClick?: VoidFunction
     children?: React.ReactNode
   }
->((props, ref) => (
-  <button
-    ref={ref}
-    type="button"
-    className={cx(
-      'flex justify-center items-center w-6 h-6',
-      'text-xs text-gray-600 border border-gray-300/0 ring-gray-300/50 rounded outline-none transition-colors',
-      'focus-visible:ring-2',
-      'hover:border-gray-300/100',
-      '2xs:w-8 2xs:h-8 2xs:text-base',
-      'xs:w-10 xs:h-10 xs:text-lg'
-    )}
-    {...props}
-  />
+>(({ tooltip, ...props }, ref) => (
+  <Tooltip disabled={tooltip == null} content={tooltip}>
+    <button
+      ref={ref}
+      type="button"
+      className={cx(
+        'flex justify-center items-center w-6 h-6',
+        'text-xs text-gray-600 border border-gray-300/0 ring-gray-300/50 rounded outline-none transition-colors',
+        'focus-visible:ring-2',
+        'hover:border-gray-300/100',
+        '2xs:w-8 2xs:h-8 2xs:text-base',
+        'xs:w-10 xs:h-10 xs:text-lg'
+      )}
+      {...props}
+    />
+  </Tooltip>
 ))
 
 const ViewDropdownItem: React.FC<{
@@ -64,12 +69,7 @@ const ViewDropdownItem: React.FC<{
 
 const ViewHeaderDropdown: React.VFC = React.memo(() => {
   const params = useParams<'gameId'>()
-
-  if (params.gameId == null) {
-    return null
-  }
-
-  const gameId = castID<GameID>(params.gameId)
+  const gameId = castID<GameID>(params.gameId!)
 
   return (
     <Menu as="div" className="relative">
@@ -98,17 +98,25 @@ const ViewHeaderDropdown: React.VFC = React.memo(() => {
 const ViewBackToGameButton: React.VFC = React.memo(() => {
   const navigate = useNavigate()
   const params = useParams<'gameId'>()
-  const isGamePath = useMatch('/game/:gameId')
 
-  if (params.gameId == null || isGamePath != null) {
-    return null
-  }
-
-  const gameId = castID<GameID>(params.gameId)
+  const gameId = castID<GameID>(params.gameId!)
 
   return (
-    <ViewTool onClick={() => navigate(`/game/${gameId}`)}>
+    <ViewTool
+      tooltip="Back to game"
+      onClick={() => navigate(`/game/${gameId}`)}
+    >
       <Icon.ArrowLeft />
+    </ViewTool>
+  )
+})
+
+const ViewStartGame: React.VFC = React.memo(() => {
+  const navigate = useNavigate()
+
+  return (
+    <ViewTool tooltip="Start new game" onClick={() => navigate('/start')}>
+      <Icon.Plus />
     </ViewTool>
   )
 })
@@ -140,8 +148,21 @@ export const Shell: React.VFC = React.memo(() => (
         <div className="flex-1 h-6 2xs:h-8 xs:h-10" />
 
         <div className="flex gap-1">
-          <ViewBackToGameButton />
-          <ViewHeaderDropdown />
+          <Routes>
+            <Route index element={<ViewStartGame />} />
+
+            <Route
+              path="game/:gameId"
+              element={
+                <>
+                  <Outlet />
+                  <ViewHeaderDropdown />
+                </>
+              }
+            >
+              <Route path="*" element={<ViewBackToGameButton />} />
+            </Route>
+          </Routes>
         </div>
       </div>
     </header>

@@ -179,6 +179,19 @@ export const ArrowLeft: React.VFC<IconProps> = props => (
   </svg>
 )
 
+export const Plus: React.VFC<IconProps> = props => (
+  <svg
+    {...props}
+    className={cx(iconClassName, props.className)}
+    viewBox="0 0 448 512"
+  >
+    <path
+      fill="currentColor"
+      d="M416 208H272V64a32 32 0 0 0-32-32h-32a32 32 0 0 0-32 32v144H32a32 32 0 0 0-32 32v32a32 32 0 0 0 32 32h144v144a32 32 0 0 0 32 32h32a32 32 0 0 0 32-32V304h144a32 32 0 0 0 32-32v-32a32 32 0 0 0-32-32z"
+    />
+  </svg>
+)
+
 export const Logo: React.VFC<IconProps> = props => (
   <svg
     {...props}

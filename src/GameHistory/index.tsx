@@ -151,7 +151,7 @@ const ViewHistoryTable: React.VFC<{
   const turnsCount = game.turns.length
 
   return (
-    <table className="w-full border-collapse xs:border-x">
+    <table className="w-full border-collapse border-b xs:border-x">
       <thead>
         <tr>
           <ViewTableHeaderCell className="border-l-gray-600 xs:border-l">
