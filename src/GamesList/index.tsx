@@ -13,6 +13,7 @@ import {
   GameStatus,
   Turn
 } from '../api'
+import * as Icon from '../Icon'
 import { OngoingGamePlayers, CompletedGamePlayers } from '../GamePlayers'
 
 const DELETE_RESTORE_INTERVAL_SEC = 3
@@ -241,6 +242,20 @@ const ViewGame: React.VFC<{
   </div>
 ))
 
+const ViewEmpty: React.VFC = React.memo(() => (
+  <div className="flex flex-col gap-2 justify-center items-center h-full">
+    <p className="text-center text-lg 2xs:text-xl xs:text-2xl">
+      No games found{' '}
+      <span role="img" className="text-2xl 2xs:text-3xl xs:text-4xl">
+        🤷‍♂️
+      </span>
+      <br />
+      Start a new game by clicking{' '}
+      <Icon.Plus role="img" className="inline-block ml-1 cursor-default" />
+    </p>
+  </div>
+))
+
 const ViewContainer: React.FC<{
   className?: string
 }> = ({ className, children }) => (
@@ -248,7 +263,7 @@ const ViewContainer: React.FC<{
     <div
       className={cx(
         className,
-        'px-2 mx-auto bg-white border-gray-50',
+        'h-full min-h-full px-2 mx-auto bg-white border-gray-50',
         'xs:max-w-md xs:px-3 xs:shadow-lg xs:border'
       )}
     >
@@ -268,6 +283,14 @@ export const GameList = React.memo(() => {
     return (
       <ViewContainer>
         Something went wrong while loading the games
+      </ViewContainer>
+    )
+  }
+
+  if (games.length === 0) {
+    return (
+      <ViewContainer>
+        <ViewEmpty />
       </ViewContainer>
     )
   }
