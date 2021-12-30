@@ -26,7 +26,9 @@
   },
   "homepage": "https://github.com/owanturist/catanstat#readme",
   "devDependencies": {
+    "@parcel/packager-raw-url": "^2.0.1",
     "@parcel/reporter-bundle-analyzer": "^2.0.1",
+    "@parcel/transformer-webmanifest": "^2.0.1",
     "@types/react": "^17.0.37",
     "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "^17.0.11",
