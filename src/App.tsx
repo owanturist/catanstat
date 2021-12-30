@@ -10,6 +10,7 @@ import * as GameRoom from './GameRoom'
 import { GameList } from './GamesList'
 import { GameHistory } from './GameHistory'
 import { GameStat } from './GameStat'
+import { NotFound } from './NotFound'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,7 +72,7 @@ export const App: React.VFC = () => (
           <Route path="history" element={<GameHistory />} />
         </Route>
 
-        <Route path="*" element={<div>TODO 404</div>} />
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
 

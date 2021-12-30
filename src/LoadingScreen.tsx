@@ -5,10 +5,22 @@ import logo from './assets/logo.svg'
 
 export const LoadingScreen: React.VFC<{
   className?: string
-}> = React.memo(({ className }) => (
-  <img
-    src={logo}
-    className={cx('w-full animate-pulse', className)}
-    alt="logo"
-  />
-))
+}> = React.memo(({ className }) => {
+  const [isRendered, setIsRendered] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsRendered(true)
+  }, [])
+
+  return (
+    <img
+      src={logo}
+      className={cx(
+        'w-full animate-pulse opacity-0 transition-opacity duration-500 ease-in-out',
+        isRendered && 'opacity-100',
+        className
+      )}
+      alt="logo"
+    />
+  )
+})
