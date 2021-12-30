@@ -1,25 +1,22 @@
 {
+  "eslint.options": {
+    "extensions": [".js", ".jsx", ".md", ".mdx", ".ts", ".tsx"]
+  },
+  "eslint.validate": [
+    "markdown",
+    "mdx",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "cSpell.enabled": true,
   "css.validate": false,
   "editor.quickSuggestions": {
     "strings": true
   },
-  "elm.analyseEnabled": true,
-  "elm.analyseCommand": "./node_modules/.bin/elm-analyse",
-  "elm.analysePort": "3030",
-  "elm.includeUserFunctionDocumentation": true,
-  "elm.includeParamsInUserAutocomplete": true,
-  "elm.showSuggestionsInElmSyntax": true,
-  "elmLS.elmFormatPath": "./node_modules/.bin/elm-format",
-  "elmLS.elmPath": "./node_modules/.bin/elm",
-  "elmLS.elmReviewPath": "./node_modules/.bin/elm-review",
-  "[elm]": {
-    "editor.formatOnSave": true
-  },
-  "tailwindCSS.includeLanguages": {
-    "elm": "html"
-  },
   "tailwindCSS.experimental.classRegex": [
-    ["\\bclass\\s+\\[([^)]*)\\]", "\"([^\"]*)\""], // TW.class
-    ["\\bclass\\s+([^)]*)", "\"([^\"]*)\""] // Html.class
+    ["\\bcx\\(([^)]*)\\)", "'([^']*)'"] // cx
   ]
 }

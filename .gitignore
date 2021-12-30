@@ -1,13 +1,12 @@
-# elm-package generated files
-elm-stuff
-# elm-repl generated files
-repl-temp-*
 # node generated files
 node_modules
 
 # cache
 .parcel-cache
 .tmp-*
+
+# analyze
+parcel-bundle-reports
 
 bin
 build
