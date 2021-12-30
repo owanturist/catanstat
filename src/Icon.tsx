@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 
-const iconClassName = cx(
+const styleIcon = cx(
   'block overflow-visible h-[1em] leading-none pointer-events-none'
 )
 
@@ -13,7 +13,7 @@ export type IconProps = Omit<
 export const Drag: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 16 16"
   >
     <path
@@ -26,7 +26,7 @@ export const Drag: React.VFC<IconProps> = props => (
 export const User: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 512 512"
   >
     <path
@@ -39,7 +39,7 @@ export const User: React.VFC<IconProps> = props => (
 export const UserOff: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 640 512"
   >
     <path
@@ -52,7 +52,7 @@ export const UserOff: React.VFC<IconProps> = props => (
 export const Pause: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 512"
   >
     <path
@@ -65,7 +65,7 @@ export const Pause: React.VFC<IconProps> = props => (
 export const Play: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 512"
   >
     <path
@@ -78,7 +78,7 @@ export const Play: React.VFC<IconProps> = props => (
 export const Flag: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 512 512"
   >
     <path
@@ -91,7 +91,7 @@ export const Flag: React.VFC<IconProps> = props => (
 export const Undo: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 512 512"
   >
     <path
@@ -104,7 +104,7 @@ export const Undo: React.VFC<IconProps> = props => (
 export const Times: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 352 512"
   >
     <path
@@ -117,7 +117,7 @@ export const Times: React.VFC<IconProps> = props => (
 export const Trophy: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 576 512"
   >
     <path
@@ -130,7 +130,7 @@ export const Trophy: React.VFC<IconProps> = props => (
 export const Ellipsis: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 192 512"
   >
     <path
@@ -143,7 +143,7 @@ export const Ellipsis: React.VFC<IconProps> = props => (
 export const ChartPie: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 544 512"
   >
     <path
@@ -156,7 +156,7 @@ export const ChartPie: React.VFC<IconProps> = props => (
 export const Book: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 512"
   >
     <path
@@ -169,7 +169,7 @@ export const Book: React.VFC<IconProps> = props => (
 export const ArrowLeft: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 512"
   >
     <path
@@ -182,7 +182,7 @@ export const ArrowLeft: React.VFC<IconProps> = props => (
 export const Plus: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 512"
   >
     <path
@@ -195,7 +195,7 @@ export const Plus: React.VFC<IconProps> = props => (
 export const Logo: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 192 128"
   >
     <path
@@ -208,7 +208,7 @@ export const Logo: React.VFC<IconProps> = props => (
 export const DieClear: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 448"
   >
     <path
@@ -221,7 +221,7 @@ export const DieClear: React.VFC<IconProps> = props => (
 export const DieOne: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 448"
   >
     <path
@@ -234,7 +234,7 @@ export const DieOne: React.VFC<IconProps> = props => (
 export const DieTwo: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 448"
   >
     <path
@@ -247,7 +247,7 @@ export const DieTwo: React.VFC<IconProps> = props => (
 export const DieThree: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 448"
   >
     <path
@@ -260,7 +260,7 @@ export const DieThree: React.VFC<IconProps> = props => (
 export const DieFour: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 448"
   >
     <path
@@ -273,7 +273,7 @@ export const DieFour: React.VFC<IconProps> = props => (
 export const DieFive: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 448"
   >
     <path
@@ -286,7 +286,7 @@ export const DieFive: React.VFC<IconProps> = props => (
 export const DieSix: React.VFC<IconProps> = props => (
   <svg
     {...props}
-    className={cx(iconClassName, props.className)}
+    className={cx(styleIcon, props.className)}
     viewBox="0 0 448 448"
   >
     <path

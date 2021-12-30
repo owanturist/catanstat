@@ -15,7 +15,7 @@ import { GameID } from './api'
 import * as Icon from './Icon'
 import { castID } from './utils'
 
-const toolClassName = cx(
+const styleTool = cx(
   'flex justify-center items-center w-6 h-6',
   'text-xs text-gray-600 border border-gray-300/0 ring-gray-300/50 rounded outline-none transition-colors',
   'focus-visible:ring-2',
@@ -56,7 +56,7 @@ const ViewHeaderDropdown: React.VFC = React.memo(() => {
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button as="button" type="button" className={toolClassName}>
+      <Menu.Button as="button" type="button" className={styleTool}>
         <Icon.Ellipsis />
       </Menu.Button>
 
@@ -84,7 +84,7 @@ const ViewBackToGameButton: React.VFC = React.memo(() => {
 
   return (
     <Tooltip content="Back to game">
-      <Link to={`/game/${gameId}`} className={toolClassName}>
+      <Link to={`/game/${gameId}`} className={styleTool}>
         <Icon.ArrowLeft />
       </Link>
     </Tooltip>
@@ -93,7 +93,7 @@ const ViewBackToGameButton: React.VFC = React.memo(() => {
 
 const ViewStartGame: React.VFC = React.memo(() => (
   <Tooltip content="Start new game">
-    <Link to="/start" className={toolClassName}>
+    <Link to="/start" className={styleTool}>
       <Icon.Plus />
     </Link>
   </Tooltip>

@@ -19,7 +19,7 @@ import { LoadingScreen } from '../LoadingScreen'
 
 const DELETE_RESTORE_INTERVAL_SEC = 3
 
-const gameToolClassName = cx(
+const styleGameTool = cx(
   'flex-1 p-1 rounded border text-center text-2xs font-semibold uppercase outline-none transition',
   'focus-within:ring-2',
   '2xs:text-xs',
@@ -32,7 +32,7 @@ const ViewGameToolLink: React.FC<{
   <Link
     {...props}
     className={cx(
-      gameToolClassName,
+      styleGameTool,
       'text-gray-600 bg-gray-50 border-gray-100 ring-gray-100',
       'hover:bg-gray-100 hover:border-gray-200'
     )}
@@ -80,7 +80,7 @@ const ViewDeleteGameTool: React.FC<{
       <button
         type="button"
         className={cx(
-          gameToolClassName,
+          styleGameTool,
           'whitespace-nowrap',
           'text-blue-600 bg-blue-50 border-blue-100 ring-blue-100',
           'hover:bg-blue-100 hover:border-blue-200'
@@ -97,7 +97,7 @@ const ViewDeleteGameTool: React.FC<{
     <button
       type="button"
       className={cx(
-        gameToolClassName,
+        styleGameTool,
         'text-red-600 bg-red-50 border-red-100 ring-red-100',
         'hover:bg-red-100 hover:border-red-200'
       )}
