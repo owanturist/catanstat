@@ -1,64 +1,10 @@
 import React from 'react'
-import {
-  Chart as ChartJS,
-  Legend,
-  BarElement,
-  ArcElement,
-  PointElement,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  RadialLinearScale,
-  Tooltip,
-  Filler
-} from 'chart.js'
-import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { useParams } from 'react-router-dom'
 import cx from 'classnames'
 
 import { castID } from '../utils'
 import { GameID, useQueryGame } from '../api'
 import { LoadingScreen } from '../LoadingScreen'
-
-import { TurnsDurationChart } from './TurnsDurationChart'
-import { TotalDurationChart } from './TotalDurationChart'
-import { TurnsDistributionChart } from './TurnsDistributionChart'
-import {
-  NumberDiceDistribution,
-  EventDieDistribution,
-  NumberPerEventDiceDistribution
-} from './DiceDistributionChart'
-
-ChartJS.register(
-  ArcElement,
-  BarElement,
-  PointElement,
-  LineElement,
-  Legend,
-  ChartDataLabels,
-  CategoryScale,
-  LinearScale,
-  RadialLinearScale,
-  Tooltip,
-  Filler
-)
-
-const ViewSection: React.FC<{
-  title: React.ReactNode
-}> = ({ title, children }) => (
-  <div>
-    <h4
-      className={cx(
-        'mb-2 text-lg text-center font-bold',
-        '2xs:text-xl',
-        'xs:text-2xl'
-      )}
-    >
-      {title}
-    </h4>
-    {children}
-  </div>
-)
 
 const ViewContainer: React.FC<{
   className?: string
@@ -77,17 +23,21 @@ const ViewContainer: React.FC<{
   </div>
 )
 
+const LazyGameStat = React.lazy(() => import('./GameStat'))
+
+const ViewLoading: React.VFC = () => (
+  <ViewContainer className="flex justify-center">
+    <LoadingScreen />
+  </ViewContainer>
+)
+
 export const GameStat: React.VFC = React.memo(() => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
-    return (
-      <ViewContainer className="flex justify-center">
-        <LoadingScreen />
-      </ViewContainer>
-    )
+    return <ViewLoading />
   }
 
   if (error != null) {
@@ -101,30 +51,10 @@ export const GameStat: React.VFC = React.memo(() => {
   }
 
   return (
-    <ViewContainer>
-      <ViewSection title="Total game duration">
-        <TotalDurationChart game={game} />
-      </ViewSection>
-
-      <ViewSection title="Turns duration">
-        <TurnsDurationChart game={game} />
-      </ViewSection>
-
-      <ViewSection title="Turns distribution">
-        <TurnsDistributionChart turns={game.turns} />
-      </ViewSection>
-
-      <ViewSection title="White and Red dice distribution">
-        <NumberDiceDistribution turns={game.turns} />
-      </ViewSection>
-
-      <ViewSection title="Event die distribution">
-        <EventDieDistribution turns={game.turns} />
-      </ViewSection>
-
-      <ViewSection title="Red to Event dice distribution">
-        <NumberPerEventDiceDistribution turns={game.turns} />
-      </ViewSection>
-    </ViewContainer>
+    <React.Suspense fallback={<ViewLoading />}>
+      <ViewContainer>
+        <LazyGameStat game={game} />
+      </ViewContainer>
+    </React.Suspense>
   )
 })
