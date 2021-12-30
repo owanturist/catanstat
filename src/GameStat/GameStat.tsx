@@ -1,6 +1,9 @@
 import React from 'react'
 import {
   Chart as ChartJS,
+  BarController,
+  LineController,
+  PieController,
   Legend,
   BarElement,
   ArcElement,
@@ -28,6 +31,9 @@ import {
 
 ChartJS.register(
   ArcElement,
+  BarController,
+  LineController,
+  PieController,
   BarElement,
   PointElement,
   LineElement,
@@ -37,7 +43,8 @@ ChartJS.register(
   LinearScale,
   RadialLinearScale,
   Tooltip,
-  Filler
+  Filler,
+  LineController
 )
 
 const ViewSection: React.FC<{
