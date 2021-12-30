@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom'
 
 import { GameID, useQueryGame } from '../api'
 import { castID } from '../utils'
-import { LoadingScreen } from '../LoadingScreen'
 
 import { CompletedGame } from './CompletedGame'
 import { State } from './domain'
@@ -45,11 +44,7 @@ export const View: React.VFC<{
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
-    return (
-      <ViewContainer className="h-full flex justify-center">
-        <LoadingScreen />
-      </ViewContainer>
-    )
+    return <ViewContainer />
   }
 
   if (error != null) {

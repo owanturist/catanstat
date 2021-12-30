@@ -7,7 +7,6 @@ import { Dice, DieEventIcon, DieNumberIcon, DiePlaceholderIcon } from '../Die'
 import { Game, GameID, Player, useQueryGame } from '../api'
 import { castID, formatDurationMs, useEvery } from '../utils'
 import * as Icon from '../Icon'
-import { LoadingScreen } from '../LoadingScreen'
 
 const ViewContainer: React.FC<{
   className?: string
@@ -202,16 +201,7 @@ export const GameHistory: React.VFC = React.memo(() => {
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
-    return (
-      <ViewContainer
-        className={cx(
-          'flex justify-center p-2 border-gray-50',
-          'xs:border-x xs:p-3 xs:shadow-lg'
-        )}
-      >
-        <LoadingScreen />
-      </ViewContainer>
-    )
+    return <ViewContainer />
   }
 
   if (error != null) {

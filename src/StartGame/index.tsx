@@ -2,8 +2,6 @@ import React from 'react'
 import { InnerStore } from 'react-inner-store'
 import cx from 'classnames'
 
-import { LoadingScreen } from '../LoadingScreen'
-
 import { State } from './domain'
 export { State } from './domain'
 
@@ -25,13 +23,7 @@ export const View: React.VFC<{
         'sm:grow-0 sm:rounded-md'
       )}
     >
-      <React.Suspense
-        fallback={
-          <div className="p-2 flex-1 flex justify-center xs:p-3">
-            <LoadingScreen />
-          </div>
-        }
-      >
+      <React.Suspense fallback={null}>
         <LazyStartGame store={store} />
       </React.Suspense>
     </div>

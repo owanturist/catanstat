@@ -4,7 +4,6 @@ import cx from 'classnames'
 
 import { castID } from '../utils'
 import { GameID, useQueryGame } from '../api'
-import { LoadingScreen } from '../LoadingScreen'
 
 const ViewContainer: React.FC<{
   className?: string
@@ -25,19 +24,13 @@ const ViewContainer: React.FC<{
 
 const LazyGameStat = React.lazy(() => import('./GameStat'))
 
-const ViewLoading: React.VFC = () => (
-  <ViewContainer className="flex justify-center">
-    <LoadingScreen />
-  </ViewContainer>
-)
-
 export const GameStat: React.VFC = React.memo(() => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
-    return <ViewLoading />
+    return <ViewContainer />
   }
 
   if (error != null) {
@@ -51,7 +44,7 @@ export const GameStat: React.VFC = React.memo(() => {
   }
 
   return (
-    <React.Suspense fallback={<ViewLoading />}>
+    <React.Suspense fallback={null}>
       <ViewContainer>
         <LazyGameStat game={game} />
       </ViewContainer>
