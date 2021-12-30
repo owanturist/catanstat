@@ -75,6 +75,6 @@ export const App: React.VFC = () => (
       </Route>
     </Routes>
 
-    <Toaster position="top-right" />
+    <Toaster position="bottom-center" />
   </QueryClientProvider>
 )

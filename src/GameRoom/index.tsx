@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom'
 
 import { GameID, useQueryGame } from '../api'
 import { castID } from '../utils'
+import { LoadingScreen } from '../LoadingScreen'
 
 import { CompletedGame } from './CompletedGame'
 import { State } from './domain'
@@ -12,7 +13,9 @@ import { OngoingGame } from './OngoingGame'
 
 export { State } from './domain'
 
-const ViewContainer: React.FC = ({ children }) => (
+const ViewContainer: React.FC<{
+  className?: string
+}> = ({ className, children }) => (
   <div className="h-full overflow-y-auto">
     <div
       className={cx(
@@ -22,8 +25,9 @@ const ViewContainer: React.FC = ({ children }) => (
     >
       <div
         className={cx(
+          className,
           'flex-1 shrink-0 max-w-md w-full p-2 bg-white border-gray-50 overflow-hidden',
-          'xs:p-3 xs:shadow-lg xs:border',
+          'xs:p-3 xs:shadow-lg xs:border-x',
           'sm:max-w-md sm:rounded-md sm:flex-initial'
         )}
       >
@@ -41,8 +45,11 @@ export const View: React.VFC<{
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
-    // @TODO loading skeleton
-    return null
+    return (
+      <ViewContainer className="h-full flex justify-center">
+        <LoadingScreen />
+      </ViewContainer>
+    )
   }
 
   if (error != null) {

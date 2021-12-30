@@ -7,10 +7,15 @@ import { Dice, DieEventIcon, DieNumberIcon, DiePlaceholderIcon } from '../Die'
 import { Game, GameID, Player, useQueryGame } from '../api'
 import { castID, formatDurationMs, useEvery } from '../utils'
 import * as Icon from '../Icon'
+import { LoadingScreen } from '../LoadingScreen'
 
-const ViewContainer: React.FC = ({ children }) => (
+const ViewContainer: React.FC<{
+  className?: string
+}> = ({ className, children }) => (
   <div className="h-full overflow-y-auto text-gray-700 mx-auto">
-    <div className={cx('mx-auto', 'xs:max-w-md')}>{children}</div>
+    <div className={cx(className, 'h-full min-h-full mx-auto', 'xs:max-w-md')}>
+      {children}
+    </div>
   </div>
 )
 
@@ -197,7 +202,16 @@ export const GameHistory: React.VFC = React.memo(() => {
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
-    return null
+    return (
+      <ViewContainer
+        className={cx(
+          'flex justify-center p-2 border-gray-50',
+          'xs:border-x xs:p-3 xs:shadow-lg'
+        )}
+      >
+        <LoadingScreen />
+      </ViewContainer>
+    )
   }
 
   if (error != null) {

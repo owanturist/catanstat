@@ -15,6 +15,7 @@ import {
 } from '../api'
 import * as Icon from '../Icon'
 import { OngoingGamePlayers, CompletedGamePlayers } from '../GamePlayers'
+import { LoadingScreen } from '../LoadingScreen'
 
 const DELETE_RESTORE_INTERVAL_SEC = 3
 
@@ -264,7 +265,7 @@ const ViewContainer: React.FC<{
       className={cx(
         className,
         'h-full min-h-full px-2 mx-auto bg-white border-gray-50',
-        'xs:max-w-md xs:px-3 xs:shadow-lg xs:border'
+        'xs:max-w-md xs:px-3 xs:shadow-lg xs:border-x'
       )}
     >
       {children}
@@ -276,7 +277,11 @@ export const GameList = React.memo(() => {
   const { isLoading, error, games } = useQueryAllGames()
 
   if (isLoading) {
-    return null
+    return (
+      <ViewContainer className="flex justify-center">
+        <LoadingScreen />
+      </ViewContainer>
+    )
   }
 
   if (error != null) {

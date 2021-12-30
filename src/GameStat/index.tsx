@@ -18,6 +18,7 @@ import cx from 'classnames'
 
 import { castID } from '../utils'
 import { GameID, useQueryGame } from '../api'
+import { LoadingScreen } from '../LoadingScreen'
 
 import { TurnsDurationChart } from './TurnsDurationChart'
 import { TotalDurationChart } from './TotalDurationChart'
@@ -59,13 +60,16 @@ const ViewSection: React.FC<{
   </div>
 )
 
-const ViewContainer: React.FC = ({ children }) => (
+const ViewContainer: React.FC<{
+  className?: string
+}> = ({ className, children }) => (
   <div className="h-full overflow-y-auto text-gray-700 mx-auto">
     <div
       className={cx(
-        'p-2 mx-auto space-y-4 bg-white border-gray-50',
+        className,
+        'h-full min-h-full p-2 mx-auto space-y-4 bg-white border-gray-50',
         '2xs:space-y-6',
-        'xs:max-w-md xs:p-3 xs:shadow-lg xs:border'
+        'xs:max-w-md xs:p-3 xs:shadow-lg xs:border-x'
       )}
     >
       {children}
@@ -79,7 +83,11 @@ export const GameStat: React.VFC = React.memo(() => {
   const { isLoading, error, game } = useQueryGame(gameId)
 
   if (isLoading) {
-    return null
+    return (
+      <ViewContainer className="flex justify-center">
+        <LoadingScreen />
+      </ViewContainer>
+    )
   }
 
   if (error != null) {
