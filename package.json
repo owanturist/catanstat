@@ -11,6 +11,7 @@
     "prebuild": "npm run clean:cache && npm run clean:build",
     "build": "parcel build public/index.html --dist-dir build",
     "postbuild": "npm run copy:index-200",
+    "analyze": "npm run build -- --reporter @parcel/reporter-bundle-analyzer",
     "ts": "tsc --noEmit"
   },
   "repository": {
@@ -25,6 +26,7 @@
   },
   "homepage": "https://github.com/owanturist/catanstat#readme",
   "devDependencies": {
+    "@parcel/reporter-bundle-analyzer": "^2.0.1",
     "@types/react": "^17.0.37",
     "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "^17.0.11",
@@ -38,7 +40,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.27.1",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "parcel": "^2.0.0",
+    "parcel": "^2.0.1",
     "postcss": "^8.4.4",
     "postcss-import": "^14.0.2",
     "prettier": "^2.5.0",
