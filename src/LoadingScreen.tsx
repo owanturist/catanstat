@@ -16,7 +16,7 @@ export const LoadingScreen: React.VFC<{
     <img
       src={logo}
       className={cx(
-        'w-full animate-pulse opacity-0 transition-opacity duration-500 ease-in-out',
+        'w-full animate-pulse opacity-0 transition-opacity duration-500 ease-in-out aspect-[196/132]',
         isRendered && 'opacity-100',
         className
       )}
