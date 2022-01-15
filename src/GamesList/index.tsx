@@ -263,7 +263,7 @@ const ViewContainer: React.FC<{
     <div
       className={cx(
         className,
-        'h-full min-h-full px-2 mx-auto bg-white border-gray-50',
+        'min-h-full px-2 mx-auto bg-white border-gray-50',
         'xs:max-w-md xs:px-3 xs:shadow-lg xs:border-x'
       )}
     >
