@@ -1,5 +1,5 @@
 import React from 'react'
-import { InnerStore } from 'react-inner-store'
+import { Sweety } from 'react-sweety'
 import cx from 'classnames'
 
 import { State } from './domain'
@@ -8,7 +8,7 @@ export { State } from './domain'
 const LazyStartGame = React.lazy(() => import('./StartGame'))
 
 export const View: React.VFC<{
-  store: InnerStore<State>
+  store: Sweety<State>
 }> = React.memo(({ store }) => (
   <div
     className={cx(

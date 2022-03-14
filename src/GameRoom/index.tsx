@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
-import { InnerStore } from 'react-inner-store'
+import { Sweety } from 'react-sweety'
 import { useParams } from 'react-router-dom'
 
 import { GameID, useQueryGame } from '../api'
@@ -37,7 +37,7 @@ const ViewContainer: React.FC<{
 )
 
 export const View: React.VFC<{
-  store: InnerStore<State>
+  store: Sweety<State>
 }> = React.memo(({ store }) => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)

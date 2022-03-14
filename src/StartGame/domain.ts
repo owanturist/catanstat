@@ -1,17 +1,17 @@
-import { InnerStore } from 'react-inner-store'
+import { Sweety } from 'react-sweety'
 
 import { Color } from '../Color'
 
 export abstract class PlayerInfo {
   abstract readonly color: Color
-  abstract readonly name: InnerStore<string>
-  abstract readonly isActive: InnerStore<boolean>
+  abstract readonly name: Sweety<string>
+  abstract readonly isActive: Sweety<boolean>
 
   public static init(color: Color): PlayerInfo {
     return {
       color,
-      name: InnerStore.of(color.label),
-      isActive: InnerStore.of<boolean>(true)
+      name: Sweety.of(color.label),
+      isActive: Sweety.of<boolean>(true)
     }
   }
 }

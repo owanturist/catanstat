@@ -1,11 +1,11 @@
 import cx from 'classnames'
 import React from 'react'
 import {
-  InnerStore,
-  useGetInnerState,
-  useInnerState,
-  useSetInnerState
-} from 'react-inner-store'
+  Sweety,
+  useGetSweetyState,
+  useSweetyState,
+  useSetSweetyState
+} from 'react-sweety'
 import { toast } from 'react-hot-toast'
 
 import {
@@ -28,10 +28,10 @@ const ViewCompleteTurnButton: React.VFC<{
   gameId: GameID
   state: State
 }> = React.memo(({ gameId, state }) => {
-  const setIsMutating = useSetInnerState(state.isMutating)
-  const whiteDie = useGetInnerState(state.whiteDie) ?? 0
-  const redDie = useGetInnerState(state.redDie) ?? 0
-  const eventDie = useGetInnerState(state.eventDie)
+  const setIsMutating = useSetSweetyState(state.isMutating)
+  const whiteDie = useGetSweetyState(state.whiteDie) ?? 0
+  const redDie = useGetSweetyState(state.redDie) ?? 0
+  const eventDie = useGetSweetyState(state.eventDie)
 
   const { completeTurn } = useCompleteTurn(gameId, {
     onError() {
@@ -113,9 +113,9 @@ const ViewSecondaryButton: React.FC<{
 const ViewPauseGameButton: React.VFC<{
   gameId: GameID
   isGamePaused: boolean
-  isMutating: InnerStore<boolean>
+  isMutating: Sweety<boolean>
 }> = React.memo(({ gameId, isGamePaused, isMutating }) => {
-  const [isMutatingBool, setIsMutating] = useInnerState(isMutating)
+  const [isMutatingBool, setIsMutating] = useSweetyState(isMutating)
 
   const { pauseGame } = usePauseGame(gameId, {
     onError() {
@@ -197,7 +197,7 @@ const ViewCompleteGameButton: React.VFC<{
   gameId: GameID
   state: State
 }> = React.memo(({ gameId, state }) => {
-  const setIsMutating = useSetInnerState(state.isMutating)
+  const setIsMutating = useSetSweetyState(state.isMutating)
   const { completeGame } = useCompleteGame(gameId, {
     onError() {
       setIsMutating(false)
@@ -234,7 +234,7 @@ const ViewAbortTurnButton: React.VFC<{
   hasTurns: boolean
   state: State
 }> = React.memo(({ gameId, hasTurns, state }) => {
-  const setIsMutating = useSetInnerState(state.isMutating)
+  const setIsMutating = useSetSweetyState(state.isMutating)
   const { abortLastTurn } = useAbortLastTurn(gameId, {
     onError() {
       setIsMutating(false)
@@ -269,10 +269,10 @@ export const OngoingGame: React.VFC<{
   status: GameStatusOngoing
   players: ReadonlyArray<Player>
   hasTurns: boolean
-  store: InnerStore<State>
+  store: Sweety<State>
 }> = React.memo(({ gameId, status, players, hasTurns, store }) => {
-  const state = useGetInnerState(store)
-  const isMutating = useGetInnerState(state.isMutating)
+  const state = useGetSweetyState(store)
+  const isMutating = useGetSweetyState(state.isMutating)
 
   return (
     <>
