@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
-import { InnerStore, useInnerState } from 'react-inner-store'
+import { Sweety, useSweetyState } from 'react-sweety'
 import cx from 'classnames'
 import { toast } from 'react-hot-toast'
 
@@ -14,8 +14,8 @@ const ViewPlayer: React.VFC<{
   index: number
   player: PlayerInfo
 }> = React.memo(({ index, player }) => {
-  const [name, setName] = useInnerState(player.name)
-  const [isActive, setIsActive] = useInnerState(player.isActive)
+  const [name, setName] = useSweetyState(player.name)
+  const [isActive, setIsActive] = useSweetyState(player.isActive)
 
   return (
     <Draggable draggableId={player.color.id} index={index}>
@@ -84,10 +84,10 @@ const ViewPlayer: React.VFC<{
 })
 
 const StartGame: React.VFC<{
-  store: InnerStore<State>
+  store: Sweety<State>
 }> = React.memo(({ store }) => {
   const navigate = useNavigate()
-  const [state, setState] = useInnerState(store)
+  const [state, setState] = useSweetyState(store)
   const { isLoading, startGame } = useStartGame({
     onError() {
       toast.error('Failed to start game')

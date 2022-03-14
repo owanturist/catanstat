@@ -1,5 +1,5 @@
 import React from 'react'
-import { InnerStore, useInnerWatch, useSetInnerState } from 'react-inner-store'
+import { Sweety, useWatchSweety, useSetSweetyState } from 'react-sweety'
 import cx from 'classnames'
 import shallow from 'shallowequal'
 
@@ -21,11 +21,11 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
   name: string
   isDisabled: boolean
   value: TDie
-  store: InnerStore<State<TDie>>
+  store: Sweety<State<TDie>>
 }) => ReturnType<React.VFC> = React.memo(
   ({ icon, name, isDisabled, value, store }) => {
-    const setState = useSetInnerState(store)
-    const [isChecked, isAnyDieSelected] = useInnerWatch(
+    const setState = useSetSweetyState(store)
+    const [isChecked, isAnyDieSelected] = useWatchSweety(
       React.useCallback(() => {
         const die = store.getState()
 
@@ -79,7 +79,7 @@ const ViewDieRow: React.FC<{ name: string }> = ({ name, children }) => (
 export interface DieRowProps<TDie extends DieNumber | DieEvent> {
   name: string
   isDisabled: boolean
-  store: InnerStore<State<TDie>>
+  store: Sweety<State<TDie>>
 }
 
 const NUMBER_DICE: ReadonlyArray<DieNumber> = [1, 2, 3, 4, 5, 6]

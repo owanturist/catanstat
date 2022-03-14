@@ -1,21 +1,21 @@
-import { InnerStore } from 'react-inner-store'
+import { Sweety } from 'react-sweety'
 
 import { Dice, DieEvent, DieNumber } from '../Die'
 
 import * as DieRow from './DieRow'
 
 export abstract class State {
-  abstract readonly isMutating: InnerStore<boolean>
-  abstract readonly whiteDie: InnerStore<DieRow.State<DieNumber>>
-  abstract readonly redDie: InnerStore<DieRow.State<DieNumber>>
-  abstract readonly eventDie: InnerStore<DieRow.State<DieEvent>>
+  abstract readonly isMutating: Sweety<boolean>
+  abstract readonly whiteDie: Sweety<DieRow.State<DieNumber>>
+  abstract readonly redDie: Sweety<DieRow.State<DieNumber>>
+  abstract readonly eventDie: Sweety<DieRow.State<DieEvent>>
 
   public static init(): State {
     return {
-      isMutating: InnerStore.of<boolean>(false),
-      whiteDie: InnerStore.of(DieRow.init()),
-      redDie: InnerStore.of(DieRow.init()),
-      eventDie: InnerStore.of(DieRow.init())
+      isMutating: Sweety.of<boolean>(false),
+      whiteDie: Sweety.of(DieRow.init()),
+      redDie: Sweety.of(DieRow.init()),
+      eventDie: Sweety.of(DieRow.init())
     }
   }
 

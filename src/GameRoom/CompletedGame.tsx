@@ -1,7 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import { toast } from 'react-hot-toast'
-import { InnerStore, useGetInnerState } from 'react-inner-store'
+import { Sweety, useGetSweetyState } from 'react-sweety'
 
 import {
   GameID,
@@ -123,9 +123,9 @@ export const CompletedGame: React.VFC<{
   gameId: GameID
   status: GameStatusCompleted
   players: ReadonlyArray<Player>
-  store: InnerStore<State>
+  store: Sweety<State>
 }> = React.memo(({ gameId, status, players, store }) => {
-  const state = useGetInnerState(store)
+  const state = useGetSweetyState(store)
   const winnerPlayer = players.find(
     player => player.id === String(status.winnerPlayerId)
   )
