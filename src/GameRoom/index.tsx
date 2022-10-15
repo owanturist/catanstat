@@ -14,6 +14,7 @@ export { State } from './domain'
 
 const ViewContainer: React.FC<{
   className?: string
+  children?: React.ReactNode
 }> = ({ className, children }) => (
   <div className="h-full overflow-y-auto">
     <div

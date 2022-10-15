@@ -4,7 +4,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "copy:index-200": "cp dist/index.html dist/200.html",
-    "start": "vite --port 3001",
+    "start": "vite --port 3000",
     "build": "vite build",
     "postbuild": "npm run copy:index-200",
     "ts": "tsc --noEmit"
@@ -21,9 +21,9 @@
   },
   "homepage": "https://github.com/owanturist/catanstat#readme",
   "devDependencies": {
-    "@types/react": "^17.0.38",
+    "@types/react": "^18.0.21",
     "@types/react-beautiful-dnd": "^13.1.2",
-    "@types/react-dom": "^17.0.11",
+    "@types/react-dom": "^18.0.6",
     "@types/shallowequal": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^5.40.0",
     "@typescript-eslint/parser": "^5.40.0",
@@ -36,9 +36,10 @@
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.18",
-    "postcss-import": "^14.0.2",
+    "postcss-import": "^15.0.0",
     "prettier": "^2.7.1",
     "tailwindcss": "^3.1.8",
+    "typescript": "^4.8.4",
     "vite": "^3.1.8"
   },
   "dependencies": {
@@ -49,14 +50,14 @@
     "classnames": "^2.3.2",
     "date-fns": "^2.29.3",
     "dexie": "^3.2.2",
-    "react": "^17.0.2",
+    "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-chartjs-2": "^4.3.1",
-    "react-dom": "^17.0.2",
+    "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.0",
     "react-query": "^3.39.2",
     "react-router-dom": "^6.4.2",
-    "react-sweety": "^1.0.0",
+    "react-sweety": "^2.0.0",
     "shallowequal": "^1.1.0",
     "tippy.js": "^6.3.7"
   },

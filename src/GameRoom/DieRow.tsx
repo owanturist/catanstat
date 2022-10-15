@@ -59,7 +59,10 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
   }
 )
 
-const ViewDieRow: React.FC<{ name: string }> = ({ name, children }) => (
+const ViewDieRow: React.FC<{
+  name: string
+  children: React.ReactNode
+}> = ({ name, children }) => (
   <ol
     className="flex gap-1 justify-between xs:gap-2"
     role="radiogroup"

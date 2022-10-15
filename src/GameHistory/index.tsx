@@ -10,6 +10,7 @@ import * as Icon from '../Icon'
 
 const ViewContainer: React.FC<{
   className?: string
+  children?: React.ReactNode
 }> = ({ className, children }) => (
   <div className="h-full overflow-y-auto text-gray-700 mx-auto">
     <div className={cx(className, 'h-full min-h-full mx-auto', 'xs:max-w-md')}>
@@ -50,6 +51,7 @@ const ViewDice: React.VFC<{
 
 const ViewTableCell: React.FC<{
   className?: string
+  children: React.ReactNode
 }> = ({ className, children }) => (
   <td className={cx('p-2', className)}>{children}</td>
 )
@@ -134,6 +136,7 @@ const ViewCurrentTableRow: React.VFC<{
 
 const ViewTableHeaderCell: React.FC<{
   className?: string
+  children: React.ReactNode
 }> = ({ className, children }) => (
   <th
     className={cx(

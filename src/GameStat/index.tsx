@@ -7,6 +7,7 @@ import { GameID, useQueryGame } from '../api'
 
 const ViewContainer: React.FC<{
   className?: string
+  children?: React.ReactNode
 }> = ({ className, children }) => (
   <div className="h-full overflow-y-auto text-gray-700 mx-auto">
     <div

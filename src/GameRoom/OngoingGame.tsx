@@ -90,6 +90,7 @@ const ViewSecondaryButton: React.FC<{
   as?: string
   className?: string
   onClick?: VoidFunction
+  children: React.ReactNode
 }> = ({ as: tagName = 'button', className, onClick, children }) => {
   return React.createElement(
     tagName,
