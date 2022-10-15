@@ -13,7 +13,7 @@ const ViewContainer: React.FC<{
     <div
       className={cx(
         className,
-        'h-full min-h-full p-2 mx-auto space-y-4 bg-white border-gray-50',
+        'min-h-full p-2 mx-auto space-y-4 bg-white border-gray-50',
         '2xs:space-y-6',
         'xs:max-w-md xs:p-3 xs:shadow-lg xs:border-x'
       )}
