@@ -1,12 +1,8 @@
 # node generated files
 node_modules
 
-# cache
-.parcel-cache
-.tmp-*
-
 # analyze
 parcel-bundle-reports
 
 bin
-build
+dist
