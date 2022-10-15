@@ -291,7 +291,7 @@ export const GameList = React.memo(() => {
 
   if (games.length === 0) {
     return (
-      <ViewContainer>
+      <ViewContainer className="h-full">
         <ViewEmpty />
       </ViewContainer>
     )
