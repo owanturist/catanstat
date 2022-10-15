@@ -91,9 +91,9 @@ const ViewCurrentPlayerCaret: React.VFC<{
   )
 })
 
-const ViewContainer: React.FC = ({ children }) => (
-  <div className="flex relative">{children}</div>
-)
+const ViewContainer: React.FC<{
+  children: React.ReactNode
+}> = ({ children }) => <div className="flex relative">{children}</div>
 
 export const OngoingGamePlayers: React.VFC<{
   status: GameStatusOngoing

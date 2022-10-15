@@ -27,6 +27,7 @@ const styleTool = cx(
 const ViewDropdownItem: React.FC<{
   to: string
   icon: React.ReactElement
+  children: React.ReactNode
 }> = ({ to, icon, children }) => (
   <Menu.Item>
     {({ active }) => (

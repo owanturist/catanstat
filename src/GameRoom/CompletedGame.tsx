@@ -19,6 +19,7 @@ import { State } from './domain'
 const ViewContinueButton: React.FC<{
   gameId: GameID
   state: State
+  children: React.ReactNode
 }> = ({ gameId, state, children }) => {
   const { abortLastTurn } = useAbortLastTurn(gameId, {
     onError() {

@@ -27,6 +27,7 @@ const styleGameTool = cx(
 
 const ViewGameToolLink: React.FC<{
   to: string
+  children: React.ReactNode
 }> = props => (
   <Link
     {...props}
@@ -258,6 +259,7 @@ const ViewEmpty: React.VFC = React.memo(() => (
 
 const ViewContainer: React.FC<{
   className?: string
+  children?: React.ReactNode
 }> = ({ className, children }) => (
   <div className="h-full overflow-x-hidden overflow-y-auto text-gray-700 mx-auto">
     <div

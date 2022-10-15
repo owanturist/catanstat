@@ -49,6 +49,7 @@ ChartJS.register(
 
 const ViewSection: React.FC<{
   title: React.ReactNode
+  children: React.ReactNode
 }> = ({ title, children }) => (
   <div>
     <h4

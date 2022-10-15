@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
   }
 })
 
-const LazyComponent = <TProps,>({
+const LazyComponent = <TProps extends Record<string, unknown>>({
   init,
   component
 }: {
