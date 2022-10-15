@@ -3,15 +3,10 @@
   "name": "catanstat",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean:build": "rm -rf ./build",
-    "clean:cache": "rm -rf ./.parcel-cache",
     "copy:index-200": "cp build/index.html build/200.html",
-    "dev": "parcel public/index.html --port 3000 --dist-dir .tmp-dev",
-    "postdev": "rm -rf ./.tmp-dev",
-    "prebuild": "npm run clean:cache && npm run clean:build",
-    "build": "parcel build public/index.html --dist-dir build",
+    "start": "vite",
+    "build": "vite build",
     "postbuild": "npm run copy:index-200",
-    "analyze": "npm run build -- --reporter @parcel/reporter-bundle-analyzer",
     "ts": "tsc --noEmit"
   },
   "repository": {
@@ -35,6 +30,7 @@
     "@types/shallowequal": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.8.1",
+    "@vitejs/plugin-react": "^2.1.0",
     "autoprefixer": "^10.4.1",
     "eslint": "^8.5.0",
     "eslint-config-prettier": "^8.3.0",
@@ -46,7 +42,8 @@
     "postcss": "^8.4.5",
     "postcss-import": "^14.0.2",
     "prettier": "^2.5.1",
-    "tailwindcss": "^3.0.8"
+    "tailwindcss": "^3.0.8",
+    "vite": "^3.1.8"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",

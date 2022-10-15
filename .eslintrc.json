@@ -138,7 +138,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["**/*.test.js", "packages/*/*.js", "./*.js"]
+        "devDependencies": ["./*.js", "./*.ts"]
       }
     ]
   },
