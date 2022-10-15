@@ -3,8 +3,8 @@
   "name": "catanstat",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "copy:index-200": "cp build/index.html build/200.html",
-    "start": "vite",
+    "copy:index-200": "cp dist/index.html dist/200.html",
+    "start": "vite --port 3000",
     "build": "vite build",
     "postbuild": "npm run copy:index-200",
     "ts": "tsc --noEmit"
