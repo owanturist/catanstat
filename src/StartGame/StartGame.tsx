@@ -83,7 +83,7 @@ const ViewPlayer: React.VFC<{
   )
 })
 
-const StartGame: React.VFC<{
+const StartGame: React.FC<{
   state: State
 }> = watch(({ state }) => {
   const players = state.players.getValue()

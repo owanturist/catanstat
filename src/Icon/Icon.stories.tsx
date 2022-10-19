@@ -1,11 +1,13 @@
 import React from 'react'
-import type { StoryFn } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
-import * as Icons from './index'
+import * as Icons from '.'
 
-export default {
+const meta: Meta = {
   title: 'Icons'
 }
+
+export default meta
 
 export const AllIcons: StoryFn<{
   color: string
