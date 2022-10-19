@@ -19,7 +19,7 @@ import { OngoingGamePlayers } from '../GamePlayers'
 import { State } from './domain'
 import * as DieRow from './DieRow'
 
-const ViewCompleteTurnButton: React.VFC<{
+const ViewCompleteTurnButton: React.FC<{
   gameId: GameID
   state: State
 }> = watch(({ gameId, state }) => {
@@ -105,7 +105,7 @@ const ViewSecondaryButton: React.FC<{
   )
 }
 
-const ViewPauseGameButton: React.VFC<{
+const ViewPauseGameButton: React.FC<{
   gameId: GameID
   isGamePaused: boolean
   isMutating: Impulse<boolean>
@@ -186,7 +186,7 @@ const ViewPauseGameButton: React.VFC<{
   )
 }
 
-const ViewCompleteGameButton: React.VFC<{
+const ViewCompleteGameButton: React.FC<{
   gameId: GameID
   state: State
 }> = ({ gameId, state }) => {
@@ -221,7 +221,7 @@ const ViewCompleteGameButton: React.VFC<{
   )
 }
 
-const ViewAbortTurnButton: React.VFC<{
+const ViewAbortTurnButton: React.FC<{
   gameId: GameID
   hasTurns: boolean
   state: State
@@ -255,7 +255,7 @@ const ViewAbortTurnButton: React.VFC<{
   )
 }
 
-export const OngoingGame: React.VFC<{
+export const OngoingGame: React.FC<{
   gameId: GameID
   status: GameStatusOngoing
   players: ReadonlyArray<Player>

@@ -42,7 +42,7 @@ const ViewContinueButton: React.FC<{
   )
 }
 
-const ViewBoardPicture: React.VFC<{
+const ViewBoardPicture: React.FC<{
   gameId: GameID
   picture: File
 }> = ({ gameId, picture }) => {
@@ -77,7 +77,7 @@ const ViewBoardPicture: React.VFC<{
   )
 }
 
-const ViewBoardPictureUpload: React.VFC<{
+const ViewBoardPictureUpload: React.FC<{
   gameId: GameID
 }> = ({ gameId }) => {
   const { isLoading, uploadBoardPicture } = useUploadBoardPicture(gameId, {
@@ -120,7 +120,7 @@ const ViewBoardPictureUpload: React.VFC<{
   )
 }
 
-export const CompletedGame: React.VFC<{
+export const CompletedGame: React.FC<{
   gameId: GameID
   status: GameStatusCompleted
   players: ReadonlyArray<Player>

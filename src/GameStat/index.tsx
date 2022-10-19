@@ -25,7 +25,7 @@ const ViewContainer: React.FC<{
 
 const LazyGameStat = React.lazy(() => import('./GameStat'))
 
-export const GameStat: React.VFC = () => {
+export const GameStat: React.FC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)

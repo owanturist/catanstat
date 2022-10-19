@@ -10,7 +10,7 @@ import { useStartGame } from '../api'
 
 import { PlayerInfo, State } from './domain'
 
-const ViewPlayer: React.VFC<{
+const ViewPlayer: React.FC<{
   index: number
   player: PlayerInfo
 }> = watch(({ index, player }) => {

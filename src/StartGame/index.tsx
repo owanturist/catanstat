@@ -6,7 +6,7 @@ export { State } from './domain'
 
 const LazyStartGame = React.lazy(() => import('./StartGame'))
 
-export const View: React.VFC<{
+export const View: React.FC<{
   state: State
 }> = ({ state }) => (
   <div

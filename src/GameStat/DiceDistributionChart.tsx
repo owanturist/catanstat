@@ -78,7 +78,7 @@ const DATASET_DEFAULTS: Partial<ChartDataset<'radar'>> = {
 
 const DIE_NUMBER_SIDES: Array<DieNumber> = [1, 2, 3, 4, 5, 6]
 
-export const NumberDiceDistribution: React.VFC<{
+export const NumberDiceDistribution: React.FC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
   const data = useImpulseMemo<ChartData<'radar'>>(() => {
@@ -134,7 +134,7 @@ const DIE_EVENT_COLORS: Record<DieEvent, string> = {
   black: cx('rgb(107, 114, 128)') // gray-500
 }
 
-export const EventDieDistribution: React.VFC<{
+export const EventDieDistribution: React.FC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
   const data = useImpulseMemo<ChartData<'radar'>>(() => {
@@ -184,7 +184,7 @@ export const EventDieDistribution: React.VFC<{
   return <Radar data={data} options={CHART_OPTIONS} />
 }
 
-export const NumberPerEventDiceDistribution: React.VFC<{
+export const NumberPerEventDiceDistribution: React.FC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
   const data = useImpulseMemo<ChartData<'radar'>>(() => {

@@ -114,7 +114,7 @@ const ViewDeleteGameTool: React.FC<{
   )
 }
 
-const ViewGameToolbar: React.VFC<{
+const ViewGameToolbar: React.FC<{
   gameId: GameID
 }> = ({ gameId }) => (
   <div className="flex gap-1 flex-row">
@@ -128,7 +128,7 @@ const ViewGameToolbar: React.VFC<{
   </div>
 )
 
-const ViewGameDuration: React.VFC<{
+const ViewGameDuration: React.FC<{
   status: GameStatus
   turns: ReadonlyArray<Turn>
 }> = ({ status, turns }) => {
@@ -190,7 +190,7 @@ const ViewGameDuration: React.VFC<{
   )
 }
 
-const ViewGamePicture: React.VFC<{
+const ViewGamePicture: React.FC<{
   picture: File
 }> = ({ picture }) => {
   const pictureUrl = useImpulseMemo(
@@ -205,7 +205,7 @@ const ViewGamePicture: React.VFC<{
   )
 }
 
-const ViewGame: React.VFC<{
+const ViewGame: React.FC<{
   game: Game
 }> = ({ game }) => (
   <div
@@ -245,7 +245,7 @@ const ViewGame: React.VFC<{
   </div>
 )
 
-const ViewEmpty: React.VFC = () => (
+const ViewEmpty: React.FC = () => (
   <div className="flex flex-col gap-2 justify-center items-center h-full">
     <p className="text-center text-lg 2xs:text-xl xs:text-2xl">
       No games found{' '}

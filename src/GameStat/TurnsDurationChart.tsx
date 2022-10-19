@@ -110,7 +110,7 @@ const CHART_OPTIONS: ChartOptions = {
   }
 }
 
-export const TurnsDurationChart: React.VFC<{
+export const TurnsDurationChart: React.FC<{
   game: Game
 }> = ({ game }) => {
   const turnsDuration = useCalcTurnsDuration(game)

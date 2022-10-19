@@ -7,7 +7,7 @@ import { pct, formatDurationMs, useEvery } from '../utils'
 import { GameStatusOngoing, Player, PlayerID } from '../api'
 import * as Icon from '../Icon'
 
-const ViewPlayerTile: React.VFC<{
+const ViewPlayerTile: React.FC<{
   isCurrentPlayer?: boolean
   isWinner?: boolean
   player: Player
@@ -40,7 +40,7 @@ const ViewPlayerTile: React.VFC<{
   )
 }
 
-const ViewCurrentPlayerCaret: React.VFC<{
+const ViewCurrentPlayerCaret: React.FC<{
   status: GameStatusOngoing
   playersCount: number
   currentPlayerIndex: number
@@ -95,7 +95,7 @@ const ViewContainer: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => <div className="flex relative">{children}</div>
 
-export const OngoingGamePlayers: React.VFC<{
+export const OngoingGamePlayers: React.FC<{
   status: GameStatusOngoing
   players: ReadonlyArray<Player>
 }> = ({ status, players }) => {
@@ -122,7 +122,7 @@ export const OngoingGamePlayers: React.VFC<{
   )
 }
 
-export const CompletedGamePlayers: React.VFC<{
+export const CompletedGamePlayers: React.FC<{
   winnerId: PlayerID
   players: ReadonlyArray<Player>
 }> = ({ winnerId, players }) => (

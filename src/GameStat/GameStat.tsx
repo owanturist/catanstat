@@ -65,7 +65,7 @@ const ViewSection: React.FC<{
   </div>
 )
 
-const GameStat: React.VFC<{
+const GameStat: React.FC<{
   game: Game
 }> = ({ game }) => (
   <>

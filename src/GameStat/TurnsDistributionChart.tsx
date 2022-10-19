@@ -82,7 +82,7 @@ const CHART_OPTIONS: ChartOptions = {
   }
 }
 
-export const TurnsDistributionChart: React.VFC<{
+export const TurnsDistributionChart: React.FC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
   const data = useImpulseMemo<ChartData>(() => {

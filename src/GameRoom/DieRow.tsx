@@ -15,13 +15,19 @@ export type State<TDie extends DieNumber | DieEvent> = null | TDie
 
 export const init = <TDie extends DieNumber | DieEvent>(): State<TDie> => null
 
-const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
+const ViewDie: <TDie extends DieNumber | DieEvent>({
+  icon,
+  name,
+  isDisabled,
+  value,
+  state
+}: {
   icon: React.ReactElement
   name: string
   isDisabled: boolean
   value: TDie
   state: Impulse<State<TDie>>
-}) => ReturnType<React.VFC> = watch(
+}) => ReturnType<React.FC> = watch(
   ({ icon, name, isDisabled, value, state }) => {
     const selectedValue = state.getValue()
 
@@ -78,7 +84,7 @@ export interface DieRowProps<TDie extends DieNumber | DieEvent> {
 
 const NUMBER_DICE: ReadonlyArray<DieNumber> = [1, 2, 3, 4, 5, 6]
 
-const ViewDieNumber: React.VFC<
+const ViewDieNumber: React.FC<
   { color: DieNumberColor } & DieRowProps<DieNumber>
 > = ({ color, name, isDisabled, state }) => (
   <ViewDieRow name={name}>
@@ -95,17 +101,17 @@ const ViewDieNumber: React.VFC<
   </ViewDieRow>
 )
 
-export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = props => (
+export const ViewWhite: React.FC<DieRowProps<DieNumber>> = props => (
   <ViewDieNumber color="white" {...props} />
 )
 
-export const ViewRed: React.VFC<DieRowProps<DieNumber>> = props => (
+export const ViewRed: React.FC<DieRowProps<DieNumber>> = props => (
   <ViewDieNumber color="red" {...props} />
 )
 
 const EVENT_DICE: ReadonlyArray<DieEvent> = ['yellow', 'blue', 'green', 'black']
 
-export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = ({
+export const ViewEvent: React.FC<DieRowProps<DieEvent>> = ({
   name,
   isDisabled,
   state
