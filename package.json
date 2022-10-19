@@ -8,7 +8,9 @@
     "build": "vite build",
     "postbuild": "npm run copy:index-200",
     "ts": "tsc --noEmit",
-    "lint": "eslint . --ext=js,jsx,ts,tsx,md"
+    "lint": "eslint . --ext=js,jsx,ts,tsx,md",
+    "storybook": "storybook dev -p 6006",
+    "storybook:build": "storybook build"
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,9 @@
   },
   "homepage": "https://github.com/owanturist/catanstat#readme",
   "devDependencies": {
+    "@storybook/addon-essentials": "^7.0.0-alpha.40",
+    "@storybook/react": "^7.0.0-alpha.40",
+    "@storybook/react-vite": "^7.0.0-alpha.40",
     "@types/react": "^18.0.21",
     "@types/react-beautiful-dnd": "^13.1.2",
     "@types/react-dom": "^18.0.6",
@@ -36,9 +41,11 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-storybook": "^0.6.6",
     "postcss": "^8.4.18",
     "postcss-import": "^15.0.0",
     "prettier": "^2.7.1",
+    "storybook": "^7.0.0-alpha.40",
     "tailwindcss": "^3.1.8",
     "typescript": "^4.8.4",
     "vite": "^3.1.8"
