@@ -262,6 +262,7 @@
     {
       "files": ["**/*.stories.ts?(x)"],
       "rules": {
+        "storybook/no-title-property-in-meta": "off",
         "storybook/csf-component": "off"
       }
     }

@@ -3,7 +3,9 @@ import type { StoryFn } from '@storybook/react'
 
 import * as Icons from './index'
 
-export default {}
+export default {
+  title: 'Icons'
+}
 
 export const AllIcons: StoryFn<{
   color: string
