@@ -22,7 +22,10 @@
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "prettier",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:storybook/recommended",
+    "plugin:storybook/csf-strict",
+    "plugin:storybook/addon-interactions"
   ],
   "rules": {
     // Possible Errors
@@ -254,6 +257,12 @@
         "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/restrict-plus-operands": "error",
         "@typescript-eslint/switch-exhaustiveness-check": "error"
+      }
+    },
+    {
+      "files": ["**/*.stories.ts?(x)"],
+      "rules": {
+        "storybook/csf-component": "off"
       }
     }
   ]
