@@ -86,6 +86,7 @@ const ViewPlayer: React.VFC<{
 const StartGame: React.VFC<{
   state: State
 }> = watch(({ state }) => {
+  const players = state.players.getState()
   const navigate = useNavigate()
   const { isLoading, startGame } = useStartGame({
     onError() {
@@ -141,7 +142,7 @@ const StartGame: React.VFC<{
                 '-m-1' // compensate items' padding to be align with divider
               )}
             >
-              {state.players.getState().map((player, index) => (
+              {players.map((player, index) => (
                 <ViewPlayer
                   key={player.color.id}
                   index={index}

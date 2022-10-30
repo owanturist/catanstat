@@ -24,7 +24,6 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
 }) => ReturnType<React.VFC> = watch(
   ({ icon, name, isDisabled, value, state }) => {
     const die = state.getState()
-    const [isChecked, isAnyDieSelected] = [die === value, die != null]
 
     return (
       <label className="cursor-pointer">
@@ -34,14 +33,14 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
           name={name}
           disabled={isDisabled}
           value={value}
-          checked={isChecked}
+          checked={die === value}
           onChange={() => state.setState(value)}
         />
 
         {React.cloneElement(icon, {
           className: cx(
             icon.props.className,
-            isAnyDieSelected && 'opacity-25',
+            die != null && 'opacity-25',
             '!h-auto transition-opacity rounded-lg stroke-[12]',
             'peer-checked:opacity-100 peer-focus-visible:ring-4'
           )
