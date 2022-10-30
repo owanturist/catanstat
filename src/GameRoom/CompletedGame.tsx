@@ -77,7 +77,9 @@ const ViewBoardPicture: React.VFC<{
   )
 }
 
-const ViewBoardPictureUpload: React.VFC<{ gameId: GameID }> = ({ gameId }) => {
+const ViewBoardPictureUpload: React.VFC<{
+  gameId: GameID
+}> = ({ gameId }) => {
   const { isLoading, uploadBoardPicture } = useUploadBoardPicture(gameId, {
     onError() {
       toast.error('Failed to upload board picture')
