@@ -11,7 +11,7 @@ export abstract class PlayerInfo {
     return {
       color,
       name: Sweety.of(color.label),
-      isActive: Sweety.of<boolean>(true)
+      isActive: Sweety.of(true)
     }
   }
 }
