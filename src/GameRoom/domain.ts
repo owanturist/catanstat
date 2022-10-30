@@ -1,4 +1,4 @@
-import { Sweety } from 'react-sweety'
+import { Sweety, batch } from 'react-sweety'
 
 import { Dice, DieEvent, DieNumber } from '../Die'
 
@@ -12,7 +12,7 @@ export abstract class State {
 
   public static init(): State {
     return {
-      isMutating: Sweety.of<boolean>(false),
+      isMutating: Sweety.of(false),
       whiteDie: Sweety.of(DieRow.init()),
       redDie: Sweety.of(DieRow.init()),
       eventDie: Sweety.of(DieRow.init())
@@ -23,10 +23,12 @@ export abstract class State {
     { isMutating, whiteDie, redDie, eventDie }: State,
     dice?: Dice
   ): void {
-    isMutating.setState(false)
-    whiteDie.setState(dice?.whiteDie ?? DieRow.init)
-    redDie.setState(dice?.redDie ?? DieRow.init)
-    eventDie.setState(dice?.eventDie ?? DieRow.init)
+    batch(() => {
+      isMutating.setState(false)
+      whiteDie.setState(dice?.whiteDie ?? DieRow.init)
+      redDie.setState(dice?.redDie ?? DieRow.init)
+      eventDie.setState(dice?.eventDie ?? DieRow.init)
+    })
   }
 
   public static toDice(state: State): null | Dice {

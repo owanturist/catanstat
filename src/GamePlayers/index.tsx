@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import { differenceInMilliseconds } from 'date-fns'
 import Tooltip from '@tippyjs/react'
+import { useSweetyMemo } from 'react-sweety'
 
 import { pct, formatDurationMs, useEvery } from '../utils'
 import { GameStatusOngoing, Player, PlayerID } from '../api'
@@ -11,7 +12,7 @@ const ViewPlayerTile: React.VFC<{
   isCurrentPlayer?: boolean
   isWinner?: boolean
   player: Player
-}> = React.memo(({ isCurrentPlayer, isWinner, player }) => {
+}> = ({ isCurrentPlayer, isWinner, player }) => {
   return (
     <div className="relative flex-1 flex justify-center">
       <Tooltip placement="bottom" offset={[0, 0]} content={player.name}>
@@ -38,13 +39,13 @@ const ViewPlayerTile: React.VFC<{
       )}
     </div>
   )
-})
+}
 
 const ViewCurrentPlayerCaret: React.VFC<{
   status: GameStatusOngoing
   playersCount: number
   currentPlayerIndex: number
-}> = React.memo(({ status, playersCount, currentPlayerIndex }) => {
+}> = ({ status, playersCount, currentPlayerIndex }) => {
   const fraction = 100 / playersCount
   const currentTurnDuration = useEvery(
     now => {
@@ -89,7 +90,7 @@ const ViewCurrentPlayerCaret: React.VFC<{
       </div>
     </div>
   )
-})
+}
 
 const ViewContainer: React.FC<{
   children: React.ReactNode
@@ -98,8 +99,8 @@ const ViewContainer: React.FC<{
 export const OngoingGamePlayers: React.VFC<{
   status: GameStatusOngoing
   players: ReadonlyArray<Player>
-}> = React.memo(({ status, players }) => {
-  const currentPlayerIndex = React.useMemo(
+}> = ({ status, players }) => {
+  const currentPlayerIndex = useSweetyMemo(
     () => players.map(player => player.id).indexOf(status.currentPlayer.id),
     [players, status.currentPlayer.id]
   )
@@ -121,12 +122,12 @@ export const OngoingGamePlayers: React.VFC<{
       ))}
     </ViewContainer>
   )
-})
+}
 
 export const CompletedGamePlayers: React.VFC<{
   winnerId: PlayerID
   players: ReadonlyArray<Player>
-}> = React.memo(({ winnerId, players }) => (
+}> = ({ winnerId, players }) => (
   <ViewContainer>
     {players.map(player => (
       <ViewPlayerTile
@@ -136,4 +137,4 @@ export const CompletedGamePlayers: React.VFC<{
       />
     ))}
   </ViewContainer>
-))
+)

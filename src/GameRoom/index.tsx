@@ -1,6 +1,5 @@
 import cx from 'classnames'
 import React from 'react'
-import { Sweety } from 'react-sweety'
 import { useParams } from 'react-router-dom'
 
 import { GameID, useQueryGame } from '../api'
@@ -38,8 +37,8 @@ const ViewContainer: React.FC<{
 )
 
 export const View: React.VFC<{
-  store: Sweety<State>
-}> = React.memo(({ store }) => {
+  state: State
+}> = ({ state }) => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)
@@ -65,7 +64,7 @@ export const View: React.VFC<{
           gameId={gameId}
           status={game.status}
           players={game.players}
-          store={store}
+          state={state}
         />
       </ViewContainer>
     )
@@ -78,8 +77,8 @@ export const View: React.VFC<{
         status={game.status}
         players={game.players}
         hasTurns={game.turns.length > 0}
-        store={store}
+        state={state}
       />
     </ViewContainer>
   )
-})
+}

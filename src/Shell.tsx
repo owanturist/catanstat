@@ -51,7 +51,7 @@ const ViewDropdownItem: React.FC<{
   </Menu.Item>
 )
 
-const ViewHeaderDropdown: React.VFC = React.memo(() => {
+const ViewHeaderDropdown: React.VFC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
 
@@ -77,9 +77,9 @@ const ViewHeaderDropdown: React.VFC = React.memo(() => {
       </Menu.Items>
     </Menu>
   )
-})
+}
 
-const ViewBackToGameButton: React.VFC = React.memo(() => {
+const ViewBackToGameButton: React.VFC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
 
@@ -90,17 +90,17 @@ const ViewBackToGameButton: React.VFC = React.memo(() => {
       </Link>
     </Tooltip>
   )
-})
+}
 
-const ViewStartGame: React.VFC = React.memo(() => (
+const ViewStartGame: React.VFC = () => (
   <Tooltip content="Start new game">
     <Link to="/start" className={styleTool}>
       <Icon.Plus />
     </Link>
   </Tooltip>
-))
+)
 
-export const Shell: React.VFC = React.memo(() => (
+export const Shell: React.VFC = () => (
   <div className="h-full flex flex-col text-gray-900">
     <header className="bg-gray-100 flex justify-center">
       <div
@@ -150,4 +150,4 @@ export const Shell: React.VFC = React.memo(() => (
       <Outlet />
     </div>
   </div>
-))
+)

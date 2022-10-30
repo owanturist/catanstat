@@ -3,6 +3,11 @@
   "env": {
     "node": true
   },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -88,6 +93,46 @@
     "prefer-arrow-callback": "error", // https://eslint.org/docs/rules/prefer-arrow-callback
     "radix": "error", // https://eslint.org/docs/rules/radix
     "require-await": "warn", // https://eslint.org/docs/rules/require-await
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react",
+            "importNames": [
+              "useMemo",
+              "useEffect",
+              "useLayoutEffect",
+              "useInsertionEffect"
+            ],
+            "message": "Please import those hooks from 'react-sweety'"
+          }
+        ]
+      }
+    ],
+    "no-restricted-properties": [
+      2,
+      {
+        "object": "React",
+        "property": "useMemo",
+        "message": "Please use useSweetyMemo from 'react-sweety'"
+      },
+      {
+        "object": "React",
+        "property": "useEffect",
+        "message": "Please use useSweetyEffect from 'react-sweety'"
+      },
+      {
+        "object": "React",
+        "property": "useLayoutEffect",
+        "message": "Please use useSweetyLayoutEffect from 'react-sweety'"
+      },
+      {
+        "object": "React",
+        "property": "useInsertionEffect",
+        "message": "Please use useSweetyInsertionEffect from 'react-sweety'"
+      }
+    ],
 
     // Variables
     "init-declarations": "error", // https://eslint.org/docs/rules/init-declarations
@@ -110,7 +155,12 @@
 
     // React-Hooks Eslint
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        "additionalHooks": "(useSweetyMemo|useSweetyEffect|useSweetyLayoutEffect|useSweetyInsertionEffect)"
+      }
+    ],
 
     // Import
     "import/order": [
@@ -140,7 +190,8 @@
       {
         "devDependencies": ["./*.js", "./*.ts"]
       }
-    ]
+    ],
+    "import/no-useless-path-segments": "error"
   },
   "overrides": [
     {

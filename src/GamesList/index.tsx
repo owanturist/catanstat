@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import cx from 'classnames'
 import { differenceInMilliseconds, format } from 'date-fns'
 import { toast } from 'react-hot-toast'
+import { useSweetyEffect, useSweetyMemo } from 'react-sweety'
 
 import { formatDurationMs, sum, useEvery } from '../utils'
 import {
@@ -41,7 +42,7 @@ const ViewGameToolLink: React.FC<{
 
 const ViewDeleteGameTool: React.FC<{
   gameId: GameID
-}> = React.memo(({ gameId }) => {
+}> = ({ gameId }) => {
   const [restoreSince, setRestoreSince] = React.useState<null | Date>(null)
   const countdown = useEvery(
     now => {
@@ -68,7 +69,7 @@ const ViewDeleteGameTool: React.FC<{
     }
   })
 
-  React.useEffect(() => {
+  useSweetyEffect(() => {
     if (countdown === 0) {
       deleteGame(gameId)
       setRestoreSince(null)
@@ -110,11 +111,11 @@ const ViewDeleteGameTool: React.FC<{
       delete
     </button>
   )
-})
+}
 
 const ViewGameToolbar: React.VFC<{
   gameId: GameID
-}> = React.memo(({ gameId }) => (
+}> = ({ gameId }) => (
   <div className="flex gap-1 flex-row">
     <ViewGameToolLink to={`/game/${gameId}`}>board</ViewGameToolLink>
 
@@ -124,13 +125,13 @@ const ViewGameToolbar: React.VFC<{
 
     <ViewDeleteGameTool gameId={gameId} />
   </div>
-))
+)
 
 const ViewGameDuration: React.VFC<{
   status: GameStatus
   turns: ReadonlyArray<Turn>
-}> = React.memo(({ status, turns }) => {
-  const prevTurnsDurationMs = React.useMemo(
+}> = ({ status, turns }) => {
+  const prevTurnsDurationMs = useSweetyMemo(
     () => sum(turns.map(turn => turn.durationMs)),
     [turns]
   )
@@ -186,12 +187,12 @@ const ViewGameDuration: React.VFC<{
       )}
     </>
   )
-})
+}
 
 const ViewGamePicture: React.VFC<{
   picture: File
-}> = React.memo(({ picture }) => {
-  const pictureUrl = React.useMemo(
+}> = ({ picture }) => {
+  const pictureUrl = useSweetyMemo(
     () => URL.createObjectURL(picture),
     [picture]
   )
@@ -201,11 +202,11 @@ const ViewGamePicture: React.VFC<{
       <img src={pictureUrl} className="max-h-96" alt="board picture" />
     </div>
   )
-})
+}
 
 const ViewGame: React.VFC<{
   game: Game
-}> = React.memo(({ game }) => (
+}> = ({ game }) => (
   <div
     className={cx(
       'py-3 space-y-2',
@@ -241,9 +242,9 @@ const ViewGame: React.VFC<{
       <OngoingGamePlayers status={game.status} players={game.players} />
     )}
   </div>
-))
+)
 
-const ViewEmpty: React.VFC = React.memo(() => (
+const ViewEmpty: React.VFC = () => (
   <div className="flex flex-col gap-2 justify-center items-center h-full">
     <p className="text-center text-lg 2xs:text-xl xs:text-2xl">
       No games found{' '}
@@ -255,7 +256,7 @@ const ViewEmpty: React.VFC = React.memo(() => (
       <Icon.Plus role="img" className="inline-block ml-1 cursor-default" />
     </p>
   </div>
-))
+)
 
 const ViewContainer: React.FC<{
   className?: string
@@ -274,7 +275,7 @@ const ViewContainer: React.FC<{
   </div>
 )
 
-export const GameList = React.memo(() => {
+export const GameList: React.FC = () => {
   const { isLoading, error, games } = useQueryAllGames()
 
   if (isLoading) {
@@ -304,4 +305,4 @@ export const GameList = React.memo(() => {
       ))}
     </ViewContainer>
   )
-})
+}

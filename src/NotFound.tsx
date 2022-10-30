@@ -8,7 +8,7 @@ const styleLink = cx(
   'focus-within:underline'
 )
 
-export const NotFound: React.VFC = React.memo(() => (
+export const NotFound: React.VFC = () => (
   <div className="h-full text-gray-700">
     <div
       className={cx(
@@ -36,4 +36,4 @@ export const NotFound: React.VFC = React.memo(() => (
       </p>
     </div>
   </div>
-))
+)

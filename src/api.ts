@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { QueryKey, useQuery, useMutation, useQueryClient } from 'react-query'
 
 import { Color } from './Color'
@@ -152,11 +151,15 @@ export const useQueryGame = (
   game: null | Game
   error: null | Error
 } => {
-  const { data, isLoading, error } = useQuery<null | DB.Game, Error>({
+  const {
+    data: game = null,
+    isLoading,
+    error
+  } = useQuery<null | DB.Game, Error, null | Game>({
     queryKey: gameQueryKey(gameId),
-    queryFn: () => DB.get_game(Number(gameId))
+    queryFn: () => DB.get_game(Number(gameId)),
+    select: response => response && decodeGame(response)
   })
-  const game = useMemo(() => (data ? decodeGame(data) : null), [data])
 
   return { isLoading, game, error }
 }
@@ -166,11 +169,15 @@ export const useQueryAllGames = (): {
   games: ReadonlyArray<Game>
   error: null | Error
 } => {
-  const { data, isLoading, error } = useQuery<ReadonlyArray<DB.Game>, Error>({
+  const {
+    data: games = [],
+    isLoading,
+    error
+  } = useQuery<ReadonlyArray<DB.Game>, Error, ReadonlyArray<Game>>({
     queryKey: allGamesQueryKey,
-    queryFn: () => DB.get_all_games()
+    queryFn: () => DB.get_all_games(),
+    select: response => response.map(decodeGame)
   })
-  const games = useMemo(() => data?.map(decodeGame) ?? [], [data])
 
   return { isLoading, games, error }
 }

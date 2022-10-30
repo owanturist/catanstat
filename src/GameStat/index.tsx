@@ -25,7 +25,7 @@ const ViewContainer: React.FC<{
 
 const LazyGameStat = React.lazy(() => import('./GameStat'))
 
-export const GameStat: React.VFC = React.memo(() => {
+export const GameStat: React.VFC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)
@@ -51,4 +51,4 @@ export const GameStat: React.VFC = React.memo(() => {
       </ViewContainer>
     </React.Suspense>
   )
-})
+}
