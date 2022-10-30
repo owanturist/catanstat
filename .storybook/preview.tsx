@@ -1,5 +1,5 @@
+import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-
 import { QueryClientProvider, QueryClient } from 'react-query'
 
 export const parameters = {
@@ -15,7 +15,7 @@ export const parameters = {
 const queryCache = new QueryClient()
 
 export const decorators = [
-  Story => (
+  (Story: React.FC) => (
     <QueryClientProvider client={queryCache}>
       <MemoryRouter>
         <Story />

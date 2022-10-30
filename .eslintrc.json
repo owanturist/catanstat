@@ -181,7 +181,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["./*.js", "./*.ts"]
+        "devDependencies": ["./*.js", "./*.ts", "./**/*.stories.*"]
       }
     ],
     "import/no-useless-path-segments": "error"

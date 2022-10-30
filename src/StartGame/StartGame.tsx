@@ -38,6 +38,7 @@ const ViewPlayer: React.FC<{
               onChange={event => player.isActive.setValue(event.target.checked)}
             />
             <div
+              data-testid="start-game-player-color"
               className={cx(
                 'flex justify-center items-center w-10 h-10 border rounded-md text-xl bg-white text-center text-gray-500 transition cursor-pointer',
                 'hover:bg-gray-50 active:bg-gray-100',
@@ -53,6 +54,7 @@ const ViewPlayer: React.FC<{
           </label>
 
           <input
+            data-testid="start-game-player-name"
             className={cx(
               'block flex-1 px-4 h-10 border rounded-md',
               'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
@@ -67,6 +69,7 @@ const ViewPlayer: React.FC<{
           />
 
           <span
+            data-testid="start-game-player-drag-handle"
             className={cx(
               'flex justify-center items-center w-6 h-10 rounded-md text-xl text-center cursor-[grab] select-none transition-colors',
               'hover:text-gray-500',
