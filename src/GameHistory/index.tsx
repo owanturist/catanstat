@@ -33,7 +33,7 @@ const ViewDie: React.VFC<{
 
 const ViewDice: React.VFC<{
   dice?: Dice
-}> = React.memo(({ dice }) => (
+}> = ({ dice }) => (
   <div className="flex gap-1 text-2xl">
     <ViewDie
       die={dice && <DieNumberIcon color="white" side={dice.whiteDie} />}
@@ -47,7 +47,7 @@ const ViewDice: React.VFC<{
       die={dice && <DieEventIcon side={dice.eventDie} />}
     />
   </div>
-))
+)
 
 const ViewTableCell: React.FC<{
   className?: string
@@ -61,7 +61,7 @@ const ViewTableRow: React.VFC<{
   player: Player
   dice?: Dice
   duration: string
-}> = React.memo(({ order, player, dice, duration }) => (
+}> = ({ order, player, dice, duration }) => (
   <tr className="even:bg-gray-50">
     <ViewTableCell className="text-right">
       <span className="mono text-gray-400 text-sm 2xs:text-base">{order}</span>
@@ -92,7 +92,7 @@ const ViewTableRow: React.VFC<{
       </span>
     </ViewTableCell>
   </tr>
-))
+)
 
 const ViewCurrentTableRow: React.VFC<{
   order: number
@@ -100,39 +100,37 @@ const ViewCurrentTableRow: React.VFC<{
   isGamePaused: boolean
   currentTurnDurationMs: number
   currentTurnDurationSince: Date
-}> = React.memo(
-  ({
-    order,
-    player,
-    isGamePaused,
-    currentTurnDurationMs,
-    currentTurnDurationSince
-  }) => {
-    const currentTurnDuration = useEvery(
-      now => {
-        if (isGamePaused) {
-          return formatDurationMs(currentTurnDurationMs)
-        }
-
-        const diffMs = differenceInMilliseconds(now, currentTurnDurationSince)
-
-        return formatDurationMs(currentTurnDurationMs + diffMs)
-      },
-      {
-        interval: 60,
-        skip: isGamePaused
+}> = ({
+  order,
+  player,
+  isGamePaused,
+  currentTurnDurationMs,
+  currentTurnDurationSince
+}) => {
+  const currentTurnDuration = useEvery(
+    now => {
+      if (isGamePaused) {
+        return formatDurationMs(currentTurnDurationMs)
       }
-    )
 
-    return (
-      <ViewTableRow
-        order={order}
-        player={player}
-        duration={currentTurnDuration}
-      />
-    )
-  }
-)
+      const diffMs = differenceInMilliseconds(now, currentTurnDurationSince)
+
+      return formatDurationMs(currentTurnDurationMs + diffMs)
+    },
+    {
+      interval: 60,
+      skip: isGamePaused
+    }
+  )
+
+  return (
+    <ViewTableRow
+      order={order}
+      player={player}
+      duration={currentTurnDuration}
+    />
+  )
+}
 
 const ViewTableHeaderCell: React.FC<{
   className?: string
@@ -154,7 +152,7 @@ const ViewTableHeaderCell: React.FC<{
 
 const ViewHistoryTable: React.VFC<{
   game: Game
-}> = React.memo(({ game }) => {
+}> = ({ game }) => {
   const turnsCount = game.turns.length
 
   return (
@@ -196,9 +194,9 @@ const ViewHistoryTable: React.VFC<{
       </tbody>
     </table>
   )
-})
+}
 
-export const GameHistory: React.VFC = React.memo(() => {
+export const GameHistory: React.VFC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)
@@ -222,4 +220,4 @@ export const GameHistory: React.VFC = React.memo(() => {
       <ViewHistoryTable game={game} />
     </ViewContainer>
   )
-})
+}

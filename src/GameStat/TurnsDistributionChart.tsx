@@ -83,7 +83,7 @@ const CHART_OPTIONS: ChartOptions = {
 
 export const TurnsDistributionChart: React.VFC<{
   turns: ReadonlyArray<Turn>
-}> = React.memo(({ turns }) => {
+}> = ({ turns }) => {
   const data = React.useMemo<ChartData>(() => {
     const turnsCount = turns.length
     const turnsDistribution = calcTurnsDistribution(turns)
@@ -140,4 +140,4 @@ export const TurnsDistributionChart: React.VFC<{
   }, [turns])
 
   return <Chart type="bar" data={data} options={CHART_OPTIONS} />
-})
+}

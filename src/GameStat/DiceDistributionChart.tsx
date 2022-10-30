@@ -79,7 +79,7 @@ const DIE_NUMBER_SIDES: Array<DieNumber> = [1, 2, 3, 4, 5, 6]
 
 export const NumberDiceDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
-}> = React.memo(({ turns }) => {
+}> = ({ turns }) => {
   const data = React.useMemo<ChartData<'radar'>>(() => {
     const turnsCount = turns.length
     const whiteDistribution = calcDieDistribution(
@@ -122,7 +122,7 @@ export const NumberDiceDistribution: React.VFC<{
   }, [turns])
 
   return <Radar data={data} options={CHART_OPTIONS} />
-})
+}
 
 const DIE_EVENT_SIDES: Array<DieEvent> = ['blue', 'green', 'black', 'yellow']
 
@@ -135,7 +135,7 @@ const DIE_EVENT_COLORS: Record<DieEvent, string> = {
 
 export const EventDieDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
-}> = React.memo(({ turns }) => {
+}> = ({ turns }) => {
   const data = React.useMemo<ChartData<'radar'>>(() => {
     const turnsCount = turns.length
     const eventDistribution = calcDieDistribution(
@@ -181,11 +181,11 @@ export const EventDieDistribution: React.VFC<{
   }, [turns])
 
   return <Radar data={data} options={CHART_OPTIONS} />
-})
+}
 
 export const NumberPerEventDiceDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
-}> = React.memo(({ turns }) => {
+}> = ({ turns }) => {
   const data = React.useMemo<ChartData<'radar'>>(() => {
     const blueDistribution = calcDieDistribution(turns, ({ dice }) => {
       return dice.eventDie === 'blue' ? dice.redDie : null
@@ -240,4 +240,4 @@ export const NumberPerEventDiceDistribution: React.VFC<{
   }, [turns])
 
   return <Radar data={data} options={CHART_OPTIONS} />
-})
+}

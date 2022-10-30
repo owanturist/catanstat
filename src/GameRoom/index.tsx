@@ -38,7 +38,7 @@ const ViewContainer: React.FC<{
 
 export const View: React.VFC<{
   state: State
-}> = React.memo(({ state }) => {
+}> = ({ state }) => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)
@@ -81,4 +81,4 @@ export const View: React.VFC<{
       />
     </ViewContainer>
   )
-})
+}

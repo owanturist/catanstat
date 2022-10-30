@@ -111,7 +111,7 @@ const CHART_OPTIONS: ChartOptions = {
 
 export const TurnsDurationChart: React.VFC<{
   game: Game
-}> = React.memo(({ game }) => {
+}> = ({ game }) => {
   const turnsDuration = useCalcTurnsDuration(game)
   const data = React.useMemo<ChartData>(
     () => ({
@@ -154,4 +154,4 @@ export const TurnsDurationChart: React.VFC<{
   )
 
   return <Chart type="bar" data={data} options={CHART_OPTIONS} />
-})
+}

@@ -67,7 +67,7 @@ const ViewSection: React.FC<{
 
 const GameStat: React.VFC<{
   game: Game
-}> = React.memo(({ game }) => (
+}> = ({ game }) => (
   <>
     <ViewSection title="Total game duration">
       <TotalDurationChart game={game} />
@@ -93,6 +93,6 @@ const GameStat: React.VFC<{
       <NumberPerEventDiceDistribution turns={game.turns} />
     </ViewSection>
   </>
-))
+)
 
 export default GameStat

@@ -26,11 +26,11 @@ export const DieNumberIcon: React.VFC<{
   className?: string
   color: DieNumberColor
   side: DieNumber
-}> = React.memo(({ className, color, side }) => {
+}> = ({ className, color, side }) => {
   return React.cloneElement(DIE_NUMBER_ICONS[side], {
     className: cx(DIE_NUMBER_COLORS[color], className)
   })
-})
+}
 
 // D I E  E V E N T
 
@@ -46,17 +46,17 @@ const DIE_EVENT_COLORS: Record<DieEvent, string> = {
 export const DieEventIcon: React.VFC<{
   className?: string
   side: DieEvent
-}> = React.memo(({ className, side }) => {
+}> = ({ className, side }) => {
   return <Icon.DieClear className={cx(DIE_EVENT_COLORS[side], className)} />
-})
+}
 
 // D I E  P L A C E H O L D E R
 
 export const DiePlaceholderIcon: React.VFC<{
   className?: string
-}> = React.memo(({ className }) => (
+}> = ({ className }) => (
   <Icon.DieClear className={cx('text-gray-100 stroke-gray-300', className)} />
-))
+)
 
 // D I C E
 

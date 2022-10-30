@@ -134,7 +134,7 @@ const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
 
 export const TotalDurationChart: React.VFC<{
   game: Game
-}> = React.memo(({ game }) => {
+}> = ({ game }) => {
   const playersDuration = useCalcPlayersDuration(game)
   const data = React.useMemo<ChartData<'doughnut'>>(
     () => ({
@@ -179,4 +179,4 @@ export const TotalDurationChart: React.VFC<{
       </div>
     </div>
   )
-})
+}
