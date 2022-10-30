@@ -1,7 +1,6 @@
 import React from 'react'
 import cx from 'classnames'
 import { toast } from 'react-hot-toast'
-import { Sweety, useGetSweetyState } from 'react-sweety'
 
 import {
   GameID,
@@ -45,7 +44,7 @@ const ViewContinueButton: React.FC<{
 const ViewBoardPicture: React.VFC<{
   gameId: GameID
   picture: File
-}> = React.memo(({ gameId, picture }) => {
+}> = ({ gameId, picture }) => {
   const pictureUrl = React.useMemo(
     () => URL.createObjectURL(picture),
     [picture]
@@ -75,58 +74,55 @@ const ViewBoardPicture: React.VFC<{
       </button>
     </div>
   )
-})
+}
 
-const ViewBoardPictureUpload: React.VFC<{ gameId: GameID }> = React.memo(
-  ({ gameId }) => {
-    const { isLoading, uploadBoardPicture } = useUploadBoardPicture(gameId, {
-      onError() {
-        toast.error('Failed to upload board picture')
-      }
-    })
+const ViewBoardPictureUpload: React.VFC<{ gameId: GameID }> = ({ gameId }) => {
+  const { isLoading, uploadBoardPicture } = useUploadBoardPicture(gameId, {
+    onError() {
+      toast.error('Failed to upload board picture')
+    }
+  })
 
-    return (
-      <label className="block relative h-64">
-        <input
-          type="file"
-          accept="image/*"
-          className="sr-only peer"
-          disabled={isLoading}
-          onChange={event => {
-            const file = event.target.files?.[0]
+  return (
+    <label className="block relative h-64">
+      <input
+        type="file"
+        accept="image/*"
+        className="sr-only peer"
+        disabled={isLoading}
+        onChange={event => {
+          const file = event.target.files?.[0]
 
-            if (file != null) {
-              uploadBoardPicture(file)
-            }
-          }}
-        />
+          if (file != null) {
+            uploadBoardPicture(file)
+          }
+        }}
+      />
 
-        <div
-          className={cx(
-            'absolute inset-0 flex justify-center items-center rounded-md',
-            'text-gray-500 bg-gray-100 ring-gray-200 cursor-pointer transition',
-            'text-md text-center font-bold tracking-wider uppercase',
-            'peer-focus-visible:ring hover:bg-gray-200'
-          )}
-        >
-          <span>
-            Click to upload
-            <br />
-            the Board picture!
-          </span>
-        </div>
-      </label>
-    )
-  }
-)
+      <div
+        className={cx(
+          'absolute inset-0 flex justify-center items-center rounded-md',
+          'text-gray-500 bg-gray-100 ring-gray-200 cursor-pointer transition',
+          'text-md text-center font-bold tracking-wider uppercase',
+          'peer-focus-visible:ring hover:bg-gray-200'
+        )}
+      >
+        <span>
+          Click to upload
+          <br />
+          the Board picture!
+        </span>
+      </div>
+    </label>
+  )
+}
 
 export const CompletedGame: React.VFC<{
   gameId: GameID
   status: GameStatusCompleted
   players: ReadonlyArray<Player>
-  store: Sweety<State>
-}> = React.memo(({ gameId, status, players, store }) => {
-  const state = useGetSweetyState(store)
+  state: State
+}> = ({ gameId, status, players, state }) => {
   const winnerPlayer = players.find(
     player => player.id === String(status.winnerPlayerId)
   )
@@ -156,4 +152,4 @@ export const CompletedGame: React.VFC<{
       )}
     </>
   )
-})
+}

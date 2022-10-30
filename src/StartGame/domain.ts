@@ -17,18 +17,18 @@ export abstract class PlayerInfo {
 }
 
 export abstract class State {
-  abstract readonly players: ReadonlyArray<PlayerInfo>
+  abstract readonly players: Sweety<ReadonlyArray<PlayerInfo>>
 
   public static init(): State {
     return {
-      players: [
+      players: Sweety.of<ReadonlyArray<PlayerInfo>>([
         PlayerInfo.init(Color.red),
         PlayerInfo.init(Color.blue),
         PlayerInfo.init(Color.white),
         PlayerInfo.init(Color.yellow),
         PlayerInfo.init(Color.green),
         PlayerInfo.init(Color.brown)
-      ]
+      ])
     }
   }
 
@@ -36,20 +36,22 @@ export abstract class State {
     sourceIndex: number,
     destinationIndex: number,
     state: State
-  ): State {
-    if (sourceIndex === destinationIndex) {
-      return state
-    }
+  ): void {
+    state.players.setState(players => {
+      if (sourceIndex === destinationIndex) {
+        return players
+      }
 
-    const players = state.players.slice()
-    const source = players.splice(sourceIndex, 1)
+      const clone = players.slice()
+      const source = clone.splice(sourceIndex, 1)
 
-    players.splice(destinationIndex, 0, ...source)
+      clone.splice(destinationIndex, 0, ...source)
 
-    return { ...state, players }
+      return clone
+    })
   }
 
   public static getActivePlayers(state: State): Array<PlayerInfo> {
-    return state.players.filter(player => player.isActive.getState())
+    return state.players.getState().filter(player => player.isActive.getState())
   }
 }

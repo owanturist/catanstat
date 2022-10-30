@@ -2,7 +2,6 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Toaster } from 'react-hot-toast'
-import { Sweety } from 'react-sweety'
 
 import { Shell } from './Shell'
 import * as StartGame from './StartGame'
@@ -48,7 +47,7 @@ export const App: React.VFC = () => (
           element={
             <LazyComponent
               init={() => ({
-                store: Sweety.of(StartGame.State.init())
+                state: StartGame.State.init()
               })}
               component={StartGame.View}
             />
@@ -61,7 +60,7 @@ export const App: React.VFC = () => (
             element={
               <LazyComponent
                 init={() => ({
-                  store: Sweety.of(GameRoom.State.init())
+                  state: GameRoom.State.init()
                 })}
                 component={GameRoom.View}
               />

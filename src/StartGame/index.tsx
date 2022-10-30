@@ -1,5 +1,4 @@
 import React from 'react'
-import { Sweety } from 'react-sweety'
 import cx from 'classnames'
 
 import { State } from './domain'
@@ -8,8 +7,8 @@ export { State } from './domain'
 const LazyStartGame = React.lazy(() => import('./StartGame'))
 
 export const View: React.VFC<{
-  store: Sweety<State>
-}> = React.memo(({ store }) => (
+  state: State
+}> = ({ state }) => (
   <div
     className={cx(
       'h-full flex flex-col items-center text-gray-700',
@@ -24,8 +23,8 @@ export const View: React.VFC<{
       )}
     >
       <React.Suspense fallback={null}>
-        <LazyStartGame store={store} />
+        <LazyStartGame state={state} />
       </React.Suspense>
     </div>
   </div>
-))
+)

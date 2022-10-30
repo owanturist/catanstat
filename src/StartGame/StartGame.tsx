@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
-import { Sweety, useSweetyState } from 'react-sweety'
+import { watch } from 'react-sweety'
 import cx from 'classnames'
 import { toast } from 'react-hot-toast'
 
@@ -13,9 +13,9 @@ import { PlayerInfo, State } from './domain'
 const ViewPlayer: React.VFC<{
   index: number
   player: PlayerInfo
-}> = React.memo(({ index, player }) => {
-  const [name, setName] = useSweetyState(player.name)
-  const [isActive, setIsActive] = useSweetyState(player.isActive)
+}> = watch(({ index, player }) => {
+  const isActive = player.isActive.getState()
+  const name = player.name.getState()
 
   return (
     <Draggable draggableId={player.color.id} index={index}>
@@ -35,7 +35,7 @@ const ViewPlayer: React.VFC<{
               name={`player-${player.color.id}-active`}
               checked={isActive}
               formNoValidate
-              onChange={event => setIsActive(event.target.checked)}
+              onChange={event => player.isActive.setState(event.target.checked)}
             />
             <div
               className={cx(
@@ -63,7 +63,7 @@ const ViewPlayer: React.VFC<{
             placeholder={player.color.label}
             readOnly={!isActive}
             value={name}
-            onChange={event => setName(event.target.value)}
+            onChange={event => player.name.setState(event.target.value)}
           />
 
           <span
@@ -84,10 +84,9 @@ const ViewPlayer: React.VFC<{
 })
 
 const StartGame: React.VFC<{
-  store: Sweety<State>
-}> = React.memo(({ store }) => {
+  state: State
+}> = watch(({ state }) => {
   const navigate = useNavigate()
-  const [state, setState] = useSweetyState(store)
   const { isLoading, startGame } = useStartGame({
     onError() {
       toast.error('Failed to start game')
@@ -101,7 +100,7 @@ const StartGame: React.VFC<{
     <DragDropContext
       onDragEnd={({ source, destination }) => {
         if (destination != null) {
-          setState(State.move(source.index, destination.index, state))
+          State.move(source.index, destination.index, state)
         }
       }}
     >
@@ -142,7 +141,7 @@ const StartGame: React.VFC<{
                 '-m-1' // compensate items' padding to be align with divider
               )}
             >
-              {state.players.map((player, index) => (
+              {state.players.getState().map((player, index) => (
                 <ViewPlayer
                   key={player.color.id}
                   index={index}

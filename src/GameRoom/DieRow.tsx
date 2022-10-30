@@ -1,7 +1,6 @@
 import React from 'react'
-import { Sweety, useWatchSweety, useSetSweetyState } from 'react-sweety'
+import { Sweety, watch } from 'react-sweety'
 import cx from 'classnames'
-import shallow from 'shallowequal'
 
 import {
   DieEvent,
@@ -21,18 +20,11 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
   name: string
   isDisabled: boolean
   value: TDie
-  store: Sweety<State<TDie>>
-}) => ReturnType<React.VFC> = React.memo(
-  ({ icon, name, isDisabled, value, store }) => {
-    const setState = useSetSweetyState(store)
-    const [isChecked, isAnyDieSelected] = useWatchSweety(
-      React.useCallback(() => {
-        const die = store.getState()
-
-        return [die === value, die != null]
-      }, [value, store]),
-      shallow
-    )
+  state: Sweety<State<TDie>>
+}) => ReturnType<React.VFC> = watch(
+  ({ icon, name, isDisabled, value, state }) => {
+    const die = state.getState()
+    const [isChecked, isAnyDieSelected] = [die === value, die != null]
 
     return (
       <label className="cursor-pointer">
@@ -43,7 +35,7 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
           disabled={isDisabled}
           value={value}
           checked={isChecked}
-          onChange={() => setState(value)}
+          onChange={() => state.setState(value)}
         />
 
         {React.cloneElement(icon, {
@@ -82,21 +74,21 @@ const ViewDieRow: React.FC<{
 export interface DieRowProps<TDie extends DieNumber | DieEvent> {
   name: string
   isDisabled: boolean
-  store: Sweety<State<TDie>>
+  state: Sweety<State<TDie>>
 }
 
 const NUMBER_DICE: ReadonlyArray<DieNumber> = [1, 2, 3, 4, 5, 6]
 
 const ViewDieNumber: React.VFC<
   { color: DieNumberColor } & DieRowProps<DieNumber>
-> = ({ color, name, isDisabled, store }) => (
+> = ({ color, name, isDisabled, state }) => (
   <ViewDieRow name={name}>
     {NUMBER_DICE.map(value => (
       <ViewDie
         key={value}
         name={name}
         isDisabled={isDisabled}
-        store={store}
+        state={state}
         value={value}
         icon={<DieNumberIcon color={color} side={value} />}
       />
@@ -104,35 +96,37 @@ const ViewDieNumber: React.VFC<
   </ViewDieRow>
 )
 
-export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = React.memo(
-  props => <ViewDieNumber color="white" {...props} />
+export const ViewWhite: React.VFC<DieRowProps<DieNumber>> = props => (
+  <ViewDieNumber color="white" {...props} />
 )
 
-export const ViewRed: React.VFC<DieRowProps<DieNumber>> = React.memo(props => (
+export const ViewRed: React.VFC<DieRowProps<DieNumber>> = props => (
   <ViewDieNumber color="red" {...props} />
-))
+)
 
 const EVENT_DICE: ReadonlyArray<DieEvent> = ['yellow', 'blue', 'green', 'black']
 
-export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = React.memo(
-  ({ name, isDisabled, store }) => (
-    <ViewDieRow name={name}>
-      {/* placeholder left */}
-      <DiePlaceholderIcon className="!h-auto text-gray-100" />
+export const ViewEvent: React.VFC<DieRowProps<DieEvent>> = ({
+  name,
+  isDisabled,
+  state
+}) => (
+  <ViewDieRow name={name}>
+    {/* placeholder left */}
+    <DiePlaceholderIcon className="!h-auto text-gray-100" />
 
-      {EVENT_DICE.map(value => (
-        <ViewDie
-          key={value}
-          name={name}
-          isDisabled={isDisabled}
-          store={store}
-          value={value}
-          icon={<DieEventIcon side={value} />}
-        />
-      ))}
+    {EVENT_DICE.map(value => (
+      <ViewDie
+        key={value}
+        name={name}
+        isDisabled={isDisabled}
+        state={state}
+        value={value}
+        icon={<DieEventIcon side={value} />}
+      />
+    ))}
 
-      {/* placeholder right */}
-      <DiePlaceholderIcon className="!h-auto text-gray-100" />
-    </ViewDieRow>
-  )
+    {/* placeholder right */}
+    <DiePlaceholderIcon className="!h-auto text-gray-100" />
+  </ViewDieRow>
 )

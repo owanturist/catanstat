@@ -1,11 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
-import {
-  Sweety,
-  useGetSweetyState,
-  useSweetyState,
-  useSetSweetyState
-} from 'react-sweety'
+import { Sweety, watch } from 'react-sweety'
 import { toast } from 'react-hot-toast'
 
 import {
@@ -27,15 +22,14 @@ import * as DieRow from './DieRow'
 const ViewCompleteTurnButton: React.VFC<{
   gameId: GameID
   state: State
-}> = React.memo(({ gameId, state }) => {
-  const setIsMutating = useSetSweetyState(state.isMutating)
-  const whiteDie = useGetSweetyState(state.whiteDie) ?? 0
-  const redDie = useGetSweetyState(state.redDie) ?? 0
-  const eventDie = useGetSweetyState(state.eventDie)
+}> = watch(({ gameId, state }) => {
+  const whiteDie = state.whiteDie.getState() ?? 0
+  const redDie = state.redDie.getState() ?? 0
+  const eventDie = state.eventDie.getState()
 
   const { completeTurn } = useCompleteTurn(gameId, {
     onError() {
-      setIsMutating(false)
+      state.isMutating.setState(false)
       toast.error('Failed to complete turn')
     },
     onSuccess() {
@@ -67,7 +61,7 @@ const ViewCompleteTurnButton: React.VFC<{
           if (dice == null) {
             toast.error('Please select all dice')
           } else {
-            setIsMutating(true)
+            state.isMutating.setState(true)
             completeTurn(dice)
           }
         }
@@ -115,25 +109,23 @@ const ViewPauseGameButton: React.VFC<{
   gameId: GameID
   isGamePaused: boolean
   isMutating: Sweety<boolean>
-}> = React.memo(({ gameId, isGamePaused, isMutating }) => {
-  const [isMutatingBool, setIsMutating] = useSweetyState(isMutating)
-
+}> = ({ gameId, isGamePaused, isMutating }) => {
   const { pauseGame } = usePauseGame(gameId, {
     onError() {
-      setIsMutating(false)
+      isMutating.setState(false)
       toast.error('Failed to pause game')
     },
     onSuccess() {
-      setIsMutating(false)
+      isMutating.setState(false)
     }
   })
   const { resumeGame } = useResumeGame(gameId, {
     onError() {
-      setIsMutating(false)
+      isMutating.setState(false)
       toast.error('Failed to resume game')
     },
     onSuccess() {
-      setIsMutating(false)
+      isMutating.setState(false)
     }
   })
 
@@ -154,7 +146,7 @@ const ViewPauseGameButton: React.VFC<{
           type="checkbox"
           name="is-game-paused"
           checked={isGamePaused}
-          readOnly={isMutatingBool}
+          readOnly={isMutating.getState()}
           onChange={event => {
             if (event.target.checked) {
               pauseGame()
@@ -192,16 +184,15 @@ const ViewPauseGameButton: React.VFC<{
       </label>
     </div>
   )
-})
+}
 
 const ViewCompleteGameButton: React.VFC<{
   gameId: GameID
   state: State
-}> = React.memo(({ gameId, state }) => {
-  const setIsMutating = useSetSweetyState(state.isMutating)
+}> = ({ gameId, state }) => {
   const { completeGame } = useCompleteGame(gameId, {
     onError() {
-      setIsMutating(false)
+      state.isMutating.setState(false)
       toast.error('Failed to complete game')
     },
     onSuccess() {
@@ -219,7 +210,7 @@ const ViewCompleteGameButton: React.VFC<{
           if (dice == null) {
             toast.error('Please select all dice')
           } else {
-            setIsMutating(true)
+            state.isMutating.setState(true)
             completeGame(dice)
           }
         }
@@ -228,17 +219,16 @@ const ViewCompleteGameButton: React.VFC<{
       <Icon.Flag />
     </ViewSecondaryButton>
   )
-})
+}
 
 const ViewAbortTurnButton: React.VFC<{
   gameId: GameID
   hasTurns: boolean
   state: State
-}> = React.memo(({ gameId, hasTurns, state }) => {
-  const setIsMutating = useSetSweetyState(state.isMutating)
+}> = ({ gameId, hasTurns, state }) => {
   const { abortLastTurn } = useAbortLastTurn(gameId, {
     onError() {
-      setIsMutating(false)
+      state.isMutating.setState(false)
       toast.error('Failed to abort last turn')
     },
     onSuccess(dice) {
@@ -252,7 +242,7 @@ const ViewAbortTurnButton: React.VFC<{
       onClick={() => {
         if (!state.isMutating.getState()) {
           if (hasTurns) {
-            setIsMutating(true)
+            state.isMutating.setState(true)
             abortLastTurn()
           } else {
             toast.error('No turns to abort')
@@ -263,17 +253,16 @@ const ViewAbortTurnButton: React.VFC<{
       <Icon.Undo />
     </ViewSecondaryButton>
   )
-})
+}
 
 export const OngoingGame: React.VFC<{
   gameId: GameID
   status: GameStatusOngoing
   players: ReadonlyArray<Player>
   hasTurns: boolean
-  store: Sweety<State>
-}> = React.memo(({ gameId, status, players, hasTurns, store }) => {
-  const state = useGetSweetyState(store)
-  const isMutating = useGetSweetyState(state.isMutating)
+  state: State
+}> = watch(({ gameId, status, players, hasTurns, state }) => {
+  const isMutating = state.isMutating.getState()
 
   return (
     <>
@@ -283,17 +272,17 @@ export const OngoingGame: React.VFC<{
         <DieRow.ViewWhite
           name="white-dice"
           isDisabled={isMutating}
-          store={state.whiteDie}
+          state={state.whiteDie}
         />
         <DieRow.ViewRed
           name="red-dice"
           isDisabled={isMutating}
-          store={state.redDie}
+          state={state.redDie}
         />
         <DieRow.ViewEvent
           name="event-dice"
           isDisabled={isMutating}
-          store={state.eventDie}
+          state={state.eventDie}
         />
       </div>
 
