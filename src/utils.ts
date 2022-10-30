@@ -1,4 +1,5 @@
-import { MutableRefObject, useRef, useState, useEffect } from 'react'
+// eslint-disable-next-line no-restricted-imports
+import { useRef, useState, useEffect } from 'react'
 
 const padDuration = (duration: number): string => {
   return duration.toString().padStart(2, '0')
@@ -31,16 +32,6 @@ export const sum = (arr: ReadonlyArray<number>): number => {
 
 export const range = (start: number, end: number): Array<number> => {
   return Array.from({ length: end - start }, (_, index) => index + start)
-}
-
-export const useDynamicRef = <T>(value: T): MutableRefObject<T> => {
-  const valueRef = useRef<T>(value)
-
-  useEffect(() => {
-    valueRef.current = value
-  }, [value])
-
-  return valueRef
 }
 
 export const useEvery = <T>(

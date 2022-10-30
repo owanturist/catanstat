@@ -7,6 +7,7 @@ import {
   differenceInMilliseconds
 } from 'date-fns'
 import cx from 'classnames'
+import { useSweetyMemo } from 'react-sweety'
 
 import { sum, formatDurationMs, useEvery } from '../utils'
 import { Game, PlayerID, Turn } from '../api'
@@ -29,7 +30,7 @@ const useCalcPlayersDuration = (game: Game): Array<number> => {
   const currentPlayerId =
     game.status.type === 'ONGOING' ? game.status.currentPlayer.id : null
 
-  const playersDurationMs = React.useMemo(
+  const playersDurationMs = useSweetyMemo(
     () => calcTotalPlayersDurationMs(game.turns),
     [game.turns]
   )
@@ -62,7 +63,7 @@ const useCalcPlayersDuration = (game: Game): Array<number> => {
     }
   )
 
-  return React.useMemo(() => {
+  return useSweetyMemo(() => {
     return game.players.map(player => {
       const baseDurationMs = playersDurationMs.get(player.id) ?? 0
 
@@ -136,7 +137,7 @@ export const TotalDurationChart: React.VFC<{
   game: Game
 }> = ({ game }) => {
   const playersDuration = useCalcPlayersDuration(game)
-  const data = React.useMemo<ChartData<'doughnut'>>(
+  const data = useSweetyMemo<ChartData<'doughnut'>>(
     () => ({
       labels: game.players.map(player => player.name),
       datasets: [
@@ -150,7 +151,7 @@ export const TotalDurationChart: React.VFC<{
     }),
     [playersDuration, game.players]
   )
-  const totalGameDurationMs = React.useMemo(
+  const totalGameDurationMs = useSweetyMemo(
     () => sum(playersDuration),
     [playersDuration]
   )

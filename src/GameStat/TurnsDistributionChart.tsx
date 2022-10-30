@@ -1,6 +1,7 @@
 import React from 'react'
 import { ChartData, ChartOptions } from 'chart.js'
 import { Chart } from 'react-chartjs-2'
+import { useSweetyMemo } from 'react-sweety'
 
 import { range } from '../utils'
 import { Turn } from '../api'
@@ -84,7 +85,7 @@ const CHART_OPTIONS: ChartOptions = {
 export const TurnsDistributionChart: React.VFC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
-  const data = React.useMemo<ChartData>(() => {
+  const data = useSweetyMemo<ChartData>(() => {
     const turnsCount = turns.length
     const turnsDistribution = calcTurnsDistribution(turns)
     const combinations = range(2, 13)

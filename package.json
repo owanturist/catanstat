@@ -7,7 +7,8 @@
     "start": "vite --port 3000",
     "build": "vite build",
     "postbuild": "npm run copy:index-200",
-    "ts": "tsc --noEmit"
+    "ts": "tsc --noEmit",
+    "lint": "eslint . --ext=js,jsx,ts,tsx,md"
   },
   "repository": {
     "type": "git",

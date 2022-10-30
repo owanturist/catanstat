@@ -1,6 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import { toast } from 'react-hot-toast'
+import { useSweetyMemo } from 'react-sweety'
 
 import {
   GameID,
@@ -45,7 +46,7 @@ const ViewBoardPicture: React.VFC<{
   gameId: GameID
   picture: File
 }> = ({ gameId, picture }) => {
-  const pictureUrl = React.useMemo(
+  const pictureUrl = useSweetyMemo(
     () => URL.createObjectURL(picture),
     [picture]
   )
