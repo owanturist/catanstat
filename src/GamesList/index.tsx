@@ -68,13 +68,14 @@ const ViewDeleteGameTool: React.FC<{
       toast.error('Failed to delete game')
     }
   })
+  const isCountDone = countdown === 0
 
   useSweetyEffect(() => {
-    if (countdown === 0) {
+    if (isCountDone) {
       deleteGame(gameId)
       setRestoreSince(null)
     }
-  }, [deleteGame, countdown, gameId])
+  }, [deleteGame, isCountDone, gameId])
 
   if (countdown != null && countdown > 0) {
     return (

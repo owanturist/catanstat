@@ -2,7 +2,6 @@ import React from 'react'
 import cx from 'classnames'
 import { differenceInMilliseconds } from 'date-fns'
 import Tooltip from '@tippyjs/react'
-import { useSweetyMemo } from 'react-sweety'
 
 import { pct, formatDurationMs, useEvery } from '../utils'
 import { GameStatusOngoing, Player, PlayerID } from '../api'
@@ -100,10 +99,9 @@ export const OngoingGamePlayers: React.VFC<{
   status: GameStatusOngoing
   players: ReadonlyArray<Player>
 }> = ({ status, players }) => {
-  const currentPlayerIndex = useSweetyMemo(
-    () => players.map(player => player.id).indexOf(status.currentPlayer.id),
-    [players, status.currentPlayer.id]
-  )
+  const currentPlayerIndex = players
+    .map(player => player.id)
+    .indexOf(status.currentPlayer.id)
 
   return (
     <ViewContainer>
