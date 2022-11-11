@@ -1,4 +1,4 @@
-import { Sweety, batch } from 'react-sweety'
+import { Sweety } from 'react-sweety'
 
 import { Dice, DieEvent, DieNumber } from '../Die'
 
@@ -23,12 +23,10 @@ export abstract class State {
     { isMutating, whiteDie, redDie, eventDie }: State,
     dice?: Dice
   ): void {
-    batch(() => {
-      isMutating.setState(false)
-      whiteDie.setState(dice?.whiteDie ?? DieRow.init)
-      redDie.setState(dice?.redDie ?? DieRow.init)
-      eventDie.setState(dice?.eventDie ?? DieRow.init)
-    })
+    isMutating.setState(false)
+    whiteDie.setState(dice?.whiteDie ?? DieRow.init)
+    redDie.setState(dice?.redDie ?? DieRow.init)
+    eventDie.setState(dice?.eventDie ?? DieRow.init)
   }
 
   public static toDice(state: State): null | Dice {
