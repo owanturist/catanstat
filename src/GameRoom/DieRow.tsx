@@ -1,5 +1,5 @@
 import React from 'react'
-import { Sweety, watch } from 'react-sweety'
+import { Impulse, watch } from 'react-impulse'
 import cx from 'classnames'
 
 import {
@@ -20,10 +20,10 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
   name: string
   isDisabled: boolean
   value: TDie
-  state: Sweety<State<TDie>>
+  state: Impulse<State<TDie>>
 }) => ReturnType<React.VFC> = watch(
   ({ icon, name, isDisabled, value, state }) => {
-    const selectedValue = state.getState()
+    const selectedValue = state.getValue()
 
     return (
       <label className="cursor-pointer">
@@ -34,7 +34,7 @@ const ViewDie: <TDie extends DieNumber | DieEvent>(props: {
           disabled={isDisabled}
           value={value}
           checked={selectedValue === value}
-          onChange={() => state.setState(value)}
+          onChange={() => state.setValue(value)}
         />
 
         {React.cloneElement(icon, {
@@ -73,7 +73,7 @@ const ViewDieRow: React.FC<{
 export interface DieRowProps<TDie extends DieNumber | DieEvent> {
   name: string
   isDisabled: boolean
-  state: Sweety<State<TDie>>
+  state: Impulse<State<TDie>>
 }
 
 const NUMBER_DICE: ReadonlyArray<DieNumber> = [1, 2, 3, 4, 5, 6]

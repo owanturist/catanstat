@@ -7,7 +7,7 @@ import {
   differenceInMilliseconds
 } from 'date-fns'
 import cx from 'classnames'
-import { useSweetyMemo } from 'react-sweety'
+import { useImpulseMemo } from 'react-impulse'
 
 import { sum, formatDurationMs, useEvery } from '../utils'
 import { Game, PlayerID, Turn } from '../api'
@@ -30,7 +30,7 @@ const useCalcPlayersDuration = (game: Game): Array<number> => {
   const currentPlayerId =
     game.status.type === 'ONGOING' ? game.status.currentPlayer.id : null
 
-  const playersDurationMs = useSweetyMemo(
+  const playersDurationMs = useImpulseMemo(
     () => calcTotalPlayersDurationMs(game.turns),
     [game.turns]
   )
@@ -63,7 +63,7 @@ const useCalcPlayersDuration = (game: Game): Array<number> => {
     }
   )
 
-  return useSweetyMemo(() => {
+  return useImpulseMemo(() => {
     return game.players.map(player => {
       const baseDurationMs = playersDurationMs.get(player.id) ?? 0
 
@@ -137,7 +137,7 @@ export const TotalDurationChart: React.VFC<{
   game: Game
 }> = ({ game }) => {
   const playersDuration = useCalcPlayersDuration(game)
-  const data = useSweetyMemo<ChartData<'doughnut'>>(
+  const data = useImpulseMemo<ChartData<'doughnut'>>(
     () => ({
       labels: game.players.map(player => player.name),
       datasets: [
@@ -151,7 +151,7 @@ export const TotalDurationChart: React.VFC<{
     }),
     [playersDuration, game.players]
   )
-  const totalGameDurationMs = useSweetyMemo(
+  const totalGameDurationMs = useImpulseMemo(
     () => sum(playersDuration),
     [playersDuration]
   )

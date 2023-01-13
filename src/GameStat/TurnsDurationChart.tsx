@@ -6,7 +6,7 @@ import {
   secondsToMilliseconds,
   differenceInMilliseconds
 } from 'date-fns'
-import { useSweetyMemo } from 'react-sweety'
+import { useImpulseMemo } from 'react-impulse'
 
 import { formatDurationMs, useEvery } from '../utils'
 import { Game } from '../api'
@@ -54,7 +54,7 @@ const useCalcTurnsDuration = (game: Game): Array<number> => {
     }
   )
 
-  return useSweetyMemo(() => {
+  return useImpulseMemo(() => {
     // safe to mutate here
     const turnsDuration = game.turns.map(turn => turn.durationMs).reverse()
 
@@ -114,7 +114,7 @@ export const TurnsDurationChart: React.VFC<{
   game: Game
 }> = ({ game }) => {
   const turnsDuration = useCalcTurnsDuration(game)
-  const data = useSweetyMemo<ChartData>(
+  const data = useImpulseMemo<ChartData>(
     () => ({
       labels: turnsDuration.map((_, index) => index + 1),
       datasets: [

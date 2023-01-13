@@ -56,9 +56,9 @@
     "react-chartjs-2": "^4.3.1",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.0",
+    "react-impulse": "^1.0.1",
     "react-query": "^3.39.2",
     "react-router-dom": "^6.4.2",
-    "react-sweety": "^2.1.0-alpha.7",
     "shallowequal": "^1.1.0",
     "tippy.js": "^6.3.7"
   },

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
-import { watch } from 'react-sweety'
+import { watch } from 'react-impulse'
 import cx from 'classnames'
 import { toast } from 'react-hot-toast'
 
@@ -14,8 +14,8 @@ const ViewPlayer: React.VFC<{
   index: number
   player: PlayerInfo
 }> = watch(({ index, player }) => {
-  const isActive = player.isActive.getState()
-  const name = player.name.getState()
+  const isActive = player.isActive.getValue()
+  const name = player.name.getValue()
 
   return (
     <Draggable draggableId={player.color.id} index={index}>
@@ -35,7 +35,7 @@ const ViewPlayer: React.VFC<{
               name={`player-${player.color.id}-active`}
               checked={isActive}
               formNoValidate
-              onChange={event => player.isActive.setState(event.target.checked)}
+              onChange={event => player.isActive.setValue(event.target.checked)}
             />
             <div
               className={cx(
@@ -63,7 +63,7 @@ const ViewPlayer: React.VFC<{
             placeholder={player.color.label}
             readOnly={!isActive}
             value={name}
-            onChange={event => player.name.setState(event.target.value)}
+            onChange={event => player.name.setValue(event.target.value)}
           />
 
           <span
@@ -86,7 +86,7 @@ const ViewPlayer: React.VFC<{
 const StartGame: React.VFC<{
   state: State
 }> = watch(({ state }) => {
-  const players = state.players.getState()
+  const players = state.players.getValue()
   const navigate = useNavigate()
   const { isLoading, startGame } = useStartGame({
     onError() {
@@ -126,7 +126,7 @@ const StartGame: React.VFC<{
             startGame(
               activePlayers.map(player => ({
                 color: player.color.id,
-                name: player.name.getState()
+                name: player.name.getValue()
               }))
             )
           }

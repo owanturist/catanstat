@@ -99,13 +99,8 @@
         "paths": [
           {
             "name": "react",
-            "importNames": [
-              "useMemo",
-              "useEffect",
-              "useLayoutEffect",
-              "useInsertionEffect"
-            ],
-            "message": "Please import those hooks from 'react-sweety'"
+            "importNames": ["useMemo", "useEffect", "useLayoutEffect"],
+            "message": "Please import those hooks from 'react-impulse'"
           }
         ]
       }
@@ -115,22 +110,17 @@
       {
         "object": "React",
         "property": "useMemo",
-        "message": "Please use useSweetyMemo from 'react-sweety'"
+        "message": "Please use useImpulseMemo from 'react-impulse'"
       },
       {
         "object": "React",
         "property": "useEffect",
-        "message": "Please use useSweetyEffect from 'react-sweety'"
+        "message": "Please use useImpulseEffect from 'react-impulse'"
       },
       {
         "object": "React",
         "property": "useLayoutEffect",
-        "message": "Please use useSweetyLayoutEffect from 'react-sweety'"
-      },
-      {
-        "object": "React",
-        "property": "useInsertionEffect",
-        "message": "Please use useSweetyInsertionEffect from 'react-sweety'"
+        "message": "Please use useImpulseLayoutEffect from 'react-impulse'"
       }
     ],
 
@@ -158,7 +148,7 @@
     "react-hooks/exhaustive-deps": [
       "warn",
       {
-        "additionalHooks": "(useSweetyMemo|useSweetyEffect|useSweetyLayoutEffect|useSweetyInsertionEffect)"
+        "additionalHooks": "(useImpulseMemo|useImpulseEffect|useImpulseLayoutEffect)"
       }
     ],
 
