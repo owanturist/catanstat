@@ -105,7 +105,7 @@
               "useLayoutEffect",
               "useInsertionEffect"
             ],
-            "message": "Please import those hooks from 'react-sweety'"
+            "message": "Please import those hooks from 'react-impulse'"
           }
         ]
       }
@@ -115,22 +115,22 @@
       {
         "object": "React",
         "property": "useMemo",
-        "message": "Please use useSweetyMemo from 'react-sweety'"
+        "message": "Please use useSweetyMemo from 'react-impulse'"
       },
       {
         "object": "React",
         "property": "useEffect",
-        "message": "Please use useSweetyEffect from 'react-sweety'"
+        "message": "Please use useSweetyEffect from 'react-impulse'"
       },
       {
         "object": "React",
         "property": "useLayoutEffect",
-        "message": "Please use useSweetyLayoutEffect from 'react-sweety'"
+        "message": "Please use useSweetyLayoutEffect from 'react-impulse'"
       },
       {
         "object": "React",
         "property": "useInsertionEffect",
-        "message": "Please use useSweetyInsertionEffect from 'react-sweety'"
+        "message": "Please use useSweetyInsertionEffect from 'react-impulse'"
       }
     ],
 

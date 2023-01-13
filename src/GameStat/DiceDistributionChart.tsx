@@ -1,7 +1,7 @@
 import React from 'react'
 import { ChartData, ChartDataset, ChartOptions } from 'chart.js'
 import { Radar } from 'react-chartjs-2'
-import { useSweetyMemo } from 'react-sweety'
+import { useImpulseMemo } from 'react-impulse'
 import cx from 'classnames'
 
 import { Turn } from '../api'
@@ -81,7 +81,7 @@ const DIE_NUMBER_SIDES: Array<DieNumber> = [1, 2, 3, 4, 5, 6]
 export const NumberDiceDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
-  const data = useSweetyMemo<ChartData<'radar'>>(() => {
+  const data = useImpulseMemo<ChartData<'radar'>>(() => {
     const turnsCount = turns.length
     const whiteDistribution = calcDieDistribution(
       turns,
@@ -137,7 +137,7 @@ const DIE_EVENT_COLORS: Record<DieEvent, string> = {
 export const EventDieDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
-  const data = useSweetyMemo<ChartData<'radar'>>(() => {
+  const data = useImpulseMemo<ChartData<'radar'>>(() => {
     const turnsCount = turns.length
     const eventDistribution = calcDieDistribution(
       turns,
@@ -187,7 +187,7 @@ export const EventDieDistribution: React.VFC<{
 export const NumberPerEventDiceDistribution: React.VFC<{
   turns: ReadonlyArray<Turn>
 }> = ({ turns }) => {
-  const data = useSweetyMemo<ChartData<'radar'>>(() => {
+  const data = useImpulseMemo<ChartData<'radar'>>(() => {
     const blueDistribution = calcDieDistribution(turns, ({ dice }) => {
       return dice.eventDie === 'blue' ? dice.redDie : null
     })

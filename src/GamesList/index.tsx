@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import cx from 'classnames'
 import { differenceInMilliseconds, format } from 'date-fns'
 import { toast } from 'react-hot-toast'
-import { useSweetyEffect, useSweetyMemo } from 'react-sweety'
+import { useImpulseEffect, useImpulseMemo } from 'react-impulse'
 
 import { formatDurationMs, sum, useEvery } from '../utils'
 import {
@@ -70,7 +70,7 @@ const ViewDeleteGameTool: React.FC<{
   })
   const isCountDone = countdown === 0
 
-  useSweetyEffect(() => {
+  useImpulseEffect(() => {
     if (isCountDone) {
       deleteGame(gameId)
       setRestoreSince(null)
@@ -132,7 +132,7 @@ const ViewGameDuration: React.VFC<{
   status: GameStatus
   turns: ReadonlyArray<Turn>
 }> = ({ status, turns }) => {
-  const prevTurnsDurationMs = useSweetyMemo(
+  const prevTurnsDurationMs = useImpulseMemo(
     () => sum(turns.map(turn => turn.durationMs)),
     [turns]
   )
@@ -193,7 +193,7 @@ const ViewGameDuration: React.VFC<{
 const ViewGamePicture: React.VFC<{
   picture: File
 }> = ({ picture }) => {
-  const pictureUrl = useSweetyMemo(
+  const pictureUrl = useImpulseMemo(
     () => URL.createObjectURL(picture),
     [picture]
   )

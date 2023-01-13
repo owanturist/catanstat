@@ -1,27 +1,27 @@
-import { Sweety } from 'react-sweety'
+import { Impulse } from 'react-impulse'
 
 import { Color } from '../Color'
 
 export abstract class PlayerInfo {
   abstract readonly color: Color
-  abstract readonly name: Sweety<string>
-  abstract readonly isActive: Sweety<boolean>
+  abstract readonly name: Impulse<string>
+  abstract readonly isActive: Impulse<boolean>
 
   public static init(color: Color): PlayerInfo {
     return {
       color,
-      name: Sweety.of(color.label),
-      isActive: Sweety.of(true)
+      name: Impulse.of(color.label),
+      isActive: Impulse.of(true)
     }
   }
 }
 
 export abstract class State {
-  abstract readonly players: Sweety<ReadonlyArray<PlayerInfo>>
+  abstract readonly players: Impulse<ReadonlyArray<PlayerInfo>>
 
   public static init(): State {
     return {
-      players: Sweety.of<ReadonlyArray<PlayerInfo>>([
+      players: Impulse.of<ReadonlyArray<PlayerInfo>>([
         PlayerInfo.init(Color.red),
         PlayerInfo.init(Color.blue),
         PlayerInfo.init(Color.white),
@@ -37,7 +37,7 @@ export abstract class State {
     destinationIndex: number,
     state: State
   ): void {
-    state.players.setState(players => {
+    state.players.setValue(players => {
       if (sourceIndex === destinationIndex) {
         return players
       }
@@ -52,6 +52,6 @@ export abstract class State {
   }
 
   public static getActivePlayers(state: State): Array<PlayerInfo> {
-    return state.players.getState().filter(player => player.isActive.getState())
+    return state.players.getValue().filter(player => player.isActive.getValue())
   }
 }

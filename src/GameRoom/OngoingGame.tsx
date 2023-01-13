@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
-import { Sweety, watch } from 'react-sweety'
+import { Impulse, watch } from 'react-impulse'
 import { toast } from 'react-hot-toast'
 
 import {
@@ -23,13 +23,13 @@ const ViewCompleteTurnButton: React.VFC<{
   gameId: GameID
   state: State
 }> = watch(({ gameId, state }) => {
-  const whiteDie = state.whiteDie.getState() ?? 0
-  const redDie = state.redDie.getState() ?? 0
-  const eventDie = state.eventDie.getState()
+  const whiteDie = state.whiteDie.getValue() ?? 0
+  const redDie = state.redDie.getValue() ?? 0
+  const eventDie = state.eventDie.getValue()
 
   const { completeTurn } = useCompleteTurn(gameId, {
     onError() {
-      state.isMutating.setState(false)
+      state.isMutating.setValue(false)
       toast.error('Failed to complete turn')
     },
     onSuccess() {
@@ -55,13 +55,13 @@ const ViewCompleteTurnButton: React.VFC<{
         }
       )}
       onClick={() => {
-        if (!state.isMutating.getState()) {
+        if (!state.isMutating.getValue()) {
           const dice = State.toDice(state)
 
           if (dice == null) {
             toast.error('Please select all dice')
           } else {
-            state.isMutating.setState(true)
+            state.isMutating.setValue(true)
             completeTurn(dice)
           }
         }
@@ -108,24 +108,24 @@ const ViewSecondaryButton: React.FC<{
 const ViewPauseGameButton: React.VFC<{
   gameId: GameID
   isGamePaused: boolean
-  isMutating: Sweety<boolean>
+  isMutating: Impulse<boolean>
 }> = ({ gameId, isGamePaused, isMutating }) => {
   const { pauseGame } = usePauseGame(gameId, {
     onError() {
-      isMutating.setState(false)
+      isMutating.setValue(false)
       toast.error('Failed to pause game')
     },
     onSuccess() {
-      isMutating.setState(false)
+      isMutating.setValue(false)
     }
   })
   const { resumeGame } = useResumeGame(gameId, {
     onError() {
-      isMutating.setState(false)
+      isMutating.setValue(false)
       toast.error('Failed to resume game')
     },
     onSuccess() {
-      isMutating.setState(false)
+      isMutating.setValue(false)
     }
   })
 
@@ -146,7 +146,7 @@ const ViewPauseGameButton: React.VFC<{
           type="checkbox"
           name="is-game-paused"
           checked={isGamePaused}
-          readOnly={isMutating.getState()}
+          readOnly={isMutating.getValue()}
           onChange={event => {
             if (event.target.checked) {
               pauseGame()
@@ -192,7 +192,7 @@ const ViewCompleteGameButton: React.VFC<{
 }> = ({ gameId, state }) => {
   const { completeGame } = useCompleteGame(gameId, {
     onError() {
-      state.isMutating.setState(false)
+      state.isMutating.setValue(false)
       toast.error('Failed to complete game')
     },
     onSuccess() {
@@ -204,13 +204,13 @@ const ViewCompleteGameButton: React.VFC<{
   return (
     <ViewSecondaryButton
       onClick={() => {
-        if (!state.isMutating.getState()) {
+        if (!state.isMutating.getValue()) {
           const dice = State.toDice(state)
 
           if (dice == null) {
             toast.error('Please select all dice')
           } else {
-            state.isMutating.setState(true)
+            state.isMutating.setValue(true)
             completeGame(dice)
           }
         }
@@ -228,7 +228,7 @@ const ViewAbortTurnButton: React.VFC<{
 }> = ({ gameId, hasTurns, state }) => {
   const { abortLastTurn } = useAbortLastTurn(gameId, {
     onError() {
-      state.isMutating.setState(false)
+      state.isMutating.setValue(false)
       toast.error('Failed to abort last turn')
     },
     onSuccess(dice) {
@@ -240,9 +240,9 @@ const ViewAbortTurnButton: React.VFC<{
   return (
     <ViewSecondaryButton
       onClick={() => {
-        if (!state.isMutating.getState()) {
+        if (!state.isMutating.getValue()) {
           if (hasTurns) {
-            state.isMutating.setState(true)
+            state.isMutating.setValue(true)
             abortLastTurn()
           } else {
             toast.error('No turns to abort')
@@ -262,7 +262,7 @@ export const OngoingGame: React.VFC<{
   hasTurns: boolean
   state: State
 }> = watch(({ gameId, status, players, hasTurns, state }) => {
-  const isMutating = state.isMutating.getState()
+  const isMutating = state.isMutating.getValue()
 
   return (
     <>
