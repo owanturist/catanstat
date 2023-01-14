@@ -86,9 +86,11 @@ const ViewPlayer: React.FC<{
   )
 })
 
-const StartGame: React.FC<{
+export interface StartGameProps {
   state: State
-}> = watch(({ state }) => {
+}
+
+const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
   const players = state.players.getValue()
   const navigate = useNavigate()
   const { isLoading, startGame } = useStartGame({

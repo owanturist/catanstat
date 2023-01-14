@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { within, userEvent, fireEvent } from '@storybook/testing-library'
 import { expect } from '@storybook/jest'
-import { Sweety } from 'react-sweety'
 
-import StartGame from './StartGame'
+import StartGame, { StartGameProps } from './StartGame'
 import { State } from './domain'
 
 const sleep = (ms: number): Promise<void> => {
@@ -17,9 +16,9 @@ const meta: Meta = {
 
 export default meta
 
-export const Initial: StoryObj = {
+export const Initial: StoryObj<StartGameProps> = {
   args: {
-    store: Sweety.of(State.init())
+    state: State.init()
   },
   play: async ({ canvasElement }) => {
     await sleep(1)
@@ -53,14 +52,14 @@ export const Initial: StoryObj = {
   }
 }
 
-export const SomeDeselected: StoryObj = {
-  args: {
-    store: Sweety.of(State.init()).clone(state => {
-      state.players[0]?.isActive.setState(false)
-      state.players[3]?.isActive.setState(false)
+const state_SomeDeselected = State.init()
 
-      return state
-    })
+state_SomeDeselected.players.getValue().at(0)?.isActive.setValue(false)
+state_SomeDeselected.players.getValue().at(3)?.isActive.setValue(false)
+
+export const SomeDeselected: StoryObj<StartGameProps> = {
+  args: {
+    state: state_SomeDeselected
   }
 }
 
