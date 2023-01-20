@@ -9,6 +9,7 @@ import * as Icon from '../Icon'
 import { useStartGame } from '../api'
 
 import { PlayerInfo, State } from './domain'
+import { PlayerItem, PlayersList, StartGameForm } from './StartGameLayout'
 
 const ViewPlayer: React.FC<{
   index: number
@@ -20,12 +21,10 @@ const ViewPlayer: React.FC<{
   return (
     <Draggable draggableId={player.color.id} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }, { isDragging }) => (
-        <div
+        <PlayerItem
           ref={innerRef}
-          className={cx(
-            'flex flex-row gap-2 p-1 bg-white rounded-md transition-shadow',
-            isDragging ? 'shadow-md' : 'shadow-none'
-          )}
+          isDragging={isDragging}
+          dragHandleProps={dragHandleProps}
           {...draggableProps}
         >
           <label>
@@ -38,7 +37,6 @@ const ViewPlayer: React.FC<{
               onChange={event => player.isActive.setValue(event.target.checked)}
             />
             <div
-              data-testid="start-game-player-color"
               className={cx(
                 'flex justify-center items-center w-10 h-10 border rounded-md text-xl bg-white text-center text-gray-500 transition cursor-pointer',
                 'hover:bg-gray-50 active:bg-gray-100',
@@ -54,7 +52,6 @@ const ViewPlayer: React.FC<{
           </label>
 
           <input
-            data-testid="start-game-player-name"
             className={cx(
               'block flex-1 px-4 h-10 border rounded-md',
               'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
@@ -67,20 +64,7 @@ const ViewPlayer: React.FC<{
             value={name}
             onChange={event => player.name.setValue(event.target.value)}
           />
-
-          <span
-            data-testid="start-game-player-drag-handle"
-            className={cx(
-              'flex justify-center items-center w-6 h-10 rounded-md text-xl text-center cursor-[grab] select-none transition-colors',
-              'hover:text-gray-500',
-              'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
-              isDragging ? 'text-gray-500' : 'text-gray-300'
-            )}
-            {...dragHandleProps}
-          >
-            <Icon.Drag />
-          </span>
-        </div>
+        </PlayerItem>
       )}
     </Draggable>
   )
@@ -110,15 +94,8 @@ const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
         }
       }}
     >
-      <form
-        className={cx(
-          'flex flex-col flex-1 max-h-full p-2 w-full',
-          'xs:p-3',
-          'sm:grow-0 sm:space-y-3'
-        )}
-        onSubmit={event => {
-          event.preventDefault()
-
+      <StartGameForm
+        onSubmit={() => {
           if (isLoading) {
             return
           }
@@ -136,32 +113,7 @@ const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
             )
           }
         }}
-      >
-        <Droppable droppableId="droppable">
-          {provided => (
-            <div
-              ref={provided.innerRef}
-              className={cx(
-                'flex-1 overflow-y-auto',
-                '-mr-3 pr-2', // position scrollbar to the containers' edge
-                '-m-1' // compensate items' padding to be align with divider
-              )}
-            >
-              {players.map((player, index) => (
-                <ViewPlayer
-                  key={player.color.id}
-                  index={index}
-                  player={player}
-                />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-
-        <div className="hidden sm:border-t sm:block" />
-
-        <footer>
+        footer={
           <button
             type="submit"
             className={cx(
@@ -172,8 +124,23 @@ const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
           >
             Start Game
           </button>
-        </footer>
-      </form>
+        }
+      >
+        <Droppable droppableId="droppable">
+          {provided => (
+            <PlayersList ref={provided.innerRef}>
+              {players.map((player, index) => (
+                <ViewPlayer
+                  key={player.color.id}
+                  index={index}
+                  player={player}
+                />
+              ))}
+              {provided.placeholder}
+            </PlayersList>
+          )}
+        </Droppable>
+      </StartGameForm>
     </DragDropContext>
   )
 })

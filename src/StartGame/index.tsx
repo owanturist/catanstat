@@ -2,6 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 
 import { State } from './domain'
+import { StartGameSkeleton } from './StartGameSkeleton'
 export { State } from './domain'
 
 const LazyStartGame = React.lazy(() => import('./StartGame'))
@@ -22,7 +23,7 @@ export const View: React.FC<{
         'sm:grow-0 sm:rounded-md'
       )}
     >
-      <React.Suspense fallback={null}>
+      <React.Suspense fallback={<StartGameSkeleton />}>
         <LazyStartGame state={state} />
       </React.Suspense>
     </div>

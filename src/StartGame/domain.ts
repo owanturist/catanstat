@@ -17,11 +17,11 @@ export abstract class PlayerInfo {
 }
 
 export abstract class State {
-  abstract readonly players: Impulse<ReadonlyArray<PlayerInfo>>
+  abstract readonly players: Impulse<Array<PlayerInfo>>
 
   public static init(): State {
     return {
-      players: Impulse.of<ReadonlyArray<PlayerInfo>>([
+      players: Impulse.of([
         PlayerInfo.init(Color.red),
         PlayerInfo.init(Color.blue),
         PlayerInfo.init(Color.white),
