@@ -22,7 +22,10 @@
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "prettier",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:storybook/recommended",
+    "plugin:storybook/csf-strict",
+    "plugin:storybook/addon-interactions"
   ],
   "rules": {
     // Possible Errors
@@ -178,7 +181,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["./*.js", "./*.ts"]
+        "devDependencies": ["./*.js", "./*.ts", "./**/*.stories.*"]
       }
     ],
     "import/no-useless-path-segments": "error"
@@ -254,6 +257,13 @@
         "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/restrict-plus-operands": "error",
         "@typescript-eslint/switch-exhaustiveness-check": "error"
+      }
+    },
+    {
+      "files": ["**/*.stories.ts?(x)"],
+      "rules": {
+        "storybook/no-title-property-in-meta": "off",
+        "storybook/csf-component": "off"
       }
     }
   ]

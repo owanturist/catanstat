@@ -22,7 +22,7 @@ const DIE_NUMBER_COLORS: Record<DieNumberColor, string> = {
   red: cx('text-red-500 stroke-red-700 ring-red-500/50')
 }
 
-export const DieNumberIcon: React.VFC<{
+export const DieNumberIcon: React.FC<{
   className?: string
   color: DieNumberColor
   side: DieNumber
@@ -43,7 +43,7 @@ const DIE_EVENT_COLORS: Record<DieEvent, string> = {
   black: cx('text-gray-600 ring-gray-600/50 stroke-gray-800')
 }
 
-export const DieEventIcon: React.VFC<{
+export const DieEventIcon: React.FC<{
   className?: string
   side: DieEvent
 }> = ({ className, side }) => {
@@ -52,7 +52,7 @@ export const DieEventIcon: React.VFC<{
 
 // D I E  P L A C E H O L D E R
 
-export const DiePlaceholderIcon: React.VFC<{
+export const DiePlaceholderIcon: React.FC<{
   className?: string
 }> = ({ className }) => (
   <Icon.DieClear className={cx('text-gray-100 stroke-gray-300', className)} />

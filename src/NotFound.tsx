@@ -8,7 +8,7 @@ const styleLink = cx(
   'focus-within:underline'
 )
 
-export const NotFound: React.VFC = () => (
+export const NotFound: React.FC = () => (
   <div className="h-full text-gray-700">
     <div
       className={cx(

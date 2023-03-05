@@ -133,7 +133,7 @@ const DOUGHNUT_OPTIONS: ChartOptions<'doughnut'> = {
   }
 }
 
-export const TotalDurationChart: React.VFC<{
+export const TotalDurationChart: React.FC<{
   game: Game
 }> = ({ game }) => {
   const playersDuration = useCalcPlayersDuration(game)

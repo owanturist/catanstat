@@ -55,7 +55,7 @@ abstract class GameEntity {
     const game = await db.games.get(game_id)
 
     if (game == null) {
-      return Promise.reject(new Error(`Game with id ${game_id} not found`))
+      throw new Error(`Game with id ${game_id} not found`)
     }
 
     return game
@@ -88,7 +88,7 @@ abstract class PlayerEntity extends Player {
     const player = await db.players.get(player_id)
 
     if (player == null) {
-      return Promise.reject(new Error(`Player with id ${player_id} not found`))
+      throw new Error(`Player with id ${player_id} not found`)
     }
 
     return player
@@ -103,7 +103,7 @@ abstract class PlayerEntity extends Player {
       .first()
 
     if (first_player == null) {
-      return Promise.reject(new Error(`No players found for game ${game_id}`))
+      throw new Error(`No players found for game ${game_id}`)
     }
 
     return first_player
@@ -121,7 +121,7 @@ abstract class TurnEntity extends Turn {
     const turn = await db.turns.get(turn_id)
 
     if (turn == null) {
-      return Promise.reject(new Error(`Turn with id ${turn_id} not found`))
+      throw new Error(`Turn with id ${turn_id} not found`)
     }
 
     return turn
@@ -209,7 +209,7 @@ const complete_turn = async (
   const game = await GameEntity.get_by_id(game_id)
 
   if (game.end_time != null) {
-    return Promise.reject(new Error('Game is over'))
+    throw new Error('Game is over')
   }
 
   const now = new Date()
@@ -253,7 +253,7 @@ export const abort_last_turn = async (game_id: number): Promise<Dice> => {
   const last_turn = await TurnEntity.get_last_turn_in_game(game_id)
 
   if (last_turn == null) {
-    return Promise.reject(new Error('No turns found'))
+    throw new Error('No turns found')
   }
 
   await db.turns.delete(last_turn.id)
@@ -279,7 +279,7 @@ export const pause_game = async (game_id: number): Promise<number> => {
   const game = await GameEntity.get_by_id(game_id)
 
   if (game.end_time != null) {
-    return Promise.reject(new Error('Game is over'))
+    throw new Error('Game is over')
   }
 
   if (!game.is_paused) {
@@ -301,7 +301,7 @@ export const resume_game = async (game_id: number): Promise<number> => {
   const game = await GameEntity.get_by_id(game_id)
 
   if (game.end_time != null) {
-    return Promise.reject(new Error('Game is over'))
+    throw new Error('Game is over')
   }
 
   if (game.is_paused) {
@@ -350,9 +350,7 @@ export const start_game = async (
   players: ReadonlyArray<PlayerPayload>
 ): Promise<number> => {
   if (players.length < 2) {
-    return Promise.reject(
-      new Error('Not enough players, minimum 2 are required')
-    )
+    throw new Error('Not enough players, minimum 2 are required')
   }
 
   const now = new Date()

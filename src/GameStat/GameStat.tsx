@@ -65,7 +65,7 @@ const ViewSection: React.FC<{
   </div>
 )
 
-const GameStat: React.VFC<{
+export const GameStat: React.FC<{
   game: Game
 }> = ({ game }) => (
   <>
@@ -94,5 +94,3 @@ const GameStat: React.VFC<{
     </ViewSection>
   </>
 )
-
-export default GameStat

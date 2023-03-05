@@ -19,7 +19,7 @@ const ViewContainer: React.FC<{
   </div>
 )
 
-const ViewDie: React.VFC<{
+const ViewDie: React.FC<{
   className?: string
   die?: React.ReactElement
 }> = ({
@@ -31,7 +31,7 @@ const ViewDie: React.VFC<{
   })
 }
 
-const ViewDice: React.VFC<{
+const ViewDice: React.FC<{
   dice?: Dice
 }> = ({ dice }) => (
   <div className="flex gap-1 text-2xl">
@@ -56,7 +56,7 @@ const ViewTableCell: React.FC<{
   <td className={cx('p-2', className)}>{children}</td>
 )
 
-const ViewTableRow: React.VFC<{
+const ViewTableRow: React.FC<{
   order: number
   player: Player
   dice?: Dice
@@ -94,7 +94,7 @@ const ViewTableRow: React.VFC<{
   </tr>
 )
 
-const ViewCurrentTableRow: React.VFC<{
+const ViewCurrentTableRow: React.FC<{
   order: number
   player: Player
   isGamePaused: boolean
@@ -150,7 +150,7 @@ const ViewTableHeaderCell: React.FC<{
   </th>
 )
 
-const ViewHistoryTable: React.VFC<{
+const ViewHistoryTable: React.FC<{
   game: Game
 }> = ({ game }) => {
   const turnsCount = game.turns.length
@@ -196,7 +196,7 @@ const ViewHistoryTable: React.VFC<{
   )
 }
 
-export const GameHistory: React.VFC = () => {
+export const GameHistory: React.FC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
   const { isLoading, error, game } = useQueryGame(gameId)

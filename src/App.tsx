@@ -36,7 +36,7 @@ const LazyComponent = <TProps extends Record<string, unknown>>({
   return React.createElement(component, propsRef.current)
 }
 
-export const App: React.VFC = () => (
+export const App: React.FC = () => (
   <QueryClientProvider client={queryClient}>
     <Routes>
       <Route path="*" element={<Shell />}>

@@ -30,28 +30,31 @@ const ViewDropdownItem: React.FC<{
   children: React.ReactNode
 }> = ({ to, icon, children }) => (
   <Menu.Item>
-    {({ active }) => (
-      <NavLink
-        to={to}
-        className={navProps =>
-          cx(
-            'flex gap-2 items-center w-full px-2 py-2 rounded-md text-sm transition-colors',
-            active && 'bg-gray-100',
-            navProps.isActive && 'text-blue-500',
-            '2xs:text-base'
-          )
-        }
-      >
-        {React.cloneElement(icon, {
-          className: cx('w-4 2xs:w-5')
-        })}
-        <span>{children}</span>
-      </NavLink>
+    {({ active: isMenuItemActive }) => (
+      // the span wrapper fixes a bug in headless ui when it stringifies the className function
+      <div>
+        <NavLink
+          to={to}
+          className={({ isActive: isLinkActive }) => {
+            return cx(
+              'flex gap-2 items-center w-full px-2 py-2 rounded-md text-sm transition-colors',
+              isMenuItemActive && 'bg-gray-100',
+              isLinkActive && 'text-blue-500',
+              '2xs:text-base'
+            )
+          }}
+        >
+          {React.cloneElement(icon, {
+            className: cx('w-4 2xs:w-5')
+          })}
+          <span>{children}</span>
+        </NavLink>
+      </div>
     )}
   </Menu.Item>
 )
 
-const ViewHeaderDropdown: React.VFC = () => {
+const ViewHeaderDropdown: React.FC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
 
@@ -79,7 +82,7 @@ const ViewHeaderDropdown: React.VFC = () => {
   )
 }
 
-const ViewBackToGameButton: React.VFC = () => {
+const ViewBackToGameButton: React.FC = () => {
   const params = useParams<'gameId'>()
   const gameId = castID<GameID>(params.gameId!)
 
@@ -92,7 +95,7 @@ const ViewBackToGameButton: React.VFC = () => {
   )
 }
 
-const ViewStartGame: React.VFC = () => (
+const ViewStartGame: React.FC = () => (
   <Tooltip content="Start new game">
     <Link to="/start" className={styleTool}>
       <Icon.Plus />
@@ -100,7 +103,7 @@ const ViewStartGame: React.VFC = () => (
   </Tooltip>
 )
 
-export const Shell: React.VFC = () => (
+export const Shell: React.FC = () => (
   <div className="h-full flex flex-col text-gray-900">
     <header className="bg-gray-100 flex justify-center">
       <div

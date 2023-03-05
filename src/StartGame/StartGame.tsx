@@ -9,8 +9,9 @@ import * as Icon from '../Icon'
 import { useStartGame } from '../api'
 
 import { PlayerInfo, State } from './domain'
+import { PlayerItem, PlayersList, StartGameForm } from './StartGameLayout'
 
-const ViewPlayer: React.VFC<{
+const ViewPlayer: React.FC<{
   index: number
   player: PlayerInfo
 }> = watch(({ index, player }) => {
@@ -20,12 +21,10 @@ const ViewPlayer: React.VFC<{
   return (
     <Draggable draggableId={player.color.id} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }, { isDragging }) => (
-        <div
+        <PlayerItem
           ref={innerRef}
-          className={cx(
-            'flex flex-row gap-2 p-1 bg-white rounded-md transition-shadow',
-            isDragging ? 'shadow-md' : 'shadow-none'
-          )}
+          isDragging={isDragging}
+          dragHandleProps={dragHandleProps}
           {...draggableProps}
         >
           <label>
@@ -65,27 +64,17 @@ const ViewPlayer: React.VFC<{
             value={name}
             onChange={event => player.name.setValue(event.target.value)}
           />
-
-          <span
-            className={cx(
-              'flex justify-center items-center w-6 h-10 rounded-md text-xl text-center cursor-[grab] select-none transition-colors',
-              'hover:text-gray-500',
-              'ring-gray-200 focus-visible:ring-2 focus-visible:outline-none',
-              isDragging ? 'text-gray-500' : 'text-gray-300'
-            )}
-            {...dragHandleProps}
-          >
-            <Icon.Drag />
-          </span>
-        </div>
+        </PlayerItem>
       )}
     </Draggable>
   )
 })
 
-const StartGame: React.VFC<{
+export interface StartGameProps {
   state: State
-}> = watch(({ state }) => {
+}
+
+export const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
   const players = state.players.getValue()
   const navigate = useNavigate()
   const { isLoading, startGame } = useStartGame({
@@ -105,15 +94,8 @@ const StartGame: React.VFC<{
         }
       }}
     >
-      <form
-        className={cx(
-          'flex flex-col flex-1 max-h-full p-2 w-full',
-          'xs:p-3',
-          'sm:grow-0 sm:space-y-3'
-        )}
-        onSubmit={event => {
-          event.preventDefault()
-
+      <StartGameForm
+        onSubmit={() => {
           if (isLoading) {
             return
           }
@@ -131,32 +113,7 @@ const StartGame: React.VFC<{
             )
           }
         }}
-      >
-        <Droppable droppableId="droppable">
-          {provided => (
-            <div
-              ref={provided.innerRef}
-              className={cx(
-                'flex-1 overflow-y-auto',
-                '-mr-3 pr-2', // position scrollbar to the containers' edge
-                '-m-1' // compensate items' padding to be align with divider
-              )}
-            >
-              {players.map((player, index) => (
-                <ViewPlayer
-                  key={player.color.id}
-                  index={index}
-                  player={player}
-                />
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-
-        <div className="hidden sm:border-t sm:block" />
-
-        <footer>
+        footer={
           <button
             type="submit"
             className={cx(
@@ -167,10 +124,23 @@ const StartGame: React.VFC<{
           >
             Start Game
           </button>
-        </footer>
-      </form>
+        }
+      >
+        <Droppable droppableId="droppable">
+          {provided => (
+            <PlayersList ref={provided.innerRef}>
+              {players.map((player, index) => (
+                <ViewPlayer
+                  key={player.color.id}
+                  index={index}
+                  player={player}
+                />
+              ))}
+              {provided.placeholder}
+            </PlayersList>
+          )}
+        </Droppable>
+      </StartGameForm>
     </DragDropContext>
   )
 })
-
-export default StartGame

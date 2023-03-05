@@ -10,7 +10,7 @@ export type IconProps = Omit<
   'children' | 'viewBox'
 >
 
-export const Drag: React.VFC<IconProps> = props => (
+export const Drag: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -23,7 +23,7 @@ export const Drag: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const User: React.VFC<IconProps> = props => (
+export const User: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -36,7 +36,7 @@ export const User: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const UserOff: React.VFC<IconProps> = props => (
+export const UserOff: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -49,7 +49,7 @@ export const UserOff: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Pause: React.VFC<IconProps> = props => (
+export const Pause: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -62,7 +62,7 @@ export const Pause: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Play: React.VFC<IconProps> = props => (
+export const Play: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -75,7 +75,7 @@ export const Play: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Flag: React.VFC<IconProps> = props => (
+export const Flag: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -88,7 +88,7 @@ export const Flag: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Undo: React.VFC<IconProps> = props => (
+export const Undo: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -101,7 +101,7 @@ export const Undo: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Times: React.VFC<IconProps> = props => (
+export const Times: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -114,7 +114,7 @@ export const Times: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Trophy: React.VFC<IconProps> = props => (
+export const Trophy: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -127,7 +127,7 @@ export const Trophy: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Ellipsis: React.VFC<IconProps> = props => (
+export const Ellipsis: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -140,7 +140,7 @@ export const Ellipsis: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const ChartPie: React.VFC<IconProps> = props => (
+export const ChartPie: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -153,7 +153,7 @@ export const ChartPie: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Book: React.VFC<IconProps> = props => (
+export const Book: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -166,7 +166,7 @@ export const Book: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const ArrowLeft: React.VFC<IconProps> = props => (
+export const ArrowLeft: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -179,7 +179,7 @@ export const ArrowLeft: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Plus: React.VFC<IconProps> = props => (
+export const Plus: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -192,7 +192,7 @@ export const Plus: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const Logo: React.VFC<IconProps> = props => (
+export const Logo: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -205,7 +205,7 @@ export const Logo: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const DieClear: React.VFC<IconProps> = props => (
+export const DieClear: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -218,7 +218,7 @@ export const DieClear: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const DieOne: React.VFC<IconProps> = props => (
+export const DieOne: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -231,7 +231,7 @@ export const DieOne: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const DieTwo: React.VFC<IconProps> = props => (
+export const DieTwo: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -244,7 +244,7 @@ export const DieTwo: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const DieThree: React.VFC<IconProps> = props => (
+export const DieThree: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -257,7 +257,7 @@ export const DieThree: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const DieFour: React.VFC<IconProps> = props => (
+export const DieFour: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -270,7 +270,7 @@ export const DieFour: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const DieFive: React.VFC<IconProps> = props => (
+export const DieFive: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}
@@ -283,7 +283,7 @@ export const DieFive: React.VFC<IconProps> = props => (
   </svg>
 )
 
-export const DieSix: React.VFC<IconProps> = props => (
+export const DieSix: React.FC<IconProps> = props => (
   <svg
     {...props}
     className={cx(styleIcon, props.className)}

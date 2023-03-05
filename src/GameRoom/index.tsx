@@ -36,7 +36,7 @@ const ViewContainer: React.FC<{
   </div>
 )
 
-export const View: React.VFC<{
+export const View: React.FC<{
   state: State
 }> = ({ state }) => {
   const params = useParams<'gameId'>()
