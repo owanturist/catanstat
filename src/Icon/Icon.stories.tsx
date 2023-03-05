@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Meta, StoryFn } from '@storybook/react'
+import { useImpulseMemo } from 'react-impulse'
 
 import * as Icons from '.'
 
@@ -14,7 +15,7 @@ export const AllIcons: StoryFn<{
   size: number
 }> = ({ color, size }) => {
   const [query, setQuery] = React.useState('')
-  const icons = React.useMemo(() => {
+  const icons = useImpulseMemo(() => {
     if (query === '') {
       return Object.entries(Icons)
     }

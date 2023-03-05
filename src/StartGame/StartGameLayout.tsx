@@ -48,7 +48,7 @@ export const PlayerItem = React.forwardRef<
   HTMLDivElement,
   {
     isDragging?: boolean
-    dragHandleProps?: HTMLAttributes<HTMLSpanElement>
+    dragHandleProps: null | undefined | HTMLAttributes<HTMLSpanElement>
     children: React.ReactNode
   }
 >(({ isDragging, children, dragHandleProps, ...props }, ref) => (
