@@ -5,7 +5,9 @@ import { State } from './domain'
 import { StartGameSkeleton } from './StartGameSkeleton'
 export { State } from './domain'
 
-const LazyStartGame = React.lazy(() => import('./StartGame'))
+const LazyStartGame = React.lazy(() =>
+  import('./StartGame').then(({ StartGame }) => ({ default: StartGame }))
+)
 
 export const View: React.FC<{
   state: State

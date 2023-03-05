@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import StartGame, { StartGameProps } from './StartGame'
+import { StartGame, StartGameProps } from './StartGame'
 import { State } from './domain'
 
 const meta: Meta = {

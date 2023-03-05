@@ -85,15 +85,6 @@ export interface SkeletonCircleProps
  * @param size px in number or any other value via string
  */
 export const SkeletonCircle: React.FC<SkeletonCircleProps> = ({
-  className,
-  inline,
-  size
-}) => (
-  <SkeletonBlock
-    className={className}
-    circle
-    inline={inline}
-    width={size}
-    height={size}
-  />
-)
+  size,
+  ...props
+}) => <SkeletonBlock circle width={size} height={size} {...props} />

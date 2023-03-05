@@ -23,7 +23,9 @@ const ViewContainer: React.FC<{
   </div>
 )
 
-const LazyGameStat = React.lazy(() => import('./GameStat'))
+const LazyGameStat = React.lazy(() =>
+  import('./GameStat').then(({ GameStat }) => ({ default: GameStat }))
+)
 
 export const GameStat: React.FC = () => {
   const params = useParams<'gameId'>()

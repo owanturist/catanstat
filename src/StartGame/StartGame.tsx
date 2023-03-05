@@ -74,7 +74,7 @@ export interface StartGameProps {
   state: State
 }
 
-const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
+export const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
   const players = state.players.getValue()
   const navigate = useNavigate()
   const { isLoading, startGame } = useStartGame({
@@ -144,5 +144,3 @@ const StartGame: React.FC<StartGameProps> = watch(({ state }) => {
     </DragDropContext>
   )
 })
-
-export default StartGame
