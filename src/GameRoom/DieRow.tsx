@@ -1,5 +1,5 @@
 import React from 'react'
-import { Impulse, watch } from 'react-impulse'
+import { Impulse, useImpulseValue } from 'react-impulse'
 import cx from 'classnames'
 
 import {
@@ -15,7 +15,7 @@ export type State<TDie extends DieNumber | DieEvent> = null | TDie
 
 export const init = <TDie extends DieNumber | DieEvent>(): State<TDie> => null
 
-const ViewDie: <TDie extends DieNumber | DieEvent>({
+const ViewDie = <TDie extends DieNumber | DieEvent>({
   icon,
   name,
   isDisabled,
@@ -27,34 +27,32 @@ const ViewDie: <TDie extends DieNumber | DieEvent>({
   isDisabled: boolean
   value: TDie
   state: Impulse<State<TDie>>
-}) => ReturnType<React.FC> = watch(
-  ({ icon, name, isDisabled, value, state }) => {
-    const selectedValue = state.getValue()
+}): ReturnType<React.FC> => {
+  const selectedValue = useImpulseValue(state)
 
-    return (
-      <label className="cursor-pointer">
-        <input
-          className="sr-only peer"
-          type="radio"
-          name={name}
-          disabled={isDisabled}
-          value={value}
-          checked={selectedValue === value}
-          onChange={() => state.setValue(value)}
-        />
+  return (
+    <label className="cursor-pointer">
+      <input
+        className="sr-only peer"
+        type="radio"
+        name={name}
+        disabled={isDisabled}
+        value={value}
+        checked={selectedValue === value}
+        onChange={() => state.setValue(value)}
+      />
 
-        {React.cloneElement(icon, {
-          className: cx(
-            icon.props.className,
-            selectedValue != null && 'opacity-25',
-            '!h-auto transition-opacity rounded-lg stroke-[12]',
-            'peer-checked:opacity-100 peer-focus-visible:ring-4'
-          )
-        })}
-      </label>
-    )
-  }
-)
+      {React.cloneElement(icon, {
+        className: cx(
+          icon.props.className,
+          selectedValue != null && 'opacity-25',
+          '!h-auto transition-opacity rounded-lg stroke-[12]',
+          'peer-checked:opacity-100 peer-focus-visible:ring-4'
+        )
+      })}
+    </label>
+  )
+}
 
 const ViewDieRow: React.FC<{
   name: string

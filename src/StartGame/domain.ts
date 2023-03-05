@@ -17,7 +17,7 @@ export abstract class PlayerInfo {
 }
 
 export abstract class State {
-  abstract readonly players: Impulse<Array<PlayerInfo>>
+  abstract readonly players: Impulse<ReadonlyArray<PlayerInfo>>
 
   public static init(): State {
     return {
@@ -28,7 +28,7 @@ export abstract class State {
         PlayerInfo.init(Color.yellow),
         PlayerInfo.init(Color.green),
         PlayerInfo.init(Color.brown)
-      ])
+      ] as ReadonlyArray<PlayerInfo>)
     }
   }
 
